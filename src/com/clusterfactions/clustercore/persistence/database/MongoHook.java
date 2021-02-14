@@ -76,7 +76,8 @@ public class MongoHook {
 	    			if(field.get(data) == null) continue;
 	    			if(field.getAnnotation(DoNotSerialize.class) != null) continue;
 	    			if(field.getAnnotation(AlternateSerializable.class) != null) {
-	    				document.append(field.getName(), ((VariableSerializer)field.getAnnotation(AlternateSerializable.class).value().getDeclaredConstructor().newInstance()).serialize(field.get(data)) );continue;
+	    				document.append(field.getName(), ((VariableSerializer)field.getAnnotation(AlternateSerializable.class).value().getDeclaredConstructor().newInstance()).serialize(field.get(data)) );
+	    				continue;
 	    			}
 	    			
 	    			document.append(field.getName(), field.get(data));
@@ -88,6 +89,7 @@ public class MongoHook {
 	    	try {
 			collection.insertOne(document);
 	    	}catch(Exception e) {
+	    		
 	    	};
 		}
 		

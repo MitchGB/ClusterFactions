@@ -78,18 +78,19 @@ public class ItemBuilder {
 	    return this;
 	  }
 	  
-	  public ItemBuilder coloredLore(String... lore) {
-	    ItemMeta meta = this.item.getItemMeta();
-	    meta.setLore(Colors.parseColors(Arrays.asList(lore)));
-	    this.item.setItemMeta(meta);
-	    return this;
-	  }
 	  
 	  public ItemBuilder lore(List<String> lore) {
 	    ItemMeta meta = this.item.getItemMeta();
 	    meta.setLore(lore);
 	    this.item.setItemMeta(meta);
 	    return this;
+	  }
+	  
+	  public ItemBuilder coloredLore(String... lore) {
+		    ItemMeta meta = this.item.getItemMeta();
+		    meta.setLore(Colors.parseColors(Arrays.asList(lore)));
+		    this.item.setItemMeta(meta);
+		    return this;
 	  }
 	  
 	  public ItemBuilder coloredLore(List<String> lore) {
