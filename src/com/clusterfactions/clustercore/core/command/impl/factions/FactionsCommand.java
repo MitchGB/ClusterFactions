@@ -31,4 +31,9 @@ public class FactionsCommand extends BaseCommand{
 
 		ClusterCore.getInstance().getFactionsManager().leave((Player)sender);
 	}
+	
+	@Subcommand("map")
+	public void map(final CommandSender sender) {
+		ClusterCore.getInstance().getFactionMapGeneratorManager().openMapView((Player)sender);
+	}
 }

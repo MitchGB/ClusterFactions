@@ -9,6 +9,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 import com.clusterfactions.clustercore.core.command.CommandManager;
 import com.clusterfactions.clustercore.core.factions.FactionsManager;
+import com.clusterfactions.clustercore.core.factions.map.FactionMapGeneratorManager;
 import com.clusterfactions.clustercore.core.inventory.util.InventoryManager;
 import com.clusterfactions.clustercore.core.lang.LanguageManager;
 import com.clusterfactions.clustercore.core.permission.PlayerPermissionManager;
@@ -29,6 +30,7 @@ public class ClusterCore extends JavaPlugin{
 	@Manager @Getter private MongoHook mongoHook;
 	@Manager @Getter private LanguageManager languageManager;
 	@Manager @Getter private PlayerPermissionManager playerPermissionManager;
+	@Manager @Getter private FactionMapGeneratorManager factionMapGeneratorManager;
 	
 	private static ClusterCore instance;
 	

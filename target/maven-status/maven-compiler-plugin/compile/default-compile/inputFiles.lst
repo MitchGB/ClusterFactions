@@ -19,6 +19,7 @@ C:\Users\Mitchell\eclipse-workspace\ClusterFactions\src\com\clusterfactions\clus
 C:\Users\Mitchell\eclipse-workspace\ClusterFactions\src\com\clusterfactions\clustercore\core\permission\PermissionGroup.java
 C:\Users\Mitchell\eclipse-workspace\ClusterFactions\src\com\clusterfactions\clustercore\persistence\serialization\UUIDSerializer.java
 C:\Users\Mitchell\eclipse-workspace\ClusterFactions\src\com\clusterfactions\clustercore\listeners\player\AsyncPlayerChatEventListener.java
+C:\Users\Mitchell\eclipse-workspace\ClusterFactions\src\com\clusterfactions\clustercore\core\factions\map\FactionMapGeneratorManager.java
 C:\Users\Mitchell\eclipse-workspace\ClusterFactions\src\com\clusterfactions\clustercore\core\command\impl\TestMenuCommand.java
 C:\Users\Mitchell\eclipse-workspace\ClusterFactions\src\com\clusterfactions\clustercore\util\Colors.java
 C:\Users\Mitchell\eclipse-workspace\ClusterFactions\src\com\clusterfactions\clustercore\persistence\serialization\LocationSerializer.java
@@ -26,6 +27,7 @@ C:\Users\Mitchell\eclipse-workspace\ClusterFactions\src\com\clusterfactions\clus
 C:\Users\Mitchell\eclipse-workspace\ClusterFactions\src\com\clusterfactions\clustercore\util\annotation\DoNotSerialize.java
 C:\Users\Mitchell\eclipse-workspace\ClusterFactions\src\com\clusterfactions\clustercore\util\ItemBuilder.java
 C:\Users\Mitchell\eclipse-workspace\ClusterFactions\src\com\clusterfactions\clustercore\core\player\PlayerData.java
+C:\Users\Mitchell\eclipse-workspace\ClusterFactions\src\com\clusterfactions\clustercore\core\factions\map\Renderer.java
 C:\Users\Mitchell\eclipse-workspace\ClusterFactions\src\com\clusterfactions\clustercore\util\annotation\AlternateSerializable.java
 C:\Users\Mitchell\eclipse-workspace\ClusterFactions\src\com\clusterfactions\clustercore\util\NumberUtil.java
 C:\Users\Mitchell\eclipse-workspace\ClusterFactions\src\com\clusterfactions\clustercore\core\command\impl\permission\PermissionCommand.java
