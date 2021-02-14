@@ -64,6 +64,7 @@ public class MongoHook {
 	    			Bson updateOperation = new Document("$set", updatedValue);
 	    			collection.updateOne(found, updateOperation);
 	    		}catch(Exception e) {
+	    			e.printStackTrace();
 	    		}
 	    	}
 		}
@@ -89,7 +90,7 @@ public class MongoHook {
 	    	try {
 			collection.insertOne(document);
 	    	}catch(Exception e) {
-	    		
+	    		e.printStackTrace();
 	    	};
 		}
 		
@@ -126,14 +127,18 @@ public class MongoHook {
 			else
 				 val = document.get(field.getName());
 			
-    		}catch(Exception e) {}
+    		}catch(Exception e) {
+    			e.printStackTrace();
+    		}
     		
     		try {
     		field.set(obj, val);
     		if(field.getName().equals("playerUUID") && val == null)
     			field.set(obj, id);
 
-    		}catch(Exception e) {}
+    		}catch(Exception e) {
+    			e.printStackTrace();
+    		}
 		}
 		return obj;
 
