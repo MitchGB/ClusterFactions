@@ -1,0 +1,7 @@
+softdepend: [NBTAPI]
+name: ClusterFactions
+version: v1
+author: ClusterFactions
+api-version: 1.16
+main: com.clusterfactions.clustercore.ClusterCore
+description: ClusterFactions Factiosn Core
