@@ -91,7 +91,7 @@ public class MongoHook {
 			collection.insertOne(document);
 	    	}catch(Exception e) {
 	    		e.printStackTrace();
-	    	};
+	    	}
 		}
 		
 		
@@ -112,7 +112,7 @@ public class MongoHook {
 		T obj = null;
 		try {
 		obj = clazz.getDeclaredConstructor().newInstance();
-		}catch(Exception e) {}
+		}catch(Exception e) {e.printStackTrace();}
 		Field[] allFields = clazz.getDeclaredFields(); 
 		Document document = (Document) collection.find(new Document("_id", id)).first();
 		for(Field field : allFields) {
