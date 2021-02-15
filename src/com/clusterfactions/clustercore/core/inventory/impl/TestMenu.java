@@ -11,7 +11,7 @@ public class TestMenu extends InventoryBase{
 
 	public TestMenu(Player player) {
 
-		super(player, "TEST_MENU", "&f" + CharRepo.MENU_CONTAINER.getCh() + CharRepo.TEST_BUTTON.getCh(), 54);
+		super(player, "TEST_MENU", "&f" + CharRepo.MENU_CONTAINER + CharRepo.TEST_BUTTON, 54);
 		
 		this.setItem(new ItemBuilder(ItemRepo.GUI_BASE).coloredName("&6This is a test button!").create(), 0, 1, 2, 3, 9, 10, 11, 12, 18, 19, 20, 21);
 		 

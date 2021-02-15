@@ -13,7 +13,7 @@ public class FactionsManager {
 	
 	private HashMap<UUID, Faction> factionCache = new HashMap<>();
 	
-	public Faction getFaction(UUID factionUUID) {
+	public Faction getFaction(UUID factionUUID) {		
 		if(factionCache.containsKey(factionUUID))
 			return factionCache.get(factionUUID);
 		
@@ -24,37 +24,40 @@ public class FactionsManager {
 		
 	}
 	
-	public void createFaction(Player leader, String name, String tag) {
-		PlayerData data = ClusterCore.getInstance().getPlayerManager().getPlayerData(leader);
-		if(data.getFaction() != null) {
-			data.sendMessage(Lang_EN_US.ALREADY_IN_FACTION);
-			return;
-		}
-		if(tag.contains(" "))
+	public Faction getFaction(String tag) {
+		//CHANGE THIS TO MONGO SEARCH
+		for(Faction f : factionCache.values())
 		{
-			data.sendMessage(Lang_EN_US.TAG_CANNOT_CONTAIN_SPACE);
-			return;
+			if(f.getFactionTag().equalsIgnoreCase(tag))
+				return f;
 		}
-		if(ClusterCore.getInstance().getMongoHook().valueExists("factionTag", tag, "factions"))
-		{
-			data.sendMessage(Lang_EN_US.FACTION_TAG_TAKEN);
-			return;
-		}
-		
-		Faction newFaction = new Faction(leader, name, tag);
-		data.setFaction(newFaction.getFactionID());
-		data.saveData();
-		data.sendMessage(Lang_EN_US.FACTION_CREATED);
+		return null;
 	}
 	
-	public void leave(Player player) {
-		PlayerData data = ClusterCore.getInstance().getPlayerManager().getPlayerData(player);
-		if(data.getFaction() == null) {
-			data.sendMessage(Lang_EN_US.NOT_IN_FACTION);
-			return;
-		}
-		data.sendMessage(String.format(Lang_EN_US.LEFT_FACTION, getFaction(data.getFaction()).getFactionName()));
-		data.setFaction(null);
+	public void createFaction(Player leader, String name, String tag) {
+		PlayerData data = ClusterCore.getInstance().getPlayerManager().getPlayerData(leader);
+		Faction newFaction = new Faction(leader, name, tag);
+		data.setFaction(newFaction);
 		data.saveData();
+		data.sendMessage(Lang_EN_US.FACTION_CREATED);
+		getFaction(newFaction.getFactionID()); // LOAD INTO CACHE
 	}
+
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

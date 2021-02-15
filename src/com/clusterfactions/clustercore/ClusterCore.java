@@ -3,9 +3,11 @@ package com.clusterfactions.clustercore;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 
+import org.bukkit.Bukkit;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.scheduler.BukkitRunnable;
 
 import com.clusterfactions.clustercore.core.command.CommandManager;
 import com.clusterfactions.clustercore.core.factions.FactionsManager;
@@ -14,8 +16,10 @@ import com.clusterfactions.clustercore.core.inventory.util.InventoryManager;
 import com.clusterfactions.clustercore.core.lang.LanguageManager;
 import com.clusterfactions.clustercore.core.permission.PlayerPermissionManager;
 import com.clusterfactions.clustercore.core.player.PlayerManager;
+import com.clusterfactions.clustercore.listeners.events.updates.UpdateSecondEvent;
 import com.clusterfactions.clustercore.listeners.player.AsyncPlayerChatEventListener;
 import com.clusterfactions.clustercore.listeners.player.PlayerJoinEventListener;
+import com.clusterfactions.clustercore.listeners.player.PlayerQuitEventListener;
 import com.clusterfactions.clustercore.persistence.database.MongoHook;
 import com.clusterfactions.clustercore.util.annotation.Manager;
 
@@ -43,11 +47,23 @@ public class ClusterCore extends JavaPlugin{
 		instance = this;
 		setupManagers();
 		setupListeners();
+		setupTimers();
+	}
+	
+	private void setupTimers() {
+		new BukkitRunnable() {
+			@Override
+			public void run() {
+				Bukkit.getPluginManager().callEvent(new UpdateSecondEvent());
+			}
+			
+		}.runTaskTimer(this, 0, 20);
 	}
 	
 	private void setupListeners() {
 		registerListener(
 				new PlayerJoinEventListener(),
+				new PlayerQuitEventListener(),
 				new AsyncPlayerChatEventListener()
 				);
 	}

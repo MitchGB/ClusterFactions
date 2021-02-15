@@ -15,7 +15,7 @@ import co.aikar.commands.annotation.Subcommand;
 import co.aikar.commands.bukkit.contexts.OnlinePlayer;
 
 @CommandAlias("permission|perm")
-@CommandPermission("hythecraft.admin")
+@CommandPermission("clustercore.admin")
 public class PermissionCommand extends BaseCommand{
 
 	@HelpCommand

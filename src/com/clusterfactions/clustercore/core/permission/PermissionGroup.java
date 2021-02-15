@@ -4,14 +4,16 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import com.clusterfactions.clustercore.util.unicode.CharRepo;
+
 import lombok.Getter;
 import lombok.Setter;
 
 public enum PermissionGroup {
 	
-	ADMIN("ADMIN", "요", null, "*", "hythecraft.admin"),
+	ADMIN("ADMIN", CharRepo.RANK_ADMIN_TAG, null, "*", "hythecraft.admin"),
 	DEVELOPER("DEV", "&c&lDEV", ADMIN),
-	DEFAULT("DEFAULT", "", null);
+	DEFAULT("DEFAULT", CharRepo.RANK_PLAYER_TAG , null);
 	
 	
 	PermissionGroup(String groupID, String groupPrefix, PermissionGroup inheritance, String... permissions)

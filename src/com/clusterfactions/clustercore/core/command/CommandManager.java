@@ -1,6 +1,7 @@
 package com.clusterfactions.clustercore.core.command;
 
 import com.clusterfactions.clustercore.ClusterCore;
+import com.clusterfactions.clustercore.core.chat.ChatMessageMode;
 import com.clusterfactions.clustercore.core.command.impl.TestMenuCommand;
 import com.clusterfactions.clustercore.core.command.impl.factions.FactionsCommand;
 import com.clusterfactions.clustercore.core.command.impl.permission.PermissionCommand;
@@ -17,7 +18,8 @@ public class CommandManager {
 	
 	public CommandManager() {
 		instance = new PaperCommandManager(ClusterCore.getInstance());
-
+		
+		instance.getCommandCompletions().registerAsyncCompletion("chat-message-modes", c -> {return ChatMessageMode.getAllList();});
 		instance.getCommandCompletions().registerAsyncCompletion("cluster-perm-groups",  c -> {return PermissionGroup.getAllList();});
 		registerCommand(
 				new TestMenuCommand(),
