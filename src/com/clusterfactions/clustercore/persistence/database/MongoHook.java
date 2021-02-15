@@ -47,6 +47,31 @@ public class MongoHook {
 	}
 	
 	@SuppressWarnings("unchecked")
+	public void saveObject(String id, String columnName, Object data, String collectionName) {
+
+		this.collection = mongoDatabase.getCollection(collectionName);
+		Document found = (Document) collection.find(new Document("_id", id)).first();	    
+		if(found == null) {
+			Document document = new Document("_id", id);
+			document.append(columnName, data);
+			collection.insertOne(document);
+		}else {
+			Bson updatedValue = new Document(columnName, data);			
+			Bson updateOperation = new Document("$set", updatedValue);
+
+			collection.updateOne(found, updateOperation);
+		}
+	}
+	public String getObject(String id, String columnName, String collectionName) {
+
+		this.collection = mongoDatabase.getCollection(collectionName);
+		Document document = (Document) collection.find(new Document("_id", id)).first();
+		if(document == null) return null;
+		return document.getString(columnName);
+	}
+	
+	
+	@SuppressWarnings("unchecked")
 	public void saveData(String id, Object data, String collectionName) {
 		this.collection = mongoDatabase.getCollection(collectionName);
 		Document found = (Document) collection.find(new Document("_id", id)).first();

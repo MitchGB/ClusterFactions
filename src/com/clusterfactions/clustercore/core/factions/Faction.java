@@ -16,7 +16,9 @@ import com.clusterfactions.clustercore.core.player.PlayerData;
 import com.clusterfactions.clustercore.persistence.serialization.LocationSerializer;
 import com.clusterfactions.clustercore.persistence.serialization.UUIDListSerializer;
 import com.clusterfactions.clustercore.persistence.serialization.UUIDSerializer;
+import com.clusterfactions.clustercore.persistence.serialization.Vector2IntegerListSerializer;
 import com.clusterfactions.clustercore.util.annotation.AlternateSerializable;
+import com.clusterfactions.clustercore.util.location.Vector2Integer;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -37,6 +39,7 @@ public class Faction implements Listener{
 	@Getter @AlternateSerializable(UUIDListSerializer.class) private List<UUID> moderators = new ArrayList<>();
 	@Getter @AlternateSerializable(UUIDListSerializer.class) private List<UUID> coLeaders = new ArrayList<>();
 	@Getter @AlternateSerializable(UUIDListSerializer.class) private List<UUID> banList = new ArrayList<>();
+	@Getter @AlternateSerializable(Vector2IntegerListSerializer.class) private ArrayList<Vector2Integer> claimedChunks = new ArrayList<>();
 	
 	@AlternateSerializable(UUIDListSerializer.class) private List<UUID> inviteList = new ArrayList<>();
 	//CLAIMED CHUNKS
@@ -128,6 +131,17 @@ public class Faction implements Listener{
 	public void acceptInvite(Player player) {
 		inviteList.remove(player.getUniqueId());
 		addPlayer(player);
+		saveData();
+	}
+	
+	public void removeClaimChunk(Vector2Integer chunkLoc) {
+		claimedChunks.remove(chunkLoc);
+		saveData();
+	}
+	
+	public void addClaimChunk(Vector2Integer chunkLoc) {
+		if(claimedChunks == null) claimedChunks = new ArrayList<>();
+		this.claimedChunks.add(chunkLoc);
 		saveData();
 	}
 	

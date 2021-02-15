@@ -19,4 +19,9 @@ public class Vector2 {
 		this.x = loc.getX();
 		this.z = loc.getZ();
 	}
+	
+	@Override
+	public String toString() {
+		return String.format("%.2f", x) + ":" + String.format("%.2f", z);
+	}
 }

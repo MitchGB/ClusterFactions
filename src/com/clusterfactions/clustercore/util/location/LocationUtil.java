@@ -34,14 +34,14 @@ public class LocationUtil {
 	}
 	
 	//disregards z axis
-	public static boolean withinBounds(Location obj, Vector2 loc1, Vector2 loc2) {
+	public static boolean withinBounds(Location obj, Vector2Integer loc1, Vector2Integer loc2) {
 		World w = obj.getWorld();
 		return withinBounds(obj, new Location(w, loc1.getX(), 256, loc1.getZ()), new Location(w, loc2.getX(), -256, loc2.getZ()));
 	}
 	
 
 	//disregards z axis
-	public static boolean withinBounds(World w, Vector2 obj, Vector2 loc1, Vector2 loc2)
+	public static boolean withinBounds(World w, Vector2Integer obj, Vector2Integer loc1, Vector2Integer loc2)
 	{
 		return withinBounds(new Location(w, obj.getX(), 0, obj.getZ()), loc1, loc2);
 		

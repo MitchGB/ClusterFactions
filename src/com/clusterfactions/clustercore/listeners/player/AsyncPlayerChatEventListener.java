@@ -6,9 +6,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
 
 import com.clusterfactions.clustercore.ClusterCore;
-import com.clusterfactions.clustercore.core.chat.ChatMessageMode;
 import com.clusterfactions.clustercore.core.factions.Faction;
-import com.clusterfactions.clustercore.core.lang.Lang_EN_US;
 import com.clusterfactions.clustercore.core.player.PlayerData;
 import com.clusterfactions.clustercore.util.unicode.CharRepo;
 
@@ -31,7 +29,7 @@ public class AsyncPlayerChatEventListener implements Listener{
 			}
 			case ALLY:
 			{
-				String format = CharRepo.ALLY_CHAT_TAG + " " + (data.getGroup() != null ? data.getGroup().getGroupPrefix() : " ")+ " " + player.getName() + ChatColor.GRAY + " ";
+				String format = CharRepo.ALLY_CHAT_TAG + " " + (data.getGroup() != null ? data.getGroup().getGroupPrefix() : " ")+ " " + player.getName()	 + ChatColor.GRAY + " ";
 				
 				e.setCancelled(true);
 				break;

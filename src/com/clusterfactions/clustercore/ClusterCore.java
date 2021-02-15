@@ -11,6 +11,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 
 import com.clusterfactions.clustercore.core.command.CommandManager;
 import com.clusterfactions.clustercore.core.factions.FactionsManager;
+import com.clusterfactions.clustercore.core.factions.claim.FactionClaimManager;
 import com.clusterfactions.clustercore.core.factions.map.FactionMapGeneratorManager;
 import com.clusterfactions.clustercore.core.inventory.util.InventoryManager;
 import com.clusterfactions.clustercore.core.lang.LanguageManager;
@@ -19,6 +20,7 @@ import com.clusterfactions.clustercore.core.player.PlayerManager;
 import com.clusterfactions.clustercore.listeners.events.updates.UpdateSecondEvent;
 import com.clusterfactions.clustercore.listeners.player.AsyncPlayerChatEventListener;
 import com.clusterfactions.clustercore.listeners.player.PlayerJoinEventListener;
+import com.clusterfactions.clustercore.listeners.player.PlayerMoveEventListener;
 import com.clusterfactions.clustercore.listeners.player.PlayerQuitEventListener;
 import com.clusterfactions.clustercore.persistence.database.MongoHook;
 import com.clusterfactions.clustercore.util.annotation.Manager;
@@ -35,6 +37,7 @@ public class ClusterCore extends JavaPlugin{
 	@Manager @Getter private LanguageManager languageManager;
 	@Manager @Getter private PlayerPermissionManager playerPermissionManager;
 	@Manager @Getter private FactionMapGeneratorManager factionMapGeneratorManager;
+	@Manager @Getter private FactionClaimManager factionClaimManager;
 	
 	private static ClusterCore instance;
 	
@@ -64,7 +67,8 @@ public class ClusterCore extends JavaPlugin{
 		registerListener(
 				new PlayerJoinEventListener(),
 				new PlayerQuitEventListener(),
-				new AsyncPlayerChatEventListener()
+				new AsyncPlayerChatEventListener(),
+				new PlayerMoveEventListener()
 				);
 	}
 	
