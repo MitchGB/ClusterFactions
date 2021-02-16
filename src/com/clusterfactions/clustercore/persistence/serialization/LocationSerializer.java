@@ -5,7 +5,7 @@ import org.bukkit.Location;
 import org.bukkit.World;
 
 //Base64 Encoder
-public class LocationSerializer extends VariableSerializer{
+public class LocationSerializer extends VariableSerializer<Location>{
     private String getStringLocation(final Location l) {
     if (l == null) {
         return "";
@@ -30,13 +30,13 @@ public class LocationSerializer extends VariableSerializer{
     }
 	
 	@Override
-	public String serialize(Object obj) {
+	public String serialize(Location obj) {
 		if(!(obj instanceof Location)) return null;
 		return getStringLocation((Location)obj);
 	}
 
 	@Override
-	public Object deserialize(String str) {
+	public Location deserialize(String str) {
 		return getLocationString(str);
 	}
     

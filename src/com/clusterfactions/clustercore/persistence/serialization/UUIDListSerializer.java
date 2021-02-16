@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.UUID;
 
 //Base64 Encoder
-public class UUIDListSerializer extends VariableSerializer{
+public class UUIDListSerializer extends VariableSerializer<List<UUID>>{
 	private String getStringUUIDList(final List<UUID> l) {
 	    StringBuilder builder = new StringBuilder();
 	    for(UUID uuid : l)
@@ -26,15 +26,14 @@ public class UUIDListSerializer extends VariableSerializer{
 		return uuids;
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
-	public String serialize(Object obj) {
+	public String serialize(List<UUID> obj) {
 		if(!(obj instanceof List<?>)) return "";
 		return getStringUUIDList((List<UUID>)obj);
 	}
 
 	@Override
-	public Object deserialize(String str) {	
+	public List<UUID> deserialize(String str) {	
 		return getUUIDListString(str);
 	}
 }

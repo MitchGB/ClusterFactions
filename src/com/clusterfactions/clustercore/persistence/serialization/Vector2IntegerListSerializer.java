@@ -6,7 +6,7 @@ import java.util.List;
 import com.clusterfactions.clustercore.util.location.Vector2Integer;
 
 //Base64 Encoder
-public class Vector2IntegerListSerializer extends VariableSerializer{
+public class Vector2IntegerListSerializer extends VariableSerializer<ArrayList<Vector2Integer>>{
 	private String getStringVector2IntegerList(final ArrayList<Vector2Integer> l) {
 		
 	    StringBuilder builder = new StringBuilder();
@@ -28,15 +28,14 @@ public class Vector2IntegerListSerializer extends VariableSerializer{
 		return ints;
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
-	public String serialize(Object obj) {
+	public String serialize(ArrayList<Vector2Integer> obj) {
 		if(!(obj instanceof List<?>)) return "";
 		return getStringVector2IntegerList((ArrayList<Vector2Integer>)obj);
 	}
 
 	@Override
-	public Object deserialize(String str) {	
+	public ArrayList<Vector2Integer> deserialize(String str) {	
 		return getStringVector2IntegerList(str);
 	}
 }

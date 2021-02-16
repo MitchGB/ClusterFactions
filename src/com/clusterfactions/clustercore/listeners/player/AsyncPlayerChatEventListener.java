@@ -35,10 +35,14 @@ public class AsyncPlayerChatEventListener implements Listener{
 					
 					String facColor = "";
 					if(faction != null && recipientFaction != null) {
-						
+						if(recipientFaction.isAllied(faction))
+							facColor = "&d";
+						if(recipientFaction.isEnemy(faction))
+							facColor = "&c";
 					}
 					
-					String format = (data.getGroup() != null ? data.getGroup().getGroupPrefix() : " ") + " " + (faction == null ? "" : faction.getFactionTag()) + " " + player.getName()	 + ChatColor.GRAY + " ";
+					String format = (data.getGroup() != null ? data.getGroup().getGroupPrefix() : " ") + " " + facColor + (faction == null ? "" : faction.getFactionTag()) + " " + player.getName()	 + ChatColor.GRAY + " ";
+					pl.sendMessage(ChatColor.translateAlternateColorCodes('&', format + e.getMessage()));
 				}
 			
 				break;

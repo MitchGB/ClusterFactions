@@ -9,7 +9,7 @@ import org.bukkit.util.io.BukkitObjectOutputStream;
 import org.yaml.snakeyaml.external.biz.base64Coder.Base64Coder;
 
 //Base64 Encoder
-public class ItemStackSerializer extends VariableSerializer{
+public class ItemStackSerializer extends VariableSerializer<ItemStack[]>{
 	private String itemStackArrayToBase64(ItemStack[] items) throws IllegalStateException {
     	try {
             ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
@@ -46,13 +46,13 @@ public class ItemStackSerializer extends VariableSerializer{
     }
 
 	@Override
-	public String serialize(Object obj) {
+	public String serialize(ItemStack[] obj) {
 		if(!(obj instanceof ItemStack[])) return null;
 		return itemStackArrayToBase64((ItemStack[])obj);
 	}
 
 	@Override
-	public Object deserialize(String str) {
+	public ItemStack[] deserialize(String str) {
 		return itemStackArrayFromBase64(str);
 	}
     

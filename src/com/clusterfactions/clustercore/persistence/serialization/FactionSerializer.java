@@ -6,7 +6,7 @@ import com.clusterfactions.clustercore.ClusterCore;
 import com.clusterfactions.clustercore.core.factions.Faction;
 
 //Base64 Encoder
-public class FactionSerializer extends VariableSerializer{
+public class FactionSerializer extends VariableSerializer<Faction>{
     private String getStringFaction(final Faction l) {
     	if(l == null) return null;
     	return l.getFactionID().toString();
@@ -19,13 +19,13 @@ public class FactionSerializer extends VariableSerializer{
     }
 	
 	@Override
-	public String serialize(Object obj) {
+	public String serialize(Faction obj) {
 		if(!(obj instanceof Faction)) return null;
 		return getStringFaction((Faction)obj);
 	}
 
 	@Override
-	public Object deserialize(String str) {
+	public Faction deserialize(String str) {
 		return getFactionString(str);
 	}
     

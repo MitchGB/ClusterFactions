@@ -1,5 +1,6 @@
 package com.clusterfactions.clustercore.core.factions.claim;
 
+import java.util.HashMap;
 import java.util.UUID;
 
 import org.bukkit.Location;
@@ -10,6 +11,7 @@ import com.clusterfactions.clustercore.core.factions.Faction;
 import com.clusterfactions.clustercore.core.lang.Lang_EN_US;
 import com.clusterfactions.clustercore.core.player.PlayerData;
 import com.clusterfactions.clustercore.util.location.Vector2Integer;
+import com.clusterfactions.clustercore.util.model.Pair;
 
 public class FactionClaimManager {
 	
@@ -20,15 +22,39 @@ public class FactionClaimManager {
 	 * West -x
 	 */
 	
+	HashMap<Vector2Integer, UUID> chunkCache = new HashMap<>();
+	
 	public Vector2Integer getChunkVector(Location loc) {
 		return new Vector2Integer((int)Math.ceil(loc.getX()/16), (int)Math.ceil(loc.getZ()/16));
 	}
 	
+	public Vector2Integer getChunkVector(int x, int z) {
+		return new Vector2Integer((int)Math.ceil(x/16), (int)Math.ceil(z/16));
+	}
+	
+	public UUID getChunkMongo(Vector2Integer chunkLoc) {
+
+		String ret = ClusterCore.getInstance().getMongoHook().getObject(chunkLoc.toString(), "owner", "chunks");
+		chunkCache.put(chunkLoc, ret == null || ret.isEmpty() ? null : UUID.fromString(ret));
+		return chunkCache.get(chunkLoc);	
+	}
+	
 	public UUID chunkClaimed(Vector2Integer chunkLoc)
 	{
-		String ret = ClusterCore.getInstance().getMongoHook().getObject(chunkLoc.toString(), "owner", "chunks");
-		return ret == null || ret.isEmpty() ? null : UUID.fromString(ret);	
+		String c =ClusterCore.getInstance().getMongoHook().getObject(chunkLoc.toString(), "owner", "chunks");
+		chunkCache.put(chunkLoc, c == null || c.isEmpty() ? null : UUID.fromString(c));
+		return chunkCache.get(chunkLoc);	
 	}
+	
+	public UUID chunkClaimedCache(Vector2Integer chunkLoc)
+	{
+		if(chunkCache.containsKey(chunkLoc)) return chunkCache.get(chunkLoc);
+		String ret = ClusterCore.getInstance().getMongoHook().getObject(chunkLoc.toString(), "owner", "chunks");
+		UUID ret2 = ret != null ? UUID.fromString(ret) : null;
+		chunkCache.put(chunkLoc, ret == null || ret.isEmpty() ? null : UUID.fromString(ret));
+		return chunkCache.get(chunkLoc);	
+	}
+	
 	
 	public void claimArea(Player player, int xrad, int zrad) {
 		PlayerData playerData = ClusterCore.getInstance().getPlayerManager().getPlayerData(player);
@@ -144,11 +170,15 @@ public class FactionClaimManager {
 	
 	public void claimChunk(Vector2Integer chunkLoc, Faction faction) {
 		ClusterCore.getInstance().getMongoHook().saveObject(chunkLoc.toString(), "owner", faction.getFactionID().toString(), "chunks");
+		if(chunkCache.containsKey(chunkLoc))chunkCache.remove(chunkLoc);
+		chunkCache.put(chunkLoc, getChunkMongo(chunkLoc));
 		faction.addClaimChunk(chunkLoc);
 	}
 	
-	public void removeClaimChunk(Vector2Integer chunkLoc, Faction faction) {
+	public void removeClaimChunk(Vector2Integer chunkLoc, Faction faction) {	
+		if(chunkCache.containsKey(chunkLoc))chunkCache.remove(chunkLoc);
 		ClusterCore.getInstance().getMongoHook().saveObject(chunkLoc.toString(), "owner", "", "chunks");
+		chunkCache.put(chunkLoc, getChunkMongo(chunkLoc));
 		faction.removeClaimChunk(chunkLoc);
 	}
 }

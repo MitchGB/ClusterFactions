@@ -1,7 +1,7 @@
 package com.clusterfactions.clustercore.persistence.serialization;
 
-public abstract class VariableSerializer {
-	public abstract String serialize(Object obj);
+public abstract class VariableSerializer<T> {
+	public abstract String serialize(T obj);
 	
-	public abstract Object deserialize(String str);
+	public abstract T deserialize(String str);
 }

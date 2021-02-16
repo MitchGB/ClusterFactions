@@ -16,8 +16,7 @@ import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 
 public class MongoHook {
-	@SuppressWarnings("rawtypes")
-	MongoCollection collection = null;
+	MongoCollection<Document> collection = null;
 	MongoClient mongoClient;
 	MongoDatabase mongoDatabase;
 	
@@ -46,7 +45,6 @@ public class MongoHook {
 			}
 	}
 	
-	@SuppressWarnings("unchecked")
 	public void saveObject(String id, String columnName, Object data, String collectionName) {
 
 		this.collection = mongoDatabase.getCollection(collectionName);
@@ -84,7 +82,7 @@ public class MongoHook {
 	    			Bson updatedValue = new Document(field.getName(), field.get(data));
 	        		if(field.getAnnotation(DoNotSerialize.class) != null) continue;
 	    			if(field.getAnnotation(AlternateSerializable.class) != null) 
-	    				updatedValue = new Document(field.getName(), ((VariableSerializer)field.getAnnotation(AlternateSerializable.class).value().getDeclaredConstructor().newInstance()).serialize(field.get(data)));
+	    				updatedValue = new Document(field.getName(), ((VariableSerializer<Object>)field.getAnnotation(AlternateSerializable.class).value().getDeclaredConstructor().newInstance()).serialize(field.get(data)));
 	    			
 	    			Bson updateOperation = new Document("$set", updatedValue);
 	    			collection.updateOne(found, updateOperation);
@@ -102,7 +100,7 @@ public class MongoHook {
 	    			if(field.get(data) == null) continue;
 	    			if(field.getAnnotation(DoNotSerialize.class) != null) continue;
 	    			if(field.getAnnotation(AlternateSerializable.class) != null) {
-	    				document.append(field.getName(), ((VariableSerializer)field.getAnnotation(AlternateSerializable.class).value().getDeclaredConstructor().newInstance()).serialize(field.get(data)) );
+	    				document.append(field.getName(), ((VariableSerializer<Object>)field.getAnnotation(AlternateSerializable.class).value().getDeclaredConstructor().newInstance()).serialize(field.get(data)) );
 	    				continue;
 	    			}
 	    			
@@ -147,17 +145,18 @@ public class MongoHook {
     		try {
     		if(field.getAnnotation(DoNotSerialize.class) != null) continue;
 			if(field.getAnnotation(AlternateSerializable.class) != null) {
-				val = ((VariableSerializer)field.getAnnotation(AlternateSerializable.class).value().getDeclaredConstructor().newInstance()).deserialize(document.getString(field.getName()));
+				val = ((VariableSerializer<?>)field.getAnnotation(AlternateSerializable.class).value().getDeclaredConstructor().newInstance()).deserialize(document.getString(field.getName()));
 			}
 			else
 				 val = document.get(field.getName());
 			
     		}catch(Exception e) {
-    			e.printStackTrace();
+    			continue;
     		}
     		
     		try {
-    		field.set(obj, val);
+    			if(obj==null) continue;
+    			field.set(obj, val);
     		if(field.getName().equals("playerUUID") && val == null)
     			field.set(obj, id);
 

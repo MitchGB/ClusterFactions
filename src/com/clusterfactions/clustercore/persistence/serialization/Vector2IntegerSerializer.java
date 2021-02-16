@@ -3,7 +3,7 @@ package com.clusterfactions.clustercore.persistence.serialization;
 import com.clusterfactions.clustercore.util.location.Vector2Integer;
 
 //Base64 Encoder
-public class Vector2IntegerSerializer extends VariableSerializer{
+public class Vector2IntegerSerializer extends VariableSerializer<Vector2Integer>{
 	private String getStringVector2IntegerList(final Vector2Integer l) {
 	    return l.toString();
 	}
@@ -17,13 +17,13 @@ public class Vector2IntegerSerializer extends VariableSerializer{
 	}
 
 	@Override
-	public String serialize(Object obj) {
+	public String serialize(Vector2Integer obj) {
 		if(!(obj instanceof Vector2Integer)) return "";
 		return getStringVector2IntegerList((Vector2Integer)obj);
 	}
 
 	@Override
-	public Object deserialize(String str) {	
+	public Vector2Integer deserialize(String str) {	
 		return getStringVector2IntegerList(str);
 	}
 }

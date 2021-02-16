@@ -129,6 +129,8 @@ public class Faction implements Listener{
 	public void allyFaction(Faction faction) {
 		if(allyshipInviteList == null) allyshipInviteList = new ArrayList<>();
 		if(allies == null) allies = new ArrayList<>();
+		if(enemies == null) enemies = new ArrayList<>();
+		if(enemies.contains(faction.getFactionID())) enemies.remove(faction.getFactionID());
 		this.allyshipInviteList.remove(faction.getFactionID());
 		this.allies.add(faction.getFactionID());
 		saveData();
@@ -141,6 +143,7 @@ public class Faction implements Listener{
 		
 		allies.remove(facId);
 		messageAll(String.format(Lang_EN_US.FACTION_NO_LONGER_ALLIES, faction.getFactionName()));
+		saveData();
 	}
 	
 	public void enemy(Faction faction) {
@@ -153,6 +156,7 @@ public class Faction implements Listener{
 		if(allies.contains(facId)) allies.remove(facId);
 		enemies.add(facId);
 		messageAll(String.format(Lang_EN_US.FACTION_ARE_NOW_ENEMIES, faction.getFactionName()));
+		saveData();
 		
 	}
 	
@@ -163,6 +167,7 @@ public class Faction implements Listener{
 		
 		enemies.remove(facId);
 		messageAll(String.format(Lang_EN_US.FACTION_NO_LONGER_ENEMIES, faction.getFactionName()));
+		saveData();
 		
 	}
 	
