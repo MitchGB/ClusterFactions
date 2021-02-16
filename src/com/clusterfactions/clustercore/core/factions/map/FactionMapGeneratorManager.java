@@ -36,7 +36,7 @@ public class FactionMapGeneratorManager implements Listener {
 		mapView.setScale(Scale.FARTHEST);
 		mapView.setUnlimitedTracking(true);
 		mapView.getRenderers().clear();
-		mapView.addRenderer(new Renderer());
+		//mapView.addRenderer(new Renderer());
 		mapView.setCenterX((int)player.getLocation().getX());
 		mapView.setCenterZ((int)player.getLocation().getZ());
 		mapView.setTrackingPosition(true);

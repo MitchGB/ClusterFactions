@@ -9,11 +9,10 @@ import org.bukkit.scoreboard.Team;
 
 import com.clusterfactions.clustercore.ClusterCore;
 import com.clusterfactions.clustercore.core.chat.ChatMessageMode;
-import com.clusterfactions.clustercore.core.factions.Faction;
 import com.clusterfactions.clustercore.core.permission.PermissionGroup;
 import com.clusterfactions.clustercore.listeners.events.updates.UpdateSecondEvent;
-import com.clusterfactions.clustercore.persistence.serialization.FactionSerializer;
 import com.clusterfactions.clustercore.persistence.serialization.PermissionGroupSerializer;
+import com.clusterfactions.clustercore.persistence.serialization.UUIDSerializer;
 import com.clusterfactions.clustercore.util.Colors;
 import com.clusterfactions.clustercore.util.annotation.AlternateSerializable;
 import com.clusterfactions.clustercore.util.annotation.DoNotSerialize;
@@ -29,8 +28,8 @@ public class PlayerData{
 	@Getter @DoNotSerialize UUID playerUUID;
 	@Getter @Setter private int power;
 	
-	@Getter @Setter @AlternateSerializable(PermissionGroupSerializer.class) private PermissionGroup group = PermissionGroup.DEFAULT;
-	@Getter @Setter @AlternateSerializable(FactionSerializer.class) private Faction faction;
+	@Getter @Setter @AlternateSerializable(PermissionGroupSerializer.class) private PermissionGroup group = PermissionGroup.MEMBER;
+	@Getter @Setter @AlternateSerializable(UUIDSerializer.class) private UUID faction;
 	
 	@Getter @Setter @DoNotSerialize ChatMessageMode chatMode = ChatMessageMode.GLOBAL;
 	
@@ -38,8 +37,8 @@ public class PlayerData{
 		ClusterCore.getInstance().getMongoHook().saveData(playerUUID.toString(), this, "players");
 	}
 	
-	public void sendMessage(String str) {
-		getPlayer().sendMessage(ChatColor.translateAlternateColorCodes('&', str));
+	public void sendMessage(String str, String... args) {
+		getPlayer().sendMessage(ChatColor.translateAlternateColorCodes('&', String.format(str, (Object[])args)));
 	}
 	
 	/*
@@ -51,6 +50,10 @@ public class PlayerData{
 	
 	public Player getPlayer() {
 		return Bukkit.getPlayer(playerUUID);
+	}
+	
+	public boolean isInFaction() {
+		return faction == null;
 	}
 	
 	public void secondUpdater(UpdateSecondEvent e) {

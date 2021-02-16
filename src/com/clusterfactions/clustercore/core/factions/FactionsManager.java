@@ -37,7 +37,7 @@ public class FactionsManager {
 	public void createFaction(Player leader, String name, String tag) {
 		PlayerData data = ClusterCore.getInstance().getPlayerManager().getPlayerData(leader);
 		Faction newFaction = new Faction(leader, name, tag);
-		data.setFaction(newFaction);
+		data.setFaction(newFaction.getFactionID());
 		data.saveData();
 		data.sendMessage(Lang_EN_US.FACTION_CREATED);
 		getFaction(newFaction.getFactionID()); // LOAD INTO CACHE

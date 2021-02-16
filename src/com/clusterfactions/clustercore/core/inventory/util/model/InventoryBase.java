@@ -126,7 +126,9 @@ public abstract class InventoryBase implements Listener{
 	public void playerInventoryClickEvent(InventoryClickEvent e) {
 		if(e.getInventory().getType() == InventoryType.CHEST) e.setResult(Result.DENY);
 		if(e.getCurrentItem() == null || e.getCurrentItem().getType() == Material.AIR) return;
+
 		if(!isApplicable(e.getCurrentItem())) return;
+
 		e.setResult(Result.DENY);
 		NBTItem nbtItem = new NBTItem(e.getCurrentItem());
 		String id = nbtItem.getString(ITEM_ID_TAG);
@@ -134,13 +136,11 @@ public abstract class InventoryBase implements Listener{
 		InventoryClickContext context = new InventoryClickContext((Player)e.getWhoClicked(), e.getCurrentItem(), e.isRightClick(), e);
 		if(!id.isEmpty()) {
 			if(!this.clickHandlers.containsKey(id)) return;
-			String uid = uuid.toString();
 
-			if(this.clickHandlers.get(uid) == null) return;
-			if(e.isRightClick() && this.clickHandlers.get(uid).getRight() != null)
-				this.clickHandlers.get(uid).getRight().exec(context);
-			if(e.isLeftClick() && this.clickHandlers.get(uid).getLeft() != null)
-				this.clickHandlers.get(uid).getLeft().exec(context);		
+			if(e.isRightClick() && this.clickHandlers.get(id).getRight() != null)
+				this.clickHandlers.get(id).getRight().exec(context);
+			if(e.isLeftClick() && this.clickHandlers.get(id).getLeft() != null)
+				this.clickHandlers.get(id).getLeft().exec(context);		
 		}
 		else {
 			if(this.defaultClickHandler != null)

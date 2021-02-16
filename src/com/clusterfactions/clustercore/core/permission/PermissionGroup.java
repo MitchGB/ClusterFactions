@@ -11,9 +11,14 @@ import lombok.Setter;
 
 public enum PermissionGroup {
 	
-	ADMIN("ADMIN", CharRepo.RANK_ADMIN_TAG, null, "*", "hythecraft.admin"),
+	ADMIN("ADMIN", CharRepo.RANK_ADMIN_TAG, null, "*", "clustercore.admin"),
 	DEVELOPER("DEV", "&c&lDEV", ADMIN),
-	DEFAULT("DEFAULT", CharRepo.RANK_PLAYER_TAG , null);
+	OLYMPIAN("OLYMPIAN", CharRepo.RANK_OLYMPIAN_TAG, null),
+	EMPYREAN("EMPYREAN", CharRepo.RANK_EMPYREAN_TAG, null),
+	ANGELIC("ANGELIC", CharRepo.RANK_ANGELIC_TAG, null),
+	DIVINE("DIVINE", CharRepo.RANK_DIVINE_TAG, null),
+	CELESTIAL("CELESTIAL", CharRepo.RANK_CELESTIAL_TAG, null),
+	MEMBER("MEMBER", CharRepo.RANK_PLAYER_TAG , null);
 	
 	
 	PermissionGroup(String groupID, String groupPrefix, PermissionGroup inheritance, String... permissions)

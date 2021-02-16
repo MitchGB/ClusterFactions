@@ -1,5 +1,5 @@
 eclipse.preferences.version=1
-encoding//src/com/clusterfactions/clustercore/core/command/impl/TestMenuCommand.java=UTF-8
-encoding//src/com/clusterfactions/clustercore/core/inventory/impl/TestMenu.java=UTF-8
+encoding//src/com/clusterfactions/clustercore/core/inventory/impl/faction/perm/FactionPermissionMenu.java=UTF-8
+encoding//src/com/clusterfactions/clustercore/core/inventory/impl/faction/perm/MainPermissionMenu.java=UTF-8
 encoding//src/com/clusterfactions/clustercore/core/permission/PermissionGroup.java=UTF-8
 encoding//src/com/clusterfactions/clustercore/util/unicode/CharRepo.java=UTF-8

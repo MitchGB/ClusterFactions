@@ -5,8 +5,6 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerMoveEvent;
 
-import com.clusterfactions.clustercore.ClusterCore;
-
 public class PlayerMoveEventListener implements Listener{
 
 	@EventHandler

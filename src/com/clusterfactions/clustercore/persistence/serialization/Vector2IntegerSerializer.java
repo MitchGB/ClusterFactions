@@ -16,7 +16,6 @@ public class Vector2IntegerSerializer extends VariableSerializer{
 		 return new Vector2Integer(x,z);
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
 	public String serialize(Object obj) {
 		if(!(obj instanceof Vector2Integer)) return "";

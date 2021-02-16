@@ -13,7 +13,7 @@ import com.clusterfactions.clustercore.core.player.PlayerData;
  * Probably should be it's own plugin
  */
 public class PlayerPermissionManager {
-	public static PermissionGroup defaultGroup = PermissionGroup.DEFAULT;
+	public static PermissionGroup defaultGroup = PermissionGroup.MEMBER;
 	
 	public static HashMap<UUID,PermissionAttachment> permissionList = new HashMap<>();
 	

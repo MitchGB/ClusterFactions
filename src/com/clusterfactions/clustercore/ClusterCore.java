@@ -17,8 +17,12 @@ import com.clusterfactions.clustercore.core.inventory.util.InventoryManager;
 import com.clusterfactions.clustercore.core.lang.LanguageManager;
 import com.clusterfactions.clustercore.core.permission.PlayerPermissionManager;
 import com.clusterfactions.clustercore.core.player.PlayerManager;
+import com.clusterfactions.clustercore.listeners.block.BlockBreakEventListener;
+import com.clusterfactions.clustercore.listeners.block.BlockPlaceEventListener;
+import com.clusterfactions.clustercore.listeners.entity.EntityInteractEventListener;
 import com.clusterfactions.clustercore.listeners.events.updates.UpdateSecondEvent;
 import com.clusterfactions.clustercore.listeners.player.AsyncPlayerChatEventListener;
+import com.clusterfactions.clustercore.listeners.player.PlayerInteractEventListener;
 import com.clusterfactions.clustercore.listeners.player.PlayerJoinEventListener;
 import com.clusterfactions.clustercore.listeners.player.PlayerMoveEventListener;
 import com.clusterfactions.clustercore.listeners.player.PlayerQuitEventListener;
@@ -67,8 +71,14 @@ public class ClusterCore extends JavaPlugin{
 		registerListener(
 				new PlayerJoinEventListener(),
 				new PlayerQuitEventListener(),
+				new PlayerInteractEventListener(),
 				new AsyncPlayerChatEventListener(),
-				new PlayerMoveEventListener()
+				new PlayerMoveEventListener(),
+				
+				new BlockBreakEventListener(),
+				new BlockPlaceEventListener(),
+				
+				new EntityInteractEventListener()
 				);
 	}
 	
