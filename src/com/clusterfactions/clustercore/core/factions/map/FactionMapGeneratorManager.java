@@ -3,6 +3,7 @@ package com.clusterfactions.clustercore.core.factions.map;
 import java.util.HashMap;
 import java.util.UUID;
 
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -10,6 +11,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerItemHeldEvent;
+import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.server.MapInitializeEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.map.MapView;
@@ -17,51 +19,46 @@ import org.bukkit.map.MapView.Scale;
 
 import com.clusterfactions.clustercore.ClusterCore;
 import com.clusterfactions.clustercore.core.factions.claim.FactionClaimManager;
+import com.clusterfactions.clustercore.util.ItemBuilder;
 import com.clusterfactions.clustercore.util.location.Vector2Integer;
 import com.clusterfactions.clustercore.util.model.Pair;
 
 public class FactionMapGeneratorManager implements Listener {
 
 	HashMap<UUID, Pair<ItemStack, Integer>> itemCache = new HashMap<>();
+	HashMap<UUID, Pair<Integer,Integer>> playerCache = new HashMap<>();
+	UUID tempCache = null;
 	
 	public FactionMapGeneratorManager() {
 		ClusterCore.getInstance().registerListener(this);
 	}
 	
 	public void openMapView(Player player) {
-		/*
-		CraftMapView mapView;
-		Location loc = player.getLocation();
 		player.getInventory().setHeldItemSlot(0);
 		ItemStack mapItem = new ItemBuilder(Material.FILLED_MAP).create();
-		net.minecraft.server.v1_16_R3.ItemStack NMSmapItem = CraftItemStack.asNMSCopy(mapItem);
-		mapView = ((CraftServer)Bukkit.getServer()).createMap(loc.getWorld());
-		Bukkit.getServer().createMap(loc.getWorld()).
-		mapView.setScale(Scale.FARTHEST);
-		mapView.setUnlimitedTracking(true);
-		mapView.setTrackingPosition(true);
-
-		//mapView.setCenterX((int)player.getLocation().getX());
-		//mapView.setCenterZ((int)player.getLocation().getZ());
-		WorldMap wMap = ItemWorldMap.getSavedMap(NMSmapItem, ((CraftWorld) loc.getWorld()).getHandle());
+		tempCache = player.getUniqueId();
+		playerCache.put(player.getUniqueId(), new Pair<Integer,Integer>((int)Math.round(player.getLocation().getX()/128)*128, (int)Math.round(player.getLocation().getZ()/128)*128));
 		
-		
-		mapView.addRenderer(new Renderer(wMap));
-		player.getInventory().setItem(0, mapItem);
 		itemCache.put(player.getUniqueId(), new Pair<ItemStack,Integer>(player.getInventory().getItem(0), Integer.valueOf(player.getInventory().getHeldItemSlot())));
-		player.sendMap(mapView);
-*/
-
+		player.getInventory().setItem(0, mapItem);
 	}
 	
+	
 	@EventHandler
-	public void onMapInitialize(MapInitializeEvent e) {
+	public void onMapInitialize(MapInitializeEvent e) {	;
 		MapView mapView = e.getMap();
-		
-		mapView.setScale(Scale.FARTHEST);
+		mapView.setScale(Scale.CLOSEST);
+		mapView.setTrackingPosition(true);
 		mapView.setUnlimitedTracking(true);
-		mapView.getRenderers().clear();
 		mapView.addRenderer(new Renderer());
+		
+		if(tempCache != null) {
+			Player player = Bukkit.getPlayer(tempCache);
+    		mapView.setCenterX((int)Math.round(player.getLocation().getX()/128)*128);
+    		mapView.setCenterZ((int)Math.round(player.getLocation().getZ()/128)*128);
+    		tempCache = null;
+		}
+		
 	}
 	
 	private void preCacheChunk(Player player)
@@ -96,6 +93,27 @@ public class FactionMapGeneratorManager implements Listener {
 	}
 	
 	@EventHandler
+	public void PlayerMoveEvent(PlayerMoveEvent e) {
+		if(playerCache.containsKey(e.getPlayer().getUniqueId()))
+		{
+			int x = playerCache.get(e.getPlayer().getUniqueId()).getLeft();
+			int xPos = (int)Math.round(e.getPlayer().getLocation().getX()/128)*128;
+			if(x != xPos)
+			{
+				openMapView(e.getPlayer());
+				return;
+			}
+			int z = playerCache.get(e.getPlayer().getUniqueId()).getRight();
+			int zPos = (int)Math.round(e.getPlayer().getLocation().getZ()/128)*128;			
+			if(z != zPos)
+			{
+				openMapView(e.getPlayer());
+				return;
+			}
+		}
+	}
+	
+	@EventHandler
 	public void PlayerItemHeldEvent(PlayerItemHeldEvent e) {
 		if(e.getPlayer().getInventory().getItem(e.getNewSlot()) != null)
 		if(e.getPlayer().getInventory().getItem(e.getNewSlot()).getType() == Material.MAP) {
@@ -107,6 +125,9 @@ public class FactionMapGeneratorManager implements Listener {
 			e.getPlayer().getInventory().setItem(0,itemCache.get(e.getPlayer().getUniqueId()).getLeft());
 			e.getPlayer().getInventory().setHeldItemSlot(itemCache.get(e.getPlayer().getUniqueId()).getRight());
 			itemCache.remove(e.getPlayer().getUniqueId());
+
+			if(playerCache.containsKey(e.getPlayer().getUniqueId()))
+				playerCache.remove(e.getPlayer().getUniqueId());	
 		}
 	}
 	
@@ -118,6 +139,10 @@ public class FactionMapGeneratorManager implements Listener {
 			e.getPlayer().getInventory().setHeldItemSlot(itemCache.get(e.getPlayer().getUniqueId()).getRight());
 			itemCache.remove(e.getPlayer().getUniqueId());
 			e.getItemDrop().remove();
+			
+
+			if(playerCache.containsKey(e.getPlayer().getUniqueId()))
+				playerCache.remove(e.getPlayer().getUniqueId());	
 		}
 	}
 	
@@ -129,6 +154,10 @@ public class FactionMapGeneratorManager implements Listener {
 			e.getPlayer().getInventory().setHeldItemSlot(itemCache.get(e.getPlayer().getUniqueId()).getRight());
 			itemCache.remove(e.getPlayer().getUniqueId());
 			e.setCancelled(true);
+			
+
+			if(playerCache.containsKey(e.getPlayer().getUniqueId()))
+				playerCache.remove(e.getPlayer().getUniqueId());	
 		}
 	}
 }

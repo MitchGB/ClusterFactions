@@ -14,18 +14,17 @@ public enum FactionPerm {
 	CHEST("FACTION.CHEST", "Use Chests", "", Material.CHEST), //
 	CLAIM("FACTION.CLAIM", "Claim Land", "Allow player to claim faction chunks", Material.DIRT),
 	CONTAINER("FACTION.CONTAINER", "Use Containers", "", Material.DISPENSER), //
-	DESTROY("FACTION.DESTROY", "Destroy Blocks", "", Material.DIRT),
 	DISBAND("FACTION.DISBAND", "Disband Faction", "", Material.DIRT),
 	DRAIN("FACTION.DRAIN", "Use Drain", "", Material.DIRT),
 	FLY("FACTION.FLY", "Use Fly", "", Material.DIRT),
-	HOME("FACTION.HOME", "Teleport Home", "", Material.DIRT),
-	INVITE("FACTION.INVITE","Invite Players", "", Material.DIRT),
+	HOME("FACTION.HOME", "Teleport Home", "", Material.ENDER_PEARL), //
+	INVITE("FACTION.INVITE","Invite Players", "", Material.APPLE), //
 	ITEMS("FACTION.ITEMS", "", "", Material.DIRT),
 	INTERACT("FACTION.INTERACT", "Interact", "Allow the player to interact with blocks", Material.STONE_BUTTON), //
 	KICK("FACTION.KICK", "Kick Players", "", Material.DIRT),
 	PAINBUILD("FACTION.PAINBUILD", "", "", Material.DIRT),
-	PROMOTE("FACTION.PROMOTE", "Promote Players", "", Material.DIRT),
-	SETHOME("FACTION.SETHOME", "Set Faction Home", "", Material.DIRT),
+	PROMOTE("FACTION.PROMOTE", "Promote Players", "", Material.DIAMOND), //
+	SETHOME("FACTION.SETHOME", "Set Faction Home", "", Material.TORCH), //
 	SETWARP("FACTION.SETWARP", "Set Faction Warp", "", Material.DIRT),
 	SPAWNER("FACTION.SPAWNER", "", "", Material.DIRT),
 	TERRITORY("FACTION.TERRITORY", "", "", Material.DIRT),

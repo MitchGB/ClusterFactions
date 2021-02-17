@@ -2,6 +2,7 @@ package com.clusterfactions.clustercore.core.command.impl.factions;
 
 import java.util.UUID;
 
+import org.bukkit.Location;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
@@ -38,6 +39,20 @@ public class FactionsCommand extends BaseCommand{
 		sender.sendMessage("TESTSETST");
 	}
 	
+	@Subcommand("randomtp|rtp|wild|wilderness")
+	public void rtp(final CommandSender sender) {
+		Player player = (Player)sender;
+		PlayerData playerData = ClusterCore.getInstance().getPlayerManager().getPlayerData(player);
+		if(ClusterCore.getInstance().getCombatManager().isTagged(player))
+		{
+			playerData.sendMessage(Lang_EN_US.PLAYER_COMBAT_TAGGED);
+			return;
+		}
+		Location safeLoc = LocationUtil.findSafeLoc(player);
+		ClusterCore.getInstance().getTeleportQueue().scheduleTeleport(player, 3000L, safeLoc);
+	    
+	}
+	
 	@Subcommand("create")
 	public void create(final CommandSender sender, final String name, final String tag){
 		PlayerData data = ClusterCore.getInstance().getPlayerManager().getPlayerData((Player)sender);
@@ -66,7 +81,11 @@ public class FactionsCommand extends BaseCommand{
 	
 	@Subcommand("leave")
 	public void leave(final CommandSender sender){
-		PlayerData data = ClusterCore.getInstance().getPlayerManager().getPlayerData((Player)sender);
+		PlayerData data = ClusterCore.getInstance().getPlayerManager().getPlayerData((Player)sender);		
+		if(data.getFaction() == null){
+			data.sendMessage(Lang_EN_US.NOT_IN_FACTION);
+			return;
+		}
 		ClusterCore.getInstance().getFactionsManager().getFaction(data.getFaction()).removePlayer((Player)sender, FactionPlayerRemoveReason.LEFT);
 	}
 	
@@ -131,6 +150,7 @@ public class FactionsCommand extends BaseCommand{
 		}
 		playerData.sendMessage(Lang_EN_US.FACTION_HOME_SET,LocationUtil.formatString(((Player)sender).getLocation()));
 		faction.setFactionHome(((Player)sender).getLocation());
+		faction.saveData();
 	}
 	
 	@Subcommand("home")
@@ -139,10 +159,23 @@ public class FactionsCommand extends BaseCommand{
 		if(playerData.getFaction() == null){
 			playerData.sendMessage(Lang_EN_US.NOT_IN_FACTION);
 			return;
+		}		
+		if(ClusterCore.getInstance().getCombatManager().isTagged(playerData))
+		{
+			playerData.sendMessage(Lang_EN_US.PLAYER_COMBAT_TAGGED);
+			return;
 		}
 		Faction faction = ClusterCore.getInstance().getFactionsManager().getFaction(playerData.getFaction());
-		//IMPLEMENT TIMER 
-		((Player)sender).teleport(faction.getFactionHome());
+		if(!faction.hasPerm((Player)sender, FactionPerm.HOME)){
+			playerData.sendMessage(Lang_EN_US.FACTION_NO_PERM);
+			return;
+		}
+		if(faction.getFactionHome() == null)
+		{
+			playerData.sendMessage(Lang_EN_US.NO_FACTION_HOME_SET);
+			return;
+		}
+		ClusterCore.getInstance().getTeleportQueue().scheduleTeleport(playerData.getPlayer(), 3000L, faction.getFactionHome());
 	}
 	
 	@Subcommand("chat")
@@ -160,6 +193,11 @@ public class FactionsCommand extends BaseCommand{
 	public void claim(final CommandSender sender, @Default("0") int radius)
 	{
 		PlayerData playerData = ClusterCore.getInstance().getPlayerManager().getPlayerData((Player)sender);
+		if(radius < 0)
+		{
+			playerData.sendMessage(Lang_EN_US.RADIUS_CANNOT_BE_NEGATIVE);
+			return;
+		}
 		if(radius > 5) {
 			playerData.sendMessage(Lang_EN_US.MAXIMUM_CLAIM_RADIUS);
 			return;
@@ -193,6 +231,11 @@ public class FactionsCommand extends BaseCommand{
 	public void claim(final CommandSender sender, int x, int z)
 	{
 		PlayerData playerData = ClusterCore.getInstance().getPlayerManager().getPlayerData((Player)sender);
+		if(x < 0 || z < 0)
+		{
+			playerData.sendMessage(Lang_EN_US.RADIUS_CANNOT_BE_NEGATIVE);
+			return;
+		}
 		if(x > 5 || z > 5) {
 			playerData.sendMessage(Lang_EN_US.MAXIMUM_CLAIM_RADIUS);
 			return;
@@ -489,6 +532,7 @@ public class FactionsCommand extends BaseCommand{
 		}
 		faction.enemy(enemy);
 	}
+	
 }
 
 

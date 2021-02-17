@@ -3,17 +3,23 @@ package com.clusterfactions.clustercore.core.factions.claim;
 import java.util.HashMap;
 import java.util.UUID;
 
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
+import org.bukkit.event.player.PlayerMoveEvent;
 
 import com.clusterfactions.clustercore.ClusterCore;
 import com.clusterfactions.clustercore.core.factions.Faction;
 import com.clusterfactions.clustercore.core.lang.Lang_EN_US;
 import com.clusterfactions.clustercore.core.player.PlayerData;
+import com.clusterfactions.clustercore.listeners.events.claim.ClaimEnterEvent;
+import com.clusterfactions.clustercore.listeners.events.claim.ClaimExitEvent;
+import com.clusterfactions.clustercore.util.Colors;
 import com.clusterfactions.clustercore.util.location.Vector2Integer;
-import com.clusterfactions.clustercore.util.model.Pair;
 
-public class FactionClaimManager {
+public class FactionClaimManager implements Listener{
 	
 	/*
 	 * North -z
@@ -21,8 +27,50 @@ public class FactionClaimManager {
 	 * South +z
 	 * West -x
 	 */
+
+	public HashMap<UUID, UUID> playerCache = new HashMap<>(); //PlayerUUID, factionUUID (faction of claim they are in, null if none);
+	private HashMap<Vector2Integer, UUID> chunkCache = new HashMap<>();
 	
-	HashMap<Vector2Integer, UUID> chunkCache = new HashMap<>();
+	@EventHandler
+	public void PlayerMoveEvent(PlayerMoveEvent e) {
+		Player player = e.getPlayer();
+		UUID faction = chunkClaimedCache(getChunkVector(player.getLocation()));
+		if(!playerCache.containsKey(player.getUniqueId()) && faction != null)
+		{
+			playerCache.put(player.getUniqueId(), faction);
+			Bukkit.getPluginManager().callEvent(new ClaimEnterEvent(player, faction));
+			return;
+		}
+		if(playerCache.containsKey(player.getUniqueId()) && faction == null) {
+			playerCache.remove(player.getUniqueId());
+			Bukkit.getPluginManager().callEvent(new ClaimExitEvent(player));
+			return;
+		}
+		if(playerCache.containsKey(player.getUniqueId()) && !playerCache.get(player.getUniqueId()).equals(faction))		
+		{
+			playerCache.replace(player.getUniqueId(), faction);
+			Bukkit.getPluginManager().callEvent(new ClaimEnterEvent(player, faction));
+			return;
+		}
+		
+	}
+	
+	@EventHandler
+	public void ClaimExitEvent(ClaimExitEvent e) {
+		Player player = e.getPlayer();
+		player.sendTitle(Colors.parseColors("&2&lWilderness"), Colors.parseColors("&7You have entered unclaimed territory"), 5, 40, 5);
+	}
+	
+	@EventHandler
+	public void ClaimEnterEvent(ClaimEnterEvent e) {
+		Player player = e.getPlayer();
+		Faction faction = ClusterCore.getInstance().getFactionsManager().getFaction(e.getFaction());
+		player.sendTitle(Colors.parseColors(faction.getFactionName()), Colors.parseColors(""), 5, 40, 5);
+	}
+	
+	public FactionClaimManager() {
+		ClusterCore.getInstance().registerListener(this);
+	}
 	
 	public Vector2Integer getChunkVector(Location loc) {
 		return new Vector2Integer((int)Math.ceil(loc.getX()/16), (int)Math.ceil(loc.getZ()/16));
@@ -50,7 +98,6 @@ public class FactionClaimManager {
 	{
 		if(chunkCache.containsKey(chunkLoc)) return chunkCache.get(chunkLoc);
 		String ret = ClusterCore.getInstance().getMongoHook().getObject(chunkLoc.toString(), "owner", "chunks");
-		UUID ret2 = ret != null ? UUID.fromString(ret) : null;
 		chunkCache.put(chunkLoc, ret == null || ret.isEmpty() ? null : UUID.fromString(ret));
 		return chunkCache.get(chunkLoc);	
 	}

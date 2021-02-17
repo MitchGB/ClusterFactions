@@ -1,13 +1,41 @@
 package com.clusterfactions.clustercore.util.location;
 
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.World;
+import org.bukkit.block.Block;
+import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Player;
+
+import com.clusterfactions.clustercore.util.NumberUtil;
 
 public class LocationUtil {
 
 	public static String formatString(Location loc) {
 		return "("+String.format("%.2f",loc.getX())+","+String.format("%.2f",loc.getY())+","+String.format("%.2f",loc.getZ())+")";
+	}
+	
+	public static Location findSafeLoc(Player player) {
+		Location location = player.getLocation().clone();
+		int x = NumberUtil.random(-5000, 5000);
+		int z = NumberUtil.random(-5000, 5000);
+		location.setX(x);
+		location.setY(location.getWorld().getHighestBlockYAt(x, z)+1);
+		location.setZ(z);
+		Block ground = location.getBlock().getRelative(BlockFace.DOWN);
+		Block head = location.getBlock().getRelative(BlockFace.UP);
+		if(location.getBlock().getRelative(BlockFace.DOWN).getType().equals(Material.WATER))
+			return findSafeLoc(player);		
+		if(location.getBlock().getRelative(BlockFace.DOWN).getType().equals(Material.LAVA))
+			return findSafeLoc(player);
+		if (head.getType().isSolid())
+			return findSafeLoc(player); 
+		if (ground.getType().isAir())
+			return findSafeLoc(player); 
+	    if (ground.getType().isSolid())
+	   		return location; 
+	    return location;
+		
 	}
 	
 	public static boolean withinBounds(Location obj, Location loc1, Location loc2) {

@@ -14,6 +14,7 @@ public class FactionsManager {
 	private HashMap<UUID, Faction> factionCache = new HashMap<>();
 	
 	public Faction getFaction(UUID factionUUID) {		
+		if(factionUUID == null) return null;
 		if(factionCache.containsKey(factionUUID))
 			return factionCache.get(factionUUID);
 		
@@ -32,6 +33,11 @@ public class FactionsManager {
 				return f;
 		}
 		return null;
+	}
+	
+	public Faction getFaction(Player player) {
+		PlayerData playerData = ClusterCore.getInstance().getPlayerManager().getPlayerData(player);
+		return getFaction(playerData.getFaction());
 	}
 	
 	public void createFaction(Player leader, String name, String tag) {

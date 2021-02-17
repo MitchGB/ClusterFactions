@@ -9,8 +9,10 @@ import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
 
+import com.clusterfactions.clustercore.core.combat.CombatManager;
 import com.clusterfactions.clustercore.core.command.CommandManager;
 import com.clusterfactions.clustercore.core.factions.FactionsManager;
+import com.clusterfactions.clustercore.core.factions.TeleportQueue;
 import com.clusterfactions.clustercore.core.factions.claim.FactionClaimManager;
 import com.clusterfactions.clustercore.core.factions.map.FactionMapGeneratorManager;
 import com.clusterfactions.clustercore.core.inventory.util.InventoryManager;
@@ -42,6 +44,9 @@ public class ClusterCore extends JavaPlugin{
 	@Manager @Getter private PlayerPermissionManager playerPermissionManager;
 	@Manager @Getter private FactionMapGeneratorManager factionMapGeneratorManager;
 	@Manager @Getter private FactionClaimManager factionClaimManager;
+	@Manager @Getter private CombatManager combatManager;
+	
+	@Manager @Getter private TeleportQueue teleportQueue;
 	
 	private static ClusterCore instance;
 	

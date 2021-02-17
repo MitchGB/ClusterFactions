@@ -3,17 +3,16 @@ package com.clusterfactions.clustercore.core.factions.map;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.map.MapCanvas;
-import org.bukkit.map.MapCursorCollection;
 import org.bukkit.map.MapPalette;
 import org.bukkit.map.MapRenderer;
 import org.bukkit.map.MapView;
 
 import com.clusterfactions.clustercore.ClusterCore;
-import com.clusterfactions.clustercore.core.factions.claim.Chunk;
+import com.clusterfactions.clustercore.core.factions.Faction;
 import com.clusterfactions.clustercore.core.factions.claim.FactionClaimManager;
-import com.clusterfactions.clustercore.util.NumberUtil;
 import com.clusterfactions.clustercore.util.location.Vector2Integer;
 import com.clusterfactions.clustercore.util.model.Pair;
 
@@ -23,118 +22,126 @@ public class Renderer extends MapRenderer{
 		super(true);
 	}
 	
-	byte[][] colorMap = new byte[128][128];
-	
 	FactionClaimManager claimManager = ClusterCore.getInstance().getFactionClaimManager();
+	
+	int xMapCenter = -Integer.MAX_VALUE;
+	int zMapCenter = -Integer.MAX_VALUE;
+	
+	//static byte[][][][] colorMap = new byte[128][128][128][128]; //mapX, mapZ, x, z
+	
+	boolean canRender = true;
+	
+	@SuppressWarnings("deprecation")
 	@Override
 	public void render(MapView map, MapCanvas canvas, Player player) {
-		final int radius = 5;
-		map.setCenterX((int) player.getLocation().getX());
-		map.setCenterZ((int) player.getLocation().getZ());
-		Vector2Integer playerChunk = claimManager.getChunkVector(player.getLocation());
+		if(canRender != true) return;
+		canRender = false;
 		
-		Vector2Integer[][] claimMap = new Vector2Integer[radius*2][radius*2];
+		//BUFFER TO RENDER (USUALLY EVERY TICK)
+		Bukkit.getScheduler().runTaskLaterAsynchronously(ClusterCore.getInstance(), new Runnable() {
+	        @Override
+	        public void run() {
+	        	canRender = true;
+	        }
+		}, 10);
 		
-		int pX = playerChunk.getX();
-		int pZ = playerChunk.getZ();
+		try {
+			/*WorldMap worldMap = null;
+			Field worldField = CraftMapView.class.getDeclaredField("worldMap");
+			worldField.setAccessible(true);
+			worldMap = (WorldMap)worldField.get((CraftMapView)map);
+			
+			int xCenter = map.getCenterX()/128+64;
+			int zCenter = map.getCenterZ()/128+64;
+			
+			
+			byte[][] mapColor = new byte[128][128];
+			
+			if(colorMap[xCenter] == null)
+				colorMap[xCenter] = new byte[128][128][128];
+				
+			if(colorMap[xCenter][zCenter] == null)
+				colorMap[xCenter][zCenter] = new byte[128][128];
+				
+			if(colorMap[xCenter] != null && colorMap[xCenter][zCenter] != null)
+				mapColor = colorMap[xCenter][zCenter];
 
-		int uX = pX + radius;
-		int uZ = pZ + radius ;
-		
-		int lX = pX - radius;
-		int lZ = pZ - radius;
-		int xIndex = 0;
-		int zIndex = 0;
-		
-		for(int z = lZ; z < uZ; z++)
-		{
-			xIndex = 0;
-			for(int x = lX; x <uX; x++)
-			{
-				claimMap[xIndex][zIndex] = new Vector2Integer(x,z);
-				xIndex++;
+			for(int x = 0; x < 128; x++) {
+				for(int z = 0; z < 128; z++) {
+					if(mapColor[x][z] == Byte.valueOf("0"))
+					{
+						canvas.setPixel(x, z, worldMap.colors[z * 128 + x]);
+						mapColor[x][z] = worldMap.colors[z * 128 + x];
+					}
+					else
+					{
+						canvas.setPixel(x, z, mapColor[x][z]);
+					}
+				}
 			}
-			zIndex++;
+			*/
+			
+			int radius = 5;
+			
+			Vector2Integer centerChunk = claimManager.getChunkVector(map.getCenterX(), map.getCenterZ());
+			Vector2Integer[][] claimMap = new Vector2Integer[radius*2][radius*2];
+			
+			int pX = centerChunk.getX();
+			int pZ = centerChunk.getZ();
+
+			int uX = pX + radius;
+			int uZ = pZ + radius ;
+			
+			int lX = pX - radius;
+			int lZ = pZ - radius;
+			int xIndex = 0;
+			int zIndex = 0;
+			
+			for(int z = lZ; z < uZ; z++)
+			{
+				xIndex = 0;
+				for(int x = lX; x <uX; x++)
+				{
+					claimMap[xIndex][zIndex] = new Vector2Integer(x,z);
+					xIndex++;
+				}
+				zIndex++;
+			}
+			
+			for (int x = 0; x < radius*2; ++x) {
+	            for (int z = 0; z < radius*2; ++z) {
+	            	Vector2Integer chunkLoc = claimMap[x][z];
+	            	List<Pair<Integer,Integer>> pixelMap = new ArrayList<>();
+	            	
+	            	for(int px = 0; px < 16; px++)
+	            	{
+	            		for(int pz = 0; pz < 16; pz++)
+	            		{
+	            			if(pz == 0 || px == 0 || px == 15 || pz == 15)
+	            				pixelMap.add(new Pair<Integer,Integer>((x*16) - 32 + px, (z*16) - 32 + pz));
+	            			
+	            		}
+	            	}
+	            	
+	            	Faction chunkFaction = ClusterCore.getInstance().getFactionsManager().getFaction(claimManager.chunkClaimedCache(chunkLoc));
+	            	Faction playerFaction = ClusterCore.getInstance().getFactionsManager().getFaction(ClusterCore.getInstance().getPlayerManager().getPlayerData(player).getFaction());
+	            	if(chunkFaction == null) 
+	            		continue;
+	            	else if(playerFaction.isAllied(chunkFaction))
+	            		setPixel(canvas, pixelMap, MapPalette.matchColor(232, 53, 129));
+	            	else
+	            		setPixel(canvas, pixelMap, MapPalette.RED);
+	            }
+	        }
+			//colorMap[xCenter][zCenter] = mapColor;
+		}catch(Exception e) {
+			e.printStackTrace();
 		}
-		
-		int xoffset = (int)player.getLocation().getX() - (NumberUtil.roundDown(player.getLocation().getX() / 16, 1) * 16);
-		int zoffset = (int)player.getLocation().getZ() - (NumberUtil.roundDown(player.getLocation().getZ() / 16, 1) * 16);
-		
-		
-        for (int x = 0; x < 10; ++x) {
-            for (int z = 0; z < 10; ++z) {
-            	Vector2Integer chunkLoc = claimMap[x][z];
-            	List<Pair<Integer,Integer>> pixelMap = new ArrayList<>();
-            	List<Pair<Integer,Integer>> resetPixelMap = new ArrayList<>();
-            	
-            	//color map made per chunk
-//            	Chunk chunk = claimManager.chunkClaimedCache(chunkLoc);
- //   			byte[][] colorMap = chunk.getColorMap() == null ? new byte[16][16] : chunk.getColorMap();
-    			
-            	for(int px = 0; px < 16; px++)
-            	{
-            		for(int pz = 0; pz < 16; pz++)
-            		{
-            			if(pz == 0 || px == 0 || px == 15 || pz == 15)
-            				pixelMap.add(new Pair<Integer,Integer>(x * 16 - 16 - xoffset + px, z * 16 - 16 -zoffset + pz));
-            			else
-            				resetPixelMap.add(new Pair<Integer,Integer>(x * 16 - 16 - xoffset + px, z * 16 - 16 -zoffset + pz));
-            			/*{
-                			byte color = canvas.getPixel(x * 16 - 16 - xoffset + px, z * 16 - 16 -zoffset + pz);
-                			if(color != Byte.valueOf("0"))
-                				colorMap[px][pz] = color;
-            				canvas.setPixel(x * 16 - 16 - xoffset + px, z * 16 - 16 -zoffset + pz, color);
-            			}*/
-            			
-            		}
-            	}
-            	/*
-            	for(int i = 0; i < 16; i++)
-            	{
-            		for(int j = 0; j < 16; j++)
-            		{
-            			if(chunk.getColorMap() == null)
-            			{
-            				chunk.setColorMap(new byte[16][16]);
-            			}
-            			if(chunk.getColorMap()[i] == null)
-            			{
-            				chunk.getColorMap()[i]=new byte[16];
-            			}
-            			
-            			if(chunk.getColorMap()[i][j] == Byte.valueOf("0"))
-            			{
-            				chunk.getColorMap()[i][j] = colorMap[i][j];
-            			}
-            		}
-            	}
-            	claimManager.replaceChunk(chunk.getLocation(), chunk);
-            	*/
-            	
-            	if(claimManager.chunkClaimedCache(chunkLoc) != null)
-            		setPixel(canvas, pixelMap, MapPalette.RED);
-            	else
-            		setPixel(canvas, pixelMap, MapPalette.DARK_GREEN);
-            	resetPixel(canvas, resetPixelMap);
-            }
-        }
-        MapCursorCollection cursors = canvas.getCursors();
-        while (cursors.size() > 0) {
-            cursors.removeCursor(cursors.getCursor(0));
-        }
-        
 	}
 	
 	private void setPixel(MapCanvas canvas, List<Pair<Integer, Integer>> pixels, byte colour) {
 		for(Pair<Integer,Integer> pixel : pixels) {
 			canvas.setPixel(pixel.getLeft().intValue(), pixel.getRight().intValue(), colour);
-		}
-	}
-	
-	@SuppressWarnings("unused")
-	private void resetPixel(MapCanvas canvas, List<Pair<Integer, Integer>> pixels) {
-		for(Pair<Integer,Integer> pixel : pixels) {
-			canvas.setPixel(pixel.getLeft().intValue(), pixel.getRight().intValue(), canvas.getBasePixel(pixel.getLeft().intValue(), pixel.getRight().intValue()));
 		}
 	}
 }

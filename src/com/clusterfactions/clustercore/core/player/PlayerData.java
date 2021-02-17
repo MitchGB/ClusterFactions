@@ -37,8 +37,8 @@ public class PlayerData{
 		ClusterCore.getInstance().getMongoHook().saveData(playerUUID.toString(), this, "players");
 	}
 	
-	public void sendMessage(String str, String... args) {
-		getPlayer().sendMessage(ChatColor.translateAlternateColorCodes('&', String.format(str, (Object[])args)));
+	public void sendMessage(String str, Object... args) {
+		getPlayer().sendMessage(ChatColor.translateAlternateColorCodes('&', String.format(str, args)));
 	}
 	
 	/*

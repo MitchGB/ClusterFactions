@@ -50,7 +50,8 @@ public class Lang_EN_US {
 	public static final String PLAYER_KICKED_FACTION = "%s has been kicked from the faction.";
 
 	public static final String FACTION_HOME_SET = "Faction home has been set to %s.";
-
+	public static final String NO_FACTION_HOME_SET = "No faction home set.";
+	
 	public static final String MAXIMUM_CLAIM_RADIUS = "The claim radius cannot be more than 5.";
 	public static final String SUCCESSFULL_CLAIM_AREA = "Successfully claimed %s chunks. (%s chunk(s) already claimed)";
 	public static final String SUCCESSFULL_CLAIM = "Successfully claimed chunk";
@@ -59,6 +60,14 @@ public class Lang_EN_US {
 	public static final String CLAIM_RADIUS_OVERLAPPING = "This claim radius would overlap another factions claim.";
 	public static final String CHUNK_ALREADY_CLAIMED = "This chunk is already claimed by %s.";
 	public static final String CHUNK_NOT_CLAIMED = "This chunk is not claimed by anyone.";
+	public static final String RADIUS_CANNOT_BE_NEGATIVE = "Radius cannot be negative.";
 	
 	public static final String BUILDING_NOT_PERMITTED = "You do not have permission to build on %s's territory";
+
+	public static final String PLAYER_BEEN_COMBAT_TAGGED = "You have been combat tagged. You may log out in %s second(s).";
+	public static final String PLAYER_COMBAT_TIMER_ENDED = "You may log out safely.";
+	public static final String PLAYER_COMBAT_TAGGED = "You are currently combat tagged!";
+	public static final String TELEPORT_CANCELLED_COMBAT_TAG = "Teleport cancelled, you have ben combat tagged.";
+	
+	public static final String TELEPORTING_IN = "Teleporting in %s second(s).";
 }

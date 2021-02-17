@@ -10,5 +10,5 @@ import com.clusterfactions.clustercore.persistence.serialization.VariableSeriali
 @Target(ElementType.FIELD)
 @Retention(RetentionPolicy.RUNTIME)
 public @interface AlternateSerializable {
-	Class<? extends VariableSerializer> value();
+	Class<? extends VariableSerializer<?>> value();
 }
