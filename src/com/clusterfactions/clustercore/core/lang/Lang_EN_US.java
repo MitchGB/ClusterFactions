@@ -13,6 +13,7 @@ public class Lang_EN_US {
 	public static final String NOT_IN_FACTION = "You are not in a faction.";
 	public static final String FACTION_TAG_TAKEN = "There is already a faction with this tag.";
 	public static final String PLAYER_NOT_IN_FACTION = "Player is not in your faction";
+	public static final String FACTION_TAG_TOO_LONG = "Faction tag must be 4 characters or less";
 	
 	public static final String FACTION_PROMOTED_PLAYER = "Promoted %s to %s.";
 	public static final String FACTION_DEMOTED_PLAYER = "Demoted %s to %s.";
@@ -27,6 +28,11 @@ public class Lang_EN_US {
 	public static final String YOU_HAVE_BEEN_BANNED = "You have been banned from %s";
 	public static final String PLAYER_IS_CURRENTLY_BANNED = "Player is banned from faction.";
 	public static final String PLAYER_NOT_BANNED = "Player is not banned from faction.";
+	
+	public static final String FACTION_WARP_SET = "Faction warp set at %s.";
+	public static final String FACTION_WARP_REMOVED = "Faction warp removed.";
+	public static final String FACTION_WARP_NOT_FOUND = "Could not find faction warp %s.";
+	public static final String FACTION_WARP_NAME_TAKEN = "Faction warp with name %s already exists.";
 	
 	public static final String BAN_LIST_EMPTY = "There are no banned players";
 	
@@ -77,6 +83,7 @@ public class Lang_EN_US {
 	public static final String CHUNK_NOT_CLAIMED = "This chunk is not claimed by anyone.";
 	public static final String RADIUS_CANNOT_BE_NEGATIVE = "Radius cannot be negative.";
 	public static final String CLAIMLIST_EMPTY = "Claim list is empty.";
+	public static final String NOT_YOUR_CLAIM = "This is not your claim";
 	
 	public static final String BUILDING_NOT_PERMITTED = "You do not have permission to build on %s's territory";
 
@@ -86,4 +93,6 @@ public class Lang_EN_US {
 	public static final String TELEPORT_CANCELLED_COMBAT_TAG = "Teleport cancelled, you have ben combat tagged.";
 	
 	public static final String TELEPORTING_IN = "Teleporting in %s second(s).";
+	
+	public static final String ALERT_RAID = "&c&l!!! ALERT BASE IS BEING RAIDED !!!";
 }

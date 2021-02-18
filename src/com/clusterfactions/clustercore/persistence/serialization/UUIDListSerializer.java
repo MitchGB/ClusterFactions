@@ -6,15 +6,19 @@ import java.util.UUID;
 
 //Base64 Encoder
 public class UUIDListSerializer extends VariableSerializer<List<UUID>>{
-	private String getStringUUIDList(final List<UUID> l) {
+
+
+	@Override
+	public String serialize(List<UUID> obj) {
 	    StringBuilder builder = new StringBuilder();
-	    for(UUID uuid : l)
+	    if(obj == null) return "";
+	    for(UUID uuid : obj)
 	    	builder.append(uuid.toString() + ",");
-	    return builder.toString().trim().substring(0,builder.toString().length());
+	    return builder.toString();
 	}
 
-
-	private List<UUID> getUUIDListString(final String s) {
+	@Override
+	public List<UUID> deserialize(String s) {	
 		if(s==null || s.isEmpty()) return null;
 		String[] array = s.split(",");
 		List<UUID> uuids = new ArrayList<>();
@@ -24,17 +28,6 @@ public class UUIDListSerializer extends VariableSerializer<List<UUID>>{
 			uuids.add(UUID.fromString(str));
 		}
 		return uuids;
-	}
-
-	@Override
-	public String serialize(List<UUID> obj) {
-		if(!(obj instanceof List<?>)) return "";
-		return getStringUUIDList((List<UUID>)obj);
-	}
-
-	@Override
-	public List<UUID> deserialize(String str) {	
-		return getUUIDListString(str);
 	}
 }
 

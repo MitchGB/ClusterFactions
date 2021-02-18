@@ -60,6 +60,10 @@ public class PlayerData{
 		setDisplayPrefix();
 	}
 	
+	public boolean isCombatTagged() {
+		return ClusterCore.getInstance().getCombatManager().isTagged(getPlayer());
+	}
+	
 	private void setDisplayPrefix() {
 		try {
 			if(!Bukkit.getOnlinePlayers().contains(getPlayer())) return;

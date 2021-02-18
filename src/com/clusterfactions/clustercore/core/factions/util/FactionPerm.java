@@ -7,12 +7,13 @@ import lombok.Getter;
 public enum FactionPerm {
 	
 	AUDIT("FACTION.AUDIT", "Audit", "", Material.BOOK),
-	ALLY("FACTION.ALLY", "ALLY", "Form an allyship with a faction", Material.GOLDEN_APPLE),//
+	ALLY("FACTION.ALLY", "Ally", "Form an allyship with a faction", Material.GOLDEN_APPLE),//
+	ALERT("FACTION.ALERT", "Alert", "Player is able to alert the faction when raided", Material.BARRIER),//
 	BAN("FACTION.BAN", "Ban", "", Material.DIRT),//
 	BUILD("FACTION.BUILD", "Build", "Allow player to build on faction claimed chunks", Material.BRICKS),//
 	CHECK("FACTION.CHECK", "Check", "", Material.DIRT),
 	CHEST("FACTION.CHEST", "Use Chests", "", Material.CHEST), //
-	CLAIM("FACTION.CLAIM", "Claim Land", "Allow player to claim faction chunks", Material.DIRT),
+	CLAIM("FACTION.CLAIM", "Claim Land", "Allow player to claim faction chunks", Material.DIRT),//
 	CONTAINER("FACTION.CONTAINER", "Use Containers", "", Material.DISPENSER), //
 	DISBAND("FACTION.DISBAND", "Disband Faction", "", Material.DIRT),
 	DRAIN("FACTION.DRAIN", "Use Drain", "", Material.DIRT),

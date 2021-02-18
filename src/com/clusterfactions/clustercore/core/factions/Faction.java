@@ -1,9 +1,11 @@
 package com.clusterfactions.clustercore.core.factions;
 
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.UUID;
 
 import org.bukkit.Bukkit;
@@ -20,7 +22,9 @@ import com.clusterfactions.clustercore.core.player.PlayerData;
 import com.clusterfactions.clustercore.persistence.serialization.LocationSerializer;
 import com.clusterfactions.clustercore.persistence.serialization.UUIDListSerializer;
 import com.clusterfactions.clustercore.persistence.serialization.UUIDSerializer;
+import com.clusterfactions.clustercore.persistence.serialization.VariableSerializer;
 import com.clusterfactions.clustercore.persistence.serialization.Vector2IntegerListSerializer;
+import com.clusterfactions.clustercore.persistence.serialization.WarpListSerializer;
 import com.clusterfactions.clustercore.util.annotation.AlternateSerializable;
 import com.clusterfactions.clustercore.util.location.Vector2Integer;
 
@@ -36,8 +40,9 @@ public class Faction implements Listener{
 	@Getter @Setter private String factionTag;
 	
 
+	@Setter @AlternateSerializable(WarpListSerializer.class) private HashMap<String, Location> warpList;
 	@Getter @Setter @AlternateSerializable(LocationSerializer.class) private Location factionHome;
-
+	
 	@Getter @AlternateSerializable(UUIDListSerializer.class) private List<UUID> allies = new ArrayList<>();
 	@Getter @AlternateSerializable(UUIDListSerializer.class) private List<UUID> enemies = new ArrayList<>(); 
 	
@@ -73,22 +78,44 @@ public class Faction implements Listener{
 		ClusterCore.getInstance().getMongoHook().saveData(factionID.toString(), this, "factions");
 	}
 	
+	@SuppressWarnings("unchecked")
+	public void saveData(String fieldName) {
+		try {
+			Object data = null;
+			Field[] allFields = this.getClass().getDeclaredFields(); 
+			for(Field field : allFields) {
+				field.setAccessible(true);
+				if(field.getName().equalsIgnoreCase(fieldName))
+				{
+					data = field.get(this);
+					if(field.getAnnotation(AlternateSerializable.class) != null) 
+						data = ((VariableSerializer<Object>)field.getAnnotation(AlternateSerializable.class).value().getDeclaredConstructor().newInstance()).serialize(field.get(this));
+					break;
+				}
+			}
+			if(data == null) return;
+			ClusterCore.getInstance().getMongoHook().saveObject(this.factionID.toString(), fieldName, data, "factions");
+		}catch(Exception e) {
+			e.printStackTrace();
+		}
+	}
+	
 	public void addPlayer(Player player) {
 		PlayerData data = ClusterCore.getInstance().getPlayerManager().getPlayerData(player);
 		data.setFaction(this.factionID);
 		data.saveData();
-		
 		players.add(player.getUniqueId());
 		messageAll(String.format(Lang_EN_US.PLAYER_JOINED_FACTION, player.getName()) );
-		saveData();
+		saveData("players");
 	}
 	
 	public void removePlayer(Player player, FactionPlayerRemoveReason reason) {
 		PlayerData data = ClusterCore.getInstance().getPlayerManager().getPlayerData(player);
 		data.setFaction(null);
-		data.saveData();
-		
 		players.remove(player.getUniqueId());
+		data.saveData();
+		saveData("players");
+		
 		switch(reason) {
 		case KICKED:
 			data.sendMessage(Lang_EN_US.YOU_HAVE_BEEN_KICKED, this.factionName);
@@ -104,20 +131,19 @@ public class Faction implements Listener{
 			break;
 		
 		}
-		saveData();
 	}
 
 	public void banPlayer(Player player) {
 		if(bannedPlayers == null) bannedPlayers = new ArrayList<>();
 		bannedPlayers.add(player.getUniqueId());
 		removePlayer(player, FactionPlayerRemoveReason.BANNED);
-		saveData();
+		saveData("bannedPlayers");
 	}
 	
 	public void unbanPlayer(Player player) {
 		if(bannedPlayers == null) bannedPlayers = new ArrayList<>();
 		bannedPlayers.remove(player.getUniqueId());
-		saveData();
+		saveData("bannedPlayers");
 	}
 	
 	public void kickPlayer(Player player) {
@@ -126,7 +152,7 @@ public class Faction implements Listener{
 	
 	public void uninvitePlayer(Player invitee) {
 		inviteList.remove(invitee.getUniqueId());
-		saveData();
+		saveData("inviteList");
 	}
 	
 	public void invitePlayer(Player invitee)
@@ -139,7 +165,7 @@ public class Faction implements Listener{
 
 		if(inviteList == null) inviteList = new ArrayList<>();
 		inviteList.add(invitee.getUniqueId());		
-		saveData();
+		saveData("inviteList");
 	}
 	
 	public void inviteAllyFaction(Faction invitee)
@@ -150,7 +176,7 @@ public class Faction implements Listener{
 
 		if(allyshipInviteList == null) allyshipInviteList = new ArrayList<>();
 		allyshipInviteList.add(invitee.getFactionID());		
-		saveData();
+		saveData("allyshipInviteList");
 	}
 	
 	public boolean isAllied(Faction faction) {
@@ -165,7 +191,8 @@ public class Faction implements Listener{
 		if(enemies.contains(faction.getFactionID())) enemies.remove(faction.getFactionID());
 		this.allyshipInviteList.remove(faction.getFactionID());
 		this.allies.add(faction.getFactionID());
-		saveData();
+		saveData("allies");
+		saveData("allyshipInviteList");
 	}
 	
 	public void unally(Faction faction) {
@@ -175,7 +202,7 @@ public class Faction implements Listener{
 		
 		allies.remove(facId);
 		messageAll(String.format(Lang_EN_US.FACTION_NO_LONGER_ALLIES, faction.getFactionName()));
-		saveData();
+		saveData("allies");
 	}
 	
 	public void enemy(Faction faction) {
@@ -188,18 +215,19 @@ public class Faction implements Listener{
 		if(allies.contains(facId)) allies.remove(facId);
 		enemies.add(facId);
 		messageAll(String.format(Lang_EN_US.FACTION_ARE_NOW_ENEMIES, faction.getFactionName()));
-		saveData();
+		saveData("enemies");		
+		saveData("allies");
+		saveData("allyshipInviteList");
 		
 	}
 	
 	public void unenemy(Faction faction) {
-		if(allyshipInviteList == null) allyshipInviteList = new ArrayList<>();
 		if(enemies == null) enemies = new ArrayList<>();
 		UUID facId = faction.getFactionID();
 		
 		enemies.remove(facId);
 		messageAll(String.format(Lang_EN_US.FACTION_NO_LONGER_ENEMIES, faction.getFactionName()));
-		saveData();
+		saveData("enemies");
 		
 	}
 	
@@ -225,7 +253,7 @@ public class Faction implements Listener{
 			permissionMap.remove(perm.getId());
 		
 		permissionMap.put(perm.getId(), weight);
-		saveData();
+		saveData("permissionMap");
 	}
 	
 	public FactionRole getPlayerRole(UUID uuid) {
@@ -250,7 +278,7 @@ public class Faction implements Listener{
 			this.roleMap.put(player.toString(), getPlayerRole(player).getWeight()+1);
 		else
 			this.roleMap.replace(player.toString(), getPlayerRole(player).getWeight()+1);
-		saveData();
+		saveData("roleMap");
 	}
 	
 	public void demotePlayer(UUID player) {
@@ -259,7 +287,7 @@ public class Faction implements Listener{
 			return;
 		else if(getPlayerRole(player).getWeight()>1)
 			this.roleMap.replace(player.toString(), getPlayerRole(player).getWeight()-1);
-		saveData();
+		saveData("roleMap");
 	}
 	
 	public boolean inviteListContains(Player player) {
@@ -276,18 +304,52 @@ public class Faction implements Listener{
 	public void acceptInvite(Player player) {
 		inviteList.remove(player.getUniqueId());
 		addPlayer(player);
-		saveData();
+		saveData("inviteList");
 	}
 	
 	public void removeClaimChunk(Vector2Integer chunkLoc) {
 		claimedChunks.remove(chunkLoc);
-		saveData();
+		saveData("claimedChunks");
 	}
 	
 	public void addClaimChunk(Vector2Integer chunkLoc) {
 		if(claimedChunks == null) claimedChunks = new ArrayList<>();
 		this.claimedChunks.add(chunkLoc);
-		saveData();
+		saveData("claimedChunks");
+	}
+	
+	public void addWarp(String name, Location loc) {
+		if(warpList == null) warpList = new HashMap<>();
+		warpList.put(name, loc);
+		saveData("warpList");
+	}
+	
+	public void removeWarp(String name) {
+		if(warpList == null) warpList = new HashMap<>();
+		if(!warpList.containsKey(name)) return;
+		warpList.remove(name);
+		saveData("warpList");
+	}
+	
+	public boolean warpExists(String name) {
+		if(warpList == null) warpList = new HashMap<>();
+		return warpList.containsKey(name);
+	}
+	
+	public Location getWarp(String name) {
+		if(warpList == null) warpList = new HashMap<>();
+		if(!warpExists(name)) return null;
+		return warpList.get(name);
+	}
+	
+	public List<String> getWarps(){
+		if(warpList == null) warpList = new HashMap<>();
+		List<String> ret = new ArrayList<>();
+		for(Entry<String, Location> entrySet : warpList.entrySet())
+		{
+			ret.add(entrySet.getKey());
+		}
+		return ret;
 	}
 	
 	public void messageAll(String message) {

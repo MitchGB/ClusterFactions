@@ -41,11 +41,16 @@ public class FactionsCommand extends BaseCommand{
 		sender.sendMessage("TESTSETST");
 	}
 	
+	@Subcommand("map")
+	public void map(final CommandSender sender) {
+		ClusterCore.getInstance().getFactionMapGeneratorManager().openMapView((Player)sender);
+	}
+	
 	@Subcommand("randomtp|rtp|wild|wilderness")
 	public void rtp(final CommandSender sender) {
 		Player player = (Player)sender;
 		PlayerData playerData = ClusterCore.getInstance().getPlayerManager().getPlayerData(player);
-		if(ClusterCore.getInstance().getCombatManager().isTagged(player))
+		if(playerData.isCombatTagged())
 		{
 			playerData.sendMessage(Lang_EN_US.PLAYER_COMBAT_TAGGED);
 			return;
@@ -55,40 +60,55 @@ public class FactionsCommand extends BaseCommand{
 	    
 	}
 	
+	@Subcommand("alert|weewoo")
+	public void alert(final CommandSender sender) {
+		PlayerData playerData = ClusterCore.getInstance().getPlayerManager().getPlayerData((Player)sender);
+		Faction faction = ClusterCore.getInstance().getFactionsManager().getFaction(playerData.getFaction());
+		if(!playerData.isInFaction()){
+			playerData.sendMessage(Lang_EN_US.NOT_IN_FACTION);
+			return;
+		}
+		if(!faction.hasPerm(playerData.getPlayer(), FactionPerm.ALERT)){
+			playerData.sendMessage(Lang_EN_US.FACTION_NO_PERM);
+			return;
+		}
+		faction.messageAll(Lang_EN_US.ALERT_RAID);
+	}
+	
 	@Subcommand("create")
 	public void create(final CommandSender sender, final String name, final String tag){
-		PlayerData data = ClusterCore.getInstance().getPlayerManager().getPlayerData((Player)sender);
-		if(data.getFaction() != null) {
-			data.sendMessage(Lang_EN_US.ALREADY_IN_FACTION);
+		PlayerData playerData = ClusterCore.getInstance().getPlayerManager().getPlayerData((Player)sender);
+		if(!playerData.isInFaction()) {
+			playerData.sendMessage(Lang_EN_US.ALREADY_IN_FACTION);
 			return;
 		}
 		if(tag.contains(" "))
 		{
-			data.sendMessage(Lang_EN_US.TAG_CANNOT_CONTAIN_SPACE);
+			playerData.sendMessage(Lang_EN_US.TAG_CANNOT_CONTAIN_SPACE);
+			return;
+		}
+		if(tag.length() > 4)
+		{
+			playerData.sendMessage(Lang_EN_US.FACTION_TAG_TOO_LONG);
 			return;
 		}
 		if(ClusterCore.getInstance().getMongoHook().valueExists("factionTag", tag, "factions"))
 		{
-			data.sendMessage(Lang_EN_US.FACTION_TAG_TAKEN);
+			playerData.sendMessage(Lang_EN_US.FACTION_TAG_TAKEN);
 			return;
 		}
 		
 		ClusterCore.getInstance().getFactionsManager().createFaction((Player)sender, name, tag);
 	}
 	
-	@Subcommand("map")
-	public void map(final CommandSender sender) {
-		ClusterCore.getInstance().getFactionMapGeneratorManager().openMapView((Player)sender);
-	}
-	
 	@Subcommand("leave")
 	public void leave(final CommandSender sender){
-		PlayerData data = ClusterCore.getInstance().getPlayerManager().getPlayerData((Player)sender);		
-		if(data.getFaction() == null){
-			data.sendMessage(Lang_EN_US.NOT_IN_FACTION);
+		PlayerData playerData = ClusterCore.getInstance().getPlayerManager().getPlayerData((Player)sender);		
+		if(!playerData.isInFaction()){
+			playerData.sendMessage(Lang_EN_US.NOT_IN_FACTION);
 			return;
 		}
-		ClusterCore.getInstance().getFactionsManager().getFaction(data.getFaction()).removePlayer((Player)sender, FactionPlayerRemoveReason.LEFT);
+		ClusterCore.getInstance().getFactionsManager().getFaction(playerData.getFaction()).removePlayer((Player)sender, FactionPlayerRemoveReason.LEFT);
 	}
 	
 	@Subcommand("invite")
@@ -96,7 +116,7 @@ public class FactionsCommand extends BaseCommand{
 	public void invite(final CommandSender sender, OnlinePlayer player) {
 		PlayerData inviterData = ClusterCore.getInstance().getPlayerManager().getPlayerData((Player)sender);
 		PlayerData inviteeData = ClusterCore.getInstance().getPlayerManager().getPlayerData(player.getPlayer());
-		if(inviterData.getFaction() == null){
+		if(!inviterData.isInFaction()){
 			inviterData.sendMessage(Lang_EN_US.NOT_IN_FACTION);
 			return;
 		}
@@ -114,7 +134,7 @@ public class FactionsCommand extends BaseCommand{
 			inviterData.sendMessage(Lang_EN_US.PLAYER_ALREADY_INVITED);
 			return;
 		}
-		if(inviteeData.getFaction() != null) {
+		if(inviteeData.isInFaction()) {
 			inviterData.sendMessage(Lang_EN_US.PLAYER_ALREADY_IN_FACTION);
 			return;
 		}
@@ -126,7 +146,7 @@ public class FactionsCommand extends BaseCommand{
 	public void uninvite(final CommandSender sender, OnlinePlayer player) {
 		PlayerData inviterData = ClusterCore.getInstance().getPlayerManager().getPlayerData((Player)sender);
 		PlayerData inviteeData = ClusterCore.getInstance().getPlayerManager().getPlayerData(player.getPlayer());
-		if(inviterData.getFaction() == null){
+		if(!inviterData.isInFaction()){
 			inviterData.sendMessage(Lang_EN_US.NOT_IN_FACTION);
 			return;
 		}
@@ -139,7 +159,7 @@ public class FactionsCommand extends BaseCommand{
 			inviterData.sendMessage(Lang_EN_US.PLAYER_NOT_ON_INVITE_LIST);
 			return;
 		}
-		if(inviteeData.getFaction() != null) {
+		if(inviteeData.isInFaction()) {
 			inviterData.sendMessage(Lang_EN_US.PLAYER_ALREADY_IN_FACTION);
 			return;
 		}
@@ -313,6 +333,10 @@ public class FactionsCommand extends BaseCommand{
 			playerData.sendMessage(Lang_EN_US.CHUNK_NOT_CLAIMED);
 			return;
 		}
+		if(!playerData.getFaction().equals(factionClaimed)){
+			playerData.sendMessage(Lang_EN_US.NOT_YOUR_CLAIM);
+			return;
+		}
 		if(radius == 0){
 
 			playerData.sendMessage(Lang_EN_US.SUCCESSFULL_UNCLAIM);
@@ -335,13 +359,17 @@ public class FactionsCommand extends BaseCommand{
 			playerData.sendMessage(Lang_EN_US.NOT_IN_FACTION);
 			return;
 		}
-		Faction faction = ClusterCore.getInstance().getFactionsManager().getFaction(playerData.getFaction());
+		Faction faction = ClusterCore.getInstance().getFactionsManager().getFaction(playerData.getFaction());		
+		FactionClaimManager claimManager = ClusterCore.getInstance().getFactionClaimManager();
+		UUID factionClaimed = claimManager.chunkClaimed(claimManager.getChunkVector(((Player)sender).getLocation()));
+		if(!playerData.getFaction().equals(factionClaimed)){
+			playerData.sendMessage(Lang_EN_US.NOT_YOUR_CLAIM);
+			return;
+		}
 		if(!faction.hasPerm((Player)sender, FactionPerm.CLAIM)){
 			playerData.sendMessage(Lang_EN_US.FACTION_NO_PERM);
 			return;
 		}
-		FactionClaimManager claimManager = ClusterCore.getInstance().getFactionClaimManager();
-		UUID factionClaimed = claimManager.chunkClaimed(claimManager.getChunkVector(((Player)sender).getLocation()));
 		if(factionClaimed == null) {
 			playerData.sendMessage(Lang_EN_US.CHUNK_NOT_CLAIMED);
 			return;
@@ -681,6 +709,74 @@ public class FactionsCommand extends BaseCommand{
 			return;
 		}
 		faction.enemy(enemy);
+	}
+	
+	@Subcommand("setwarp")
+	public void setwarp(final CommandSender sender, String name) {
+		name = name.toUpperCase();
+		PlayerData playerData = ClusterCore.getInstance().getPlayerManager().getPlayerData((Player)sender);
+		Faction faction = ClusterCore.getInstance().getFactionsManager().getFaction(playerData.getFaction());	
+		if(playerData.getFaction() == null){
+			playerData.sendMessage(Lang_EN_US.NOT_IN_FACTION);
+			return;
+		}		
+		if(!faction.hasPerm((Player)sender, FactionPerm.SETWARP)){
+			playerData.sendMessage(Lang_EN_US.FACTION_NO_PERM);
+			return;
+		}
+		if(faction.warpExists(name))
+		{
+			playerData.sendMessage(Lang_EN_US.FACTION_WARP_NAME_TAKEN, name);
+			return;
+		}
+		playerData.sendMessage(Lang_EN_US.FACTION_WARP_SET, LocationUtil.formatString(((Player)sender).getLocation()));
+		faction.addWarp(name, ((Player)sender).getLocation());
+	}
+	
+	@Subcommand("removewarp|delwarp")
+	@CommandCompletion("@faction-warps")
+	public void delwarp(final CommandSender sender, String name) {
+		name = name.toUpperCase();
+		PlayerData playerData = ClusterCore.getInstance().getPlayerManager().getPlayerData((Player)sender);
+		Faction faction = ClusterCore.getInstance().getFactionsManager().getFaction(playerData.getFaction());	
+		if(playerData.getFaction() == null){
+			playerData.sendMessage(Lang_EN_US.NOT_IN_FACTION);
+			return;
+		}		
+		if(!faction.hasPerm((Player)sender, FactionPerm.SETWARP)){
+			playerData.sendMessage(Lang_EN_US.FACTION_NO_PERM);
+			return;
+		}
+		if(!faction.warpExists(name))
+		{
+			playerData.sendMessage(Lang_EN_US.FACTION_WARP_NOT_FOUND, name);
+			return;
+		}
+		playerData.sendMessage(Lang_EN_US.FACTION_WARP_REMOVED, LocationUtil.formatString(((Player)sender).getLocation()));
+		faction.removeWarp(name);
+	}
+	
+	@Subcommand("warp")
+	@CommandCompletion("@faction-warps")
+	public void warp(final CommandSender sender, String name) {
+		name = name.toUpperCase();
+		PlayerData playerData = ClusterCore.getInstance().getPlayerManager().getPlayerData((Player)sender);
+		Faction faction = ClusterCore.getInstance().getFactionsManager().getFaction(playerData.getFaction());	
+		if(playerData.getFaction() == null){
+			playerData.sendMessage(Lang_EN_US.NOT_IN_FACTION);
+			return;
+		}		
+		if(!faction.hasPerm((Player)sender, FactionPerm.WARP)){
+			playerData.sendMessage(Lang_EN_US.FACTION_NO_PERM);
+			return;
+		}
+		if(!faction.warpExists(name))
+		{
+			playerData.sendMessage(Lang_EN_US.FACTION_WARP_NOT_FOUND, name);
+			return;
+		}
+
+		ClusterCore.getInstance().getTeleportQueue().scheduleTeleport(playerData.getPlayer(), 3000L, faction.getWarp(name));
 	}
 	
 	@Subcommand("who")

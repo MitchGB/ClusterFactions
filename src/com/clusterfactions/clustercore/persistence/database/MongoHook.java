@@ -1,6 +1,10 @@
+  
 package com.clusterfactions.clustercore.persistence.database;
 
 import java.lang.reflect.Field;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Map.Entry;
 
 import org.bson.Document;
 import org.bson.conversions.Bson;
@@ -45,6 +49,13 @@ public class MongoHook {
 			}
 	}
 	
+	public boolean valueExists(String varName, String varValue, String collectionName) {
+
+		this.collection = mongoDatabase.getCollection(collectionName);
+		Document document = (Document) collection.find(new Document(varName, varValue)).first();
+		return document != null;
+	}
+	
 	public void saveObject(String id, String columnName, Object data, String collectionName) {
 
 		this.collection = mongoDatabase.getCollection(collectionName);
@@ -56,7 +67,6 @@ public class MongoHook {
 		}else {
 			Bson updatedValue = new Document(columnName, data);			
 			Bson updateOperation = new Document("$set", updatedValue);
-
 			collection.updateOne(found, updateOperation);
 		}
 	}
@@ -71,104 +81,66 @@ public class MongoHook {
 	
 	@SuppressWarnings("unchecked")
 	public void saveData(String id, Object data, String collectionName) {
-		this.collection = mongoDatabase.getCollection(collectionName);
-		Document found = (Document) collection.find(new Document("_id", id)).first();
-		if(found != null) {
-			Field[] allFields = data.getClass().getDeclaredFields(); 
-	    	for(Field field : allFields) {
-	    		field.setAccessible(true);
-	    		try {
-
-	    			Bson updatedValue = new Document(field.getName(), field.get(data));
-	        		if(field.getAnnotation(DoNotSerialize.class) != null) continue;
-	    			if(field.getAnnotation(AlternateSerializable.class) != null) 
-	    				updatedValue = new Document(field.getName(), ((VariableSerializer<Object>)field.getAnnotation(AlternateSerializable.class).value().getDeclaredConstructor().newInstance()).serialize(field.get(data)));
-	    			
-	    			Bson updateOperation = new Document("$set", updatedValue);
-	    			collection.updateOne(found, updateOperation);
-	    		}catch(Exception e) {
-	    			e.printStackTrace();
-	    		}
-	    	}
-		}
-		else {
-			Document document = new Document("_id", id);
-			Field[] allFields = data.getClass().getDeclaredFields(); 
-	    	for(Field field : allFields) {
-	    		field.setAccessible(true);
-	    		try {
-	    			if(field.get(data) == null) continue;
-	    			if(field.getAnnotation(DoNotSerialize.class) != null) continue;
-	    			if(field.getAnnotation(AlternateSerializable.class) != null) {
-	    				document.append(field.getName(), ((VariableSerializer<Object>)field.getAnnotation(AlternateSerializable.class).value().getDeclaredConstructor().newInstance()).serialize(field.get(data)) );
-	    				continue;
-	    			}
-	    			
-	    			document.append(field.getName(), field.get(data));
-
-	    		}catch(Exception e) {
-	    			e.printStackTrace();
-	    		}
-	    	}
-	    	try {
-			collection.insertOne(document);
-	    	}catch(Exception e) {
-	    		e.printStackTrace();
-	    	}
-		}
+		collection = mongoDatabase.getCollection(collectionName);
 		
+		Map<String, Object> variableMap = new HashMap<>();
 		
-		
-	}
-	
-	public boolean valueExists(String varName, String varValue, String collectionName) {
-
-		this.collection = mongoDatabase.getCollection(collectionName);
-		Document document = (Document) collection.find(new Document(varName, varValue)).first();
-		if(document == null)
-			return false;
-		return true;
-	}
-	
-	public <T> T getObject(String id, Class<T> clazz, String collectionName) {
-		this.collection = mongoDatabase.getCollection(collectionName);
-		T obj = null;
-		try {
-		obj = clazz.getDeclaredConstructor().newInstance();
-		}catch(Exception e) {e.printStackTrace();}
-		Field[] allFields = clazz.getDeclaredFields(); 
-		Document document = (Document) collection.find(new Document("_id", id)).first();
-		for(Field field : allFields) {
-    		field.setAccessible(true);
-
-    		Object val = null;
+    	for(Field field : data.getClass().getDeclaredFields()) {
     		try {
-    		if(field.getAnnotation(DoNotSerialize.class) != null) continue;
-			if(field.getAnnotation(AlternateSerializable.class) != null) {
-				val = ((VariableSerializer<?>)field.getAnnotation(AlternateSerializable.class).value().getDeclaredConstructor().newInstance()).deserialize(document.getString(field.getName()));
-			}
-			else
-				 val = document.get(field.getName());
-			
-    		}catch(Exception e) {
-    			continue;
-    		}
-    		
-    		try {
-    			if(obj==null) continue;
-    			field.set(obj, val);
-    		if(field.getName().equals("playerUUID") && val == null)
-    			field.set(obj, id);
-
+    			field.setAccessible(true);
+    			Object value = field.get(data);
+        		if(field.getAnnotation(DoNotSerialize.class) != null) continue;
+        		if(field.getAnnotation(AlternateSerializable.class) != null) 
+        			value = ((VariableSerializer<Object>)field.getAnnotation(AlternateSerializable.class).value().getDeclaredConstructor().newInstance()).serialize(field.get(data));
+        		variableMap.put(field.getName(), value);
     		}catch(Exception e) {
     			e.printStackTrace();
     		}
-		}
-		return obj;
-
+    	}
+    	
+    	Document document = (Document) collection.find(new Document("_id", id)).first() ;
+    	for(Entry<String, Object> entrySet : variableMap.entrySet()) {
+    		if(document != null){
+    			Bson bsonValue = new Document(entrySet.getKey(), entrySet.getValue());
+    			Bson bsonOperation = new Document("$set", bsonValue);
+    			collection.updateOne(document, bsonOperation);
+    		} else {
+    			Document newValue = new Document("_id", id);
+    			newValue.append(entrySet.getKey(), entrySet.getValue());
+    			collection.insertOne(newValue);
+    		}
+    	}
 	}
 	
-	public void disable() {
-		mongoClient.close();
+	public <T> T getObject(String id, Class<T> clazz, String collectionName) {
+		T object = null;
+		try {
+			collection = mongoDatabase.getCollection(collectionName);
+			object = clazz.getDeclaredConstructor().newInstance();
+		
+			Document document = (Document) collection.find(new Document("_id", id)).first();
+		
+			for(Field field : clazz.getDeclaredFields()) {
+				try {
+					field.setAccessible(true);
+					Object value = null;
+    		
+					if(field.getAnnotation(DoNotSerialize.class) != null) continue;
+					if(field.getAnnotation(AlternateSerializable.class) != null) 
+						value = ((VariableSerializer<?>)field.getAnnotation(AlternateSerializable.class).value().getDeclaredConstructor().newInstance()).deserialize(document.getString(field.getName()));
+					else
+						value = document.get(field.getName());
+    			
+					field.set(object, value);
+
+				}catch(Exception e) {
+					e.printStackTrace();
+				}
+			}
+		}catch(Exception e) {
+			e.printStackTrace();
+		}
+		return object;
+
 	}
 }

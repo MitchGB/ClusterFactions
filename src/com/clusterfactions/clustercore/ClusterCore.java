@@ -16,6 +16,7 @@ import com.clusterfactions.clustercore.core.factions.TeleportQueue;
 import com.clusterfactions.clustercore.core.factions.claim.FactionClaimManager;
 import com.clusterfactions.clustercore.core.factions.map.FactionMapGeneratorManager;
 import com.clusterfactions.clustercore.core.inventory.util.InventoryManager;
+import com.clusterfactions.clustercore.core.items.ItemManager;
 import com.clusterfactions.clustercore.core.lang.LanguageManager;
 import com.clusterfactions.clustercore.core.permission.PlayerPermissionManager;
 import com.clusterfactions.clustercore.core.player.PlayerManager;
@@ -45,6 +46,7 @@ public class ClusterCore extends JavaPlugin{
 	@Manager @Getter private FactionMapGeneratorManager factionMapGeneratorManager;
 	@Manager @Getter private FactionClaimManager factionClaimManager;
 	@Manager @Getter private CombatManager combatManager;
+	@Manager @Getter private ItemManager itemManager;
 	
 	@Manager @Getter private TeleportQueue teleportQueue;
 	

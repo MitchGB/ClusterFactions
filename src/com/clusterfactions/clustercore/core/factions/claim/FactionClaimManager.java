@@ -104,59 +104,65 @@ public class FactionClaimManager implements Listener{
 	
 	
 	public void claimArea(Player player, int xrad, int zrad) {
-		PlayerData playerData = ClusterCore.getInstance().getPlayerManager().getPlayerData(player);
-		Faction faction = ClusterCore.getInstance().getFactionsManager().getFaction(playerData.getFaction());
-		Vector2Integer playerChunk = getChunkVector(player.getLocation());
+		Bukkit.getScheduler().runTaskLaterAsynchronously(ClusterCore.getInstance(), new Runnable() {
+	        @Override
+	        public void run() {
+	        	
+	        	PlayerData playerData = ClusterCore.getInstance().getPlayerManager().getPlayerData(player);
+	        	Faction faction = ClusterCore.getInstance().getFactionsManager().getFaction(playerData.getFaction());
+	        	Vector2Integer playerChunk = getChunkVector(player.getLocation());
 		
-		Vector2Integer[][] claimMap = new Vector2Integer[xrad*2][zrad*2];
+	        	Vector2Integer[][] claimMap = new Vector2Integer[xrad*2][zrad*2];
 		
-		int pX = playerChunk.getX();
-		int pZ = playerChunk.getZ();
+	        	int pX = playerChunk.getX();
+	        	int pZ = playerChunk.getZ();
+		
+	        	int uX = pX + xrad;
+	        	int uZ = pZ + zrad;
+		
+	        	int lX = pX - xrad;
+	        	int lZ = pZ - zrad;
+	        	int xIndex = 0;
+	        	int zIndex = 0;
 
-		int uX = pX + xrad;
-		int uZ = pZ + zrad ;
+	        	int overlapping = 0;
 		
-		int lX = pX - xrad;
-		int lZ = pZ - zrad;
-		int xIndex = 0;
-		int zIndex = 0;
+	        	for(int z = lZ; z < uZ; z++)
+	        	{
+	        		xIndex = 0;
+	        		for(int x = lX; x <uX; x++)
+	        		{
+	        			claimMap[xIndex][zIndex] = new Vector2Integer(x,z);
+	        			if(chunkClaimed(claimMap[xIndex][zIndex]) != null)
+	        			{
+	        				if(chunkClaimed(claimMap[xIndex][zIndex]).equals(playerData.getFaction()))
+	        				{
+	        					claimMap[xIndex][zIndex] = null;
+	        					overlapping++;
+	        					xIndex++;
 
-		int overlapping = 0;
-		
-		for(int z = lZ; z < uZ; z++)
-		{
-			xIndex = 0;
-			for(int x = lX; x <uX; x++)
-			{
-				claimMap[xIndex][zIndex] = new Vector2Integer(x,z);
-				if(chunkClaimed(claimMap[xIndex][zIndex]) != null)
-				{
-					if(chunkClaimed(claimMap[xIndex][zIndex]).equals(playerData.getFaction()))
-					{
-						claimMap[xIndex][zIndex] = null;
-						overlapping++;
-						xIndex++;
+	        					continue;
+	        				}
+	        				playerData.sendMessage(Lang_EN_US.CLAIM_RADIUS_OVERLAPPING);
+	        				return;
+	        			}
 
-						continue;
-					}
-					playerData.sendMessage(Lang_EN_US.CLAIM_RADIUS_OVERLAPPING);
-					return;
-				}
-
-				xIndex++;
-			}
-			zIndex++;
-		}
+	        			xIndex++;
+	        		}
+	        		zIndex++;
+	        	}
 		
-		for(Vector2Integer[] vA : claimMap) {
-			for(Vector2Integer v : vA)
-			{
-				if(v == null) continue;
-				claimChunk(v, faction);
-			}
-		}
+	        	for(Vector2Integer[] vA : claimMap) {
+	        		for(Vector2Integer v : vA)
+	        		{
+	        			if(v == null) continue;
+	        			claimChunk(v, faction);
+	        		}
+	        	}
 		
-		playerData.sendMessage(Lang_EN_US.SUCCESSFULL_CLAIM_AREA, (xrad*2)*(zrad*2) - overlapping + "", overlapping + "");
+	        	playerData.sendMessage(Lang_EN_US.SUCCESSFULL_CLAIM_AREA, (xrad*2)*(zrad*2) - overlapping + "", overlapping + "");
+	        }
+		}, 1);
 	}
 	
 	public void removeClaimArea(Player player, int xrad, int zrad) {
