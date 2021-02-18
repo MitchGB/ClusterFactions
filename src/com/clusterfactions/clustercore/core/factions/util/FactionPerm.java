@@ -8,7 +8,7 @@ public enum FactionPerm {
 	
 	AUDIT("FACTION.AUDIT", "Audit", "", Material.BOOK),
 	ALLY("FACTION.ALLY", "ALLY", "Form an allyship with a faction", Material.GOLDEN_APPLE),//
-	BAN("FACTION.BAN", "Ban", "", Material.DIRT),
+	BAN("FACTION.BAN", "Ban", "", Material.DIRT),//
 	BUILD("FACTION.BUILD", "Build", "Allow player to build on faction claimed chunks", Material.BRICKS),//
 	CHECK("FACTION.CHECK", "Check", "", Material.DIRT),
 	CHEST("FACTION.CHEST", "Use Chests", "", Material.CHEST), //
@@ -21,7 +21,7 @@ public enum FactionPerm {
 	INVITE("FACTION.INVITE","Invite Players", "", Material.APPLE), //
 	ITEMS("FACTION.ITEMS", "", "", Material.DIRT),
 	INTERACT("FACTION.INTERACT", "Interact", "Allow the player to interact with blocks", Material.STONE_BUTTON), //
-	KICK("FACTION.KICK", "Kick Players", "", Material.DIRT),
+	KICK("FACTION.KICK", "Kick Players", "", Material.DIRT),//
 	PAINBUILD("FACTION.PAINBUILD", "", "", Material.DIRT),
 	PROMOTE("FACTION.PROMOTE", "Promote Players", "", Material.DIAMOND), //
 	SETHOME("FACTION.SETHOME", "Set Faction Home", "", Material.TORCH), //

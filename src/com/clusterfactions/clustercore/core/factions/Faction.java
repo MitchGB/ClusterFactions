@@ -42,7 +42,7 @@ public class Faction implements Listener{
 	@Getter @AlternateSerializable(UUIDListSerializer.class) private List<UUID> enemies = new ArrayList<>(); 
 	
 	@Getter @AlternateSerializable(UUIDListSerializer.class) private List<UUID> players = new ArrayList<>();
-	@Getter @AlternateSerializable(UUIDListSerializer.class) private List<UUID> banList = new ArrayList<>();
+	@Getter @AlternateSerializable(UUIDListSerializer.class) private List<UUID> bannedPlayers = new ArrayList<>();
 	@Getter @AlternateSerializable(Vector2IntegerListSerializer.class) private ArrayList<Vector2Integer> claimedChunks = new ArrayList<>();
 	@Getter @Setter private Map<String,Integer> permissionMap = new HashMap<>(); //PERMISSION, WEIGHT
 	@Getter @Setter private Map<String,Integer> roleMap = new HashMap<>(); //UUID,RANK
@@ -85,19 +85,51 @@ public class Faction implements Listener{
 	
 	public void removePlayer(Player player, FactionPlayerRemoveReason reason) {
 		PlayerData data = ClusterCore.getInstance().getPlayerManager().getPlayerData(player);
-		data.sendMessage(reason == FactionPlayerRemoveReason.LEFT ? Lang_EN_US.LEFT_FACTION : Lang_EN_US.KICKED_FROM_FACTION, this.factionName);
 		data.setFaction(null);
 		data.saveData();
 		
-		
-			//CHOOSE MOD AND PROMOTE
-		
-		messageAll(String.format(reason == FactionPlayerRemoveReason.KICKED ? Lang_EN_US.PLAYER_KICKED_FACTION : Lang_EN_US.PLAYER_LEFT_FACTION, player.getName()));
 		players.remove(player.getUniqueId());
+		switch(reason) {
+		case KICKED:
+			data.sendMessage(Lang_EN_US.YOU_HAVE_BEEN_KICKED, this.factionName);
+			messageAll(String.format(Lang_EN_US.PLAYER_KICKED_FACTION, player.getName()));
+			break;
+		case BANNED:
+			data.sendMessage(Lang_EN_US.YOU_HAVE_BEEN_BANNED, this.factionName);
+			messageAll(String.format(Lang_EN_US.PLAYER_BANNED_FACTION, player.getName()));
+			break;
+		case LEFT:
+			data.sendMessage(Lang_EN_US.LEFT_FACTION, this.factionName);
+			messageAll(String.format(Lang_EN_US.PLAYER_LEFT_FACTION, player.getName()));
+			break;
+		
+		}
 		saveData();
 	}
 
-	public void invitePlayer(Player invter, Player invitee)
+	public void banPlayer(Player player) {
+		if(bannedPlayers == null) bannedPlayers = new ArrayList<>();
+		bannedPlayers.add(player.getUniqueId());
+		removePlayer(player, FactionPlayerRemoveReason.BANNED);
+		saveData();
+	}
+	
+	public void unbanPlayer(Player player) {
+		if(bannedPlayers == null) bannedPlayers = new ArrayList<>();
+		bannedPlayers.remove(player.getUniqueId());
+		saveData();
+	}
+	
+	public void kickPlayer(Player player) {
+		removePlayer(player, FactionPlayerRemoveReason.KICKED);
+	}
+	
+	public void uninvitePlayer(Player invitee) {
+		inviteList.remove(invitee.getUniqueId());
+		saveData();
+	}
+	
+	public void invitePlayer(Player invitee)
 	{
 		PlayerData inviteeData = ClusterCore.getInstance().getPlayerManager().getPlayerData(invitee);
 		
@@ -237,6 +269,7 @@ public class Faction implements Listener{
 	
 	public boolean allyInviteListContains(Faction fac) {
 		if(allyshipInviteList == null) allyshipInviteList = new ArrayList<>();
+		if(fac == null) return false;
 		return allyshipInviteList.contains(fac.getFactionID());
 	}
 	

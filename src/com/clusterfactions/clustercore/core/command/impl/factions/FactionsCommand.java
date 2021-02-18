@@ -2,6 +2,7 @@ package com.clusterfactions.clustercore.core.command.impl.factions;
 
 import java.util.UUID;
 
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -17,6 +18,7 @@ import com.clusterfactions.clustercore.core.inventory.impl.faction.perm.MainPerm
 import com.clusterfactions.clustercore.core.lang.Lang_EN_US;
 import com.clusterfactions.clustercore.core.player.PlayerData;
 import com.clusterfactions.clustercore.util.location.LocationUtil;
+import com.clusterfactions.clustercore.util.location.Vector2Integer;
 
 import co.aikar.commands.BaseCommand;
 import co.aikar.commands.annotation.CommandAlias;
@@ -103,6 +105,11 @@ public class FactionsCommand extends BaseCommand{
 			inviterData.sendMessage(Lang_EN_US.FACTION_NO_PERM);
 			return;
 		}
+		if(faction.getBannedPlayers() != null && faction.getBannedPlayers().contains(player.getPlayer().getUniqueId()))
+		{
+			inviterData.sendMessage(Lang_EN_US.PLAYER_IS_CURRENTLY_BANNED);
+			return;
+		}
 		if(faction.inviteListContains(player.getPlayer())){
 			inviterData.sendMessage(Lang_EN_US.PLAYER_ALREADY_INVITED);
 			return;
@@ -111,9 +118,33 @@ public class FactionsCommand extends BaseCommand{
 			inviterData.sendMessage(Lang_EN_US.PLAYER_ALREADY_IN_FACTION);
 			return;
 		}
-		//CHECK IF SENDER HAS PERMS
-		
-		faction.invitePlayer((Player)sender, player.getPlayer());
+		faction.invitePlayer(player.getPlayer());
+	}
+	
+	@Subcommand("deinvite|uninvite")
+	@CommandCompletion("@players")
+	public void uninvite(final CommandSender sender, OnlinePlayer player) {
+		PlayerData inviterData = ClusterCore.getInstance().getPlayerManager().getPlayerData((Player)sender);
+		PlayerData inviteeData = ClusterCore.getInstance().getPlayerManager().getPlayerData(player.getPlayer());
+		if(inviterData.getFaction() == null){
+			inviterData.sendMessage(Lang_EN_US.NOT_IN_FACTION);
+			return;
+		}
+		Faction faction = ClusterCore.getInstance().getFactionsManager().getFaction(inviterData.getFaction());
+		if(!faction.hasPerm((Player)sender, FactionPerm.INVITE)){
+			inviterData.sendMessage(Lang_EN_US.FACTION_NO_PERM);
+			return;
+		}
+		if(!faction.inviteListContains(player.getPlayer())){
+			inviterData.sendMessage(Lang_EN_US.PLAYER_NOT_ON_INVITE_LIST);
+			return;
+		}
+		if(inviteeData.getFaction() != null) {
+			inviterData.sendMessage(Lang_EN_US.PLAYER_ALREADY_IN_FACTION);
+			return;
+		}
+		inviterData.sendMessage(Lang_EN_US.UNINVITED_PLAYER);
+		faction.uninvitePlayer(player.getPlayer());
 	}
 	
 	@Subcommand("join")
@@ -327,6 +358,27 @@ public class FactionsCommand extends BaseCommand{
 		playerData.sendMessage(factionClaimed == null ? "This chunk is not claimed" : "This chunk is claimed by " + ClusterCore.getInstance().getFactionsManager().getFaction(factionClaimed).getFactionName());
 	}
 	
+	@Subcommand("showclaims|claims|claimlist")
+	public void showclaims(final CommandSender sender) {
+		PlayerData senderData = ClusterCore.getInstance().getPlayerManager().getPlayerData((Player)sender);
+		if(senderData.getFaction() == null){
+			senderData.sendMessage(Lang_EN_US.NOT_IN_FACTION);
+			return;
+		}
+		Faction faction = ClusterCore.getInstance().getFactionsManager().getFaction(senderData.getFaction());		
+		if(faction.getClaimedChunks() == null || faction.getClaimedChunks().isEmpty())
+		{
+			senderData.sendMessage(Lang_EN_US.CLAIMLIST_EMPTY);
+			return;
+		}
+		senderData.sendMessage("Faction claims:");
+		StringBuilder builder = new StringBuilder();
+		for(Vector2Integer claim : faction.getClaimedChunks()) {
+			builder.append("&7[&a" + claim.getX() + "&7,&a" + claim.getZ() +"&7],");
+		}
+		senderData.sendMessage(builder.toString());
+	}
+	
 	@Subcommand("perms|perm|permission|permissions")
 	public void perm(final CommandSender sender) {
 		PlayerData playerData = ClusterCore.getInstance().getPlayerManager().getPlayerData((Player)sender);
@@ -352,12 +404,12 @@ public class FactionsCommand extends BaseCommand{
 			return;
 		}
 		Faction faction = ClusterCore.getInstance().getFactionsManager().getFaction(senderData.getFaction());
-		if(playerData.getFaction() == null || !playerData.getFaction().toString().equals(faction.getFactionID().toString())) {
-			senderData.sendMessage(Lang_EN_US.PLAYER_NOT_IN_FACTION);
-			return;
-		}
 		if(!faction.hasPerm((Player)sender, FactionPerm.PROMOTE)){
 			senderData.sendMessage(Lang_EN_US.FACTION_NO_PERM);
+			return;
+		}
+		if(playerData.getFaction() == null || !playerData.getFaction().toString().equals(faction.getFactionID().toString())) {
+			senderData.sendMessage(Lang_EN_US.PLAYER_NOT_IN_FACTION);
 			return;
 		}
 		if(faction.getPlayerRole(player.getPlayer()).equals(FactionRole.COLEADER))
@@ -384,12 +436,12 @@ public class FactionsCommand extends BaseCommand{
 			return;
 		}
 		Faction faction = ClusterCore.getInstance().getFactionsManager().getFaction(senderData.getFaction());
-		if(playerData.getFaction() == null || !playerData.getFaction().toString().equals(faction.getFactionID().toString())) {
-			senderData.sendMessage(Lang_EN_US.PLAYER_NOT_IN_FACTION);
-			return;
-		}
 		if(!faction.hasPerm((Player)sender, FactionPerm.PROMOTE)){
 			senderData.sendMessage(Lang_EN_US.FACTION_NO_PERM);
+			return;
+		}
+		if(playerData.getFaction() == null || !playerData.getFaction().toString().equals(faction.getFactionID().toString())) {
+			senderData.sendMessage(Lang_EN_US.PLAYER_NOT_IN_FACTION);
 			return;
 		}
 		if(faction.getPlayerRole(player.getPlayer()).getWeight() == 1 || faction.getPlayerRole((Player)sender).getWeight() < faction.getPlayerRole(player.getPlayer()).getWeight())
@@ -399,6 +451,104 @@ public class FactionsCommand extends BaseCommand{
 		}
 		faction.demotePlayer(player.getPlayer().getUniqueId());
 		faction.messageAll(String.format(Lang_EN_US.FACTION_DEMOTED_PLAYER, player.getPlayer().getName(), faction.getPlayerRole(player.getPlayer()).toString()));
+	}
+	
+	@Subcommand("kick")
+	@CommandCompletion("@faction-online-players")
+	public void kick(final CommandSender sender, OnlinePlayer player) {
+		PlayerData senderData = ClusterCore.getInstance().getPlayerManager().getPlayerData((Player)sender);
+		PlayerData playerData = ClusterCore.getInstance().getPlayerManager().getPlayerData(player.getPlayer());
+		if(senderData.getFaction() == null){
+			senderData.sendMessage(Lang_EN_US.NOT_IN_FACTION);
+			return;
+		}
+		Faction faction = ClusterCore.getInstance().getFactionsManager().getFaction(senderData.getFaction());		
+		if(!faction.hasPerm((Player)sender, FactionPerm.KICK)){
+			senderData.sendMessage(Lang_EN_US.FACTION_NO_PERM);
+			return;
+		}
+		if(playerData.getFaction() == null || !playerData.getFaction().toString().equals(faction.getFactionID().toString())) {
+			senderData.sendMessage(Lang_EN_US.PLAYER_NOT_IN_FACTION);
+			return;
+		}
+
+		if(faction.getPlayerRole((Player)sender).getWeight() <= faction.getPlayerRole(player.getPlayer()).getWeight())
+		{
+			senderData.sendMessage(Lang_EN_US.FACTION_CANNOT_KICK_PLAYER);
+			return;
+		}
+		faction.banPlayer(player.getPlayer());
+	}
+	
+	@Subcommand("ban")
+	@CommandCompletion("@faction-online-players")
+	public void ban(final CommandSender sender, OnlinePlayer player) {
+		PlayerData senderData = ClusterCore.getInstance().getPlayerManager().getPlayerData((Player)sender);
+		PlayerData playerData = ClusterCore.getInstance().getPlayerManager().getPlayerData(player.getPlayer());
+		if(senderData.getFaction() == null){
+			senderData.sendMessage(Lang_EN_US.NOT_IN_FACTION);
+			return;
+		}
+		Faction faction = ClusterCore.getInstance().getFactionsManager().getFaction(senderData.getFaction());
+		if(!faction.hasPerm((Player)sender, FactionPerm.BAN)){
+			senderData.sendMessage(Lang_EN_US.FACTION_NO_PERM);
+			return;
+		}
+		if(playerData.getFaction() == null || !playerData.getFaction().toString().equals(faction.getFactionID().toString())) {
+			senderData.sendMessage(Lang_EN_US.PLAYER_NOT_IN_FACTION);
+			return;
+		}
+		if(faction.getPlayerRole((Player)sender).getWeight() <= faction.getPlayerRole(player.getPlayer()).getWeight())
+		{
+			senderData.sendMessage(Lang_EN_US.FACTION_CANNOT_BAN_PLAYER);
+			return;
+		}
+		faction.banPlayer(player.getPlayer());
+	}
+	
+	@Subcommand("unban")
+	public void unban(final CommandSender sender, OnlinePlayer player) {
+		PlayerData senderData = ClusterCore.getInstance().getPlayerManager().getPlayerData((Player)sender);
+		if(senderData.getFaction() == null){
+			senderData.sendMessage(Lang_EN_US.NOT_IN_FACTION);
+			return;
+		}
+		Faction faction = ClusterCore.getInstance().getFactionsManager().getFaction(senderData.getFaction());
+		if(!faction.hasPerm((Player)sender, FactionPerm.BAN)){
+			senderData.sendMessage(Lang_EN_US.FACTION_NO_PERM);
+			return;
+		}
+		if(faction.getBannedPlayers() != null)
+		if(!faction.getBannedPlayers().contains(player.getPlayer().getUniqueId()))
+		{
+			senderData.sendMessage(Lang_EN_US.PLAYER_NOT_BANNED);
+			return;
+		}
+		faction.unbanPlayer(player.getPlayer());
+		senderData.sendMessage(Lang_EN_US.FACTION_UNBANNED_PLAYER, player.getPlayer().getName());
+	}
+	
+	@Subcommand("banlist")
+	public void banlist(final CommandSender sender) {
+		PlayerData senderData = ClusterCore.getInstance().getPlayerManager().getPlayerData((Player)sender);
+		if(senderData.getFaction() == null){
+			senderData.sendMessage(Lang_EN_US.NOT_IN_FACTION);
+			return;
+		}
+		Faction faction = ClusterCore.getInstance().getFactionsManager().getFaction(senderData.getFaction());
+		if(faction.getBannedPlayers() == null || faction.getBannedPlayers().isEmpty())
+		{
+			senderData.sendMessage(Lang_EN_US.BAN_LIST_EMPTY);
+			return;
+		}
+		
+		senderData.sendMessage("Banned players:");
+		StringBuilder builder = new StringBuilder();
+		for(UUID uuid : faction.getBannedPlayers())
+		{
+			builder.append(Bukkit.getPlayer(uuid).getName() + ",");
+		}
+		senderData.sendMessage(builder.toString());
 	}
 	
 	@Subcommand("ally")
@@ -531,6 +681,22 @@ public class FactionsCommand extends BaseCommand{
 			return;
 		}
 		faction.enemy(enemy);
+	}
+	
+	@Subcommand("who")
+	public void who(final CommandSender sender, String tag) {
+		PlayerData playerData = ClusterCore.getInstance().getPlayerManager().getPlayerData((Player)sender);
+		Faction faction = ClusterCore.getInstance().getFactionsManager().getFaction(tag);
+		if(faction == null) {
+			playerData.sendMessage(Lang_EN_US.NO_FACTION_WITH_TAG, tag);
+			return;
+		}
+		playerData.sendMessage("");
+		playerData.sendMessage("");
+		playerData.sendMessage("");
+		playerData.sendMessage("");
+		playerData.sendMessage("");
+		playerData.sendMessage("");
 	}
 	
 }
