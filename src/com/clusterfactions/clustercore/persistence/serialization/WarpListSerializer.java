@@ -13,7 +13,7 @@ public class WarpListSerializer extends VariableSerializer<HashMap<String, Locat
 	@Override
 	public String serialize(HashMap<String, Location> obj) {
 		StringBuilder builder = new StringBuilder();
-		System.out.println("se");
+		if(obj == null) return "";
 		for(Entry<String,Location> entrySet : obj.entrySet())
 		{
 			builder.append(entrySet.getKey());
@@ -31,7 +31,6 @@ public class WarpListSerializer extends VariableSerializer<HashMap<String, Locat
 		if(str == null || str.isEmpty()) return ret;
 		for(String a : str.split(","))
 		{
-			System.out.println(a);
 			String[] m = a.split(":");
 			Location loc = null;
 			String name = m[0];

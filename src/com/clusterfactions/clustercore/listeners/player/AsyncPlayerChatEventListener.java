@@ -9,6 +9,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
 
 import com.clusterfactions.clustercore.ClusterCore;
+import com.clusterfactions.clustercore.core.chat.ChatMessageMode;
 import com.clusterfactions.clustercore.core.factions.Faction;
 import com.clusterfactions.clustercore.core.player.PlayerData;
 import com.clusterfactions.clustercore.util.unicode.CharRepo;
@@ -24,6 +25,7 @@ public class AsyncPlayerChatEventListener implements Listener{
 		e.setCancelled(true);				
 		PlayerData playerData = ClusterCore.getInstance().getPlayerManager().getPlayerData(e.getPlayer());
 		Faction faction = ClusterCore.getInstance().getFactionsManager().getFaction(playerData.getFaction());
+		if(data.getChatMode() != ChatMessageMode.GLOBAL && faction == null) data.setChatMode(ChatMessageMode.GLOBAL);
 		switch(data.getChatMode())
 		{
 			case GLOBAL:
@@ -35,13 +37,15 @@ public class AsyncPlayerChatEventListener implements Listener{
 					
 					String facColor = "";
 					if(faction != null && recipientFaction != null) {
-						if(recipientFaction.isAllied(faction))
+						if(recipientFaction.isAlly(faction))
 							facColor = "&d";
 						if(recipientFaction.isEnemy(faction))
 							facColor = "&c";
+						if(recipientFaction.isSame(faction))
+							facColor = "&a";
 					}
 					
-					String format = (data.getGroup() != null ? data.getGroup().getGroupPrefix() : " ") + " " + facColor + (faction == null ? "" : faction.getFactionTag()) + " " + player.getName()	 + ChatColor.GRAY + " ";
+					String format = (data.getGroup() != null ? data.getGroup().getGroupPrefix() : " ") + " " + facColor + (faction == null ? "" : faction.getFactionTag() + " ") + "&f" +player.getName()	 + ChatColor.GRAY + " ";
 					pl.sendMessage(ChatColor.translateAlternateColorCodes('&', format + e.getMessage()));
 				}
 			
@@ -51,6 +55,7 @@ public class AsyncPlayerChatEventListener implements Listener{
 			{
 				String format = CharRepo.ALLY_CHAT_TAG + " " + (data.getGroup() != null ? data.getGroup().getGroupPrefix() : " ")+ " " + player.getName()	 + ChatColor.GRAY + " ";
 				faction.messageAll(ChatColor.translateAlternateColorCodes('&', format + e.getMessage()));
+				if(faction.getAllies() != null)
 				for(UUID ally : faction.getAllies())
 				{
 					Faction allyFaction = ClusterCore.getInstance().getFactionsManager().getFaction(ally);

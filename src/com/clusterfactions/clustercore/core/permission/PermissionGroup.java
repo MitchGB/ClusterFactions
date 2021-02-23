@@ -9,7 +9,7 @@ import com.clusterfactions.clustercore.util.unicode.CharRepo;
 import lombok.Getter;
 import lombok.Setter;
 
-public enum PermissionGroup {
+public enum PermissionGroup{
 	
 	ADMIN("ADMIN", CharRepo.RANK_ADMIN_TAG, null, "*", "clustercore.admin"),
 	DEVELOPER("DEV", "&c&lDEV", ADMIN),
@@ -52,12 +52,5 @@ public enum PermissionGroup {
 			perms.addAll(inheritance.getAllPerms());
 			return perms;
 		}
-	}
-	
-	public static List<String> getAllList(){
-		List<String> ret = new ArrayList<>();
-		for(PermissionGroup t : PermissionGroup.values())
-			ret.add(t.toString());
-		return ret;
 	}
 }

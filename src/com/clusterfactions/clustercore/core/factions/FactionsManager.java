@@ -6,12 +6,15 @@ import java.util.UUID;
 import org.bukkit.entity.Player;
 
 import com.clusterfactions.clustercore.ClusterCore;
-import com.clusterfactions.clustercore.core.lang.Lang_EN_US;
+import com.clusterfactions.clustercore.core.lang.Lang;
 import com.clusterfactions.clustercore.core.player.PlayerData;
 
 public class FactionsManager {
 	
 	private HashMap<UUID, Faction> factionCache = new HashMap<>();
+
+	public static final int disbandTimer = 5000;
+	public HashMap<UUID, Long> disbandTimerMap = new HashMap<>();
 	
 	public Faction getFaction(UUID factionUUID) {		
 		if(factionUUID == null) return null;
@@ -26,13 +29,20 @@ public class FactionsManager {
 	}
 	
 	public Faction getFaction(String tag) {
-		//CHANGE THIS TO MONGO SEARCH
+		if(factionCache == null) factionCache = new HashMap<>();
+		Faction fac = null;
 		for(Faction f : factionCache.values())
 		{
-			if(f.getFactionTag().equalsIgnoreCase(tag))
-				return f;
+			if(f != null)
+				if(f.getFactionTag() != null)
+					if(f.getFactionTag().equalsIgnoreCase(tag))
+						fac = f;
 		}
-		return null;
+		if(fac == null) {
+			fac = ClusterCore.getInstance().getMongoHook().getObject(tag.toLowerCase(), "factionLower", Faction.class, "factions");
+			factionCache.put(fac.getFactionID(), fac);
+		}
+		return fac;
 	}
 	
 	public Faction getFaction(Player player) {
@@ -40,13 +50,23 @@ public class FactionsManager {
 		return getFaction(playerData.getFaction());
 	}
 	
-	public void createFaction(Player leader, String name, String tag) {
+	public void createFaction(Player leader, String tag) {
 		PlayerData data = ClusterCore.getInstance().getPlayerManager().getPlayerData(leader);
-		Faction newFaction = new Faction(leader, name, tag);
+		Faction newFaction = new Faction(leader, tag);
 		data.setFaction(newFaction.getFactionID());
-		data.saveData();
-		data.sendMessage(Lang_EN_US.FACTION_CREATED);
+		data.saveData("faction");
+		data.sendMessage(Lang.FACTION_CREATED);
 		getFaction(newFaction.getFactionID()); // LOAD INTO CACHE
+	}
+	
+	public void setDisbandTimer(Faction faction) {
+		disbandTimerMap.put(faction.getFactionID(), System.currentTimeMillis());
+	}
+	
+	public boolean canDisband(Faction faction) {
+		if(!disbandTimerMap.containsKey(faction.getFactionID())) return false;
+		if(System.currentTimeMillis() - disbandTimerMap.get(faction.getFactionID()) <= disbandTimer) return true;
+		return false;
 	}
 
 }

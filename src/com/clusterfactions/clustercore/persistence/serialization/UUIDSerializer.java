@@ -7,6 +7,7 @@ public class UUIDSerializer extends VariableSerializer<UUID>{
 	
 	@Override
 	public String serialize(UUID obj) {
+		if(obj == null) return "";
 		return obj.toString();
 	}
 

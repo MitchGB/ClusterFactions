@@ -34,7 +34,7 @@ public class PlayerPermissionManager {
 		PlayerData user = ClusterCore.getInstance().getPlayerManager().getPlayerData(player);
 		user.setGroup(group);
 		assignPermissions(player);
-		user.saveData();
+		user.saveData("group");
 	}
 	
 	/*

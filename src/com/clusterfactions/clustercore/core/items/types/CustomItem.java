@@ -1,8 +1,5 @@
 package com.clusterfactions.clustercore.core.items.types;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 import java.util.UUID;
 
 import org.bukkit.Bukkit;
@@ -25,9 +22,8 @@ import org.bukkit.inventory.meta.ItemMeta;
 
 import com.clusterfactions.clustercore.ClusterCore;
 import com.clusterfactions.clustercore.core.items.CustomItemType;
+import com.clusterfactions.clustercore.core.items.types.interfaces.EnchantableItem;
 import com.clusterfactions.clustercore.core.items.types.interfaces.StackableItem;
-import com.clusterfactions.clustercore.core.player.PlayerData;
-import com.clusterfactions.clustercore.util.Colors;
 import com.clusterfactions.clustercore.util.ItemBuilder;
 
 import de.tr7zw.changeme.nbtapi.NBTItem;
@@ -40,27 +36,18 @@ public class CustomItem implements Listener{
 	@Getter CustomItemType itemCustomType;
 	@Getter String ID;
 	@Getter ItemStack item;
-	@Getter String displayName;
-	@Getter List<String> lore;
 	
-	public CustomItem(CustomItemType type, ItemStack item, String displayName, String... lore)
+	public CustomItem(CustomItemType type, ItemStack item)
 	{
 		this.ID = type.getId();
 		this.item = item;
-		this.displayName = displayName;
 		this.itemCustomType = type;
-		this.lore = Arrays.asList(lore);
-	}
 	
-	public List<String> getItemLore(PlayerData user, List<String> modLore)
-	{
-		return lore == null ? new ArrayList<>() : new ArrayList<String>(lore);
 	}
-	
+
     public boolean isApplicableItem(ItemStack itemStack) {
         if (itemStack == null) return false;
         if (!getItemType().equals(itemStack.getType())) return false;
-        
         CustomItemType type = ClusterCore.getInstance().getItemManager().getCustomItemType(itemStack);
         return type == this.itemCustomType;
     }
@@ -89,7 +76,6 @@ public class CustomItem implements Listener{
 
         if (itemMeta == null) itemMeta = Bukkit.getItemFactory().getItemMeta(itemStack.getType());
 
-        itemMeta.setDisplayName(Colors.parseColors(displayName));
         itemStack.setItemMeta(itemMeta);
         itemStack.setAmount(amount);
         return itemStack;
@@ -104,8 +90,8 @@ public class CustomItem implements Listener{
 
     // disable using custom items in enchanting table
     @EventHandler
-    public void onItem(EnchantItemEvent event) {
-        if (isApplicableItem(event.getItem())) event.setCancelled(true);
+    public void onItemEnchant(EnchantItemEvent event) {
+        if (isApplicableItem(event.getItem()) && !(this instanceof EnchantableItem)) event.setCancelled(true);
     }
 
     @EventHandler
@@ -117,12 +103,27 @@ public class CustomItem implements Listener{
     	player.updateInventory();
     }
 
+    
     @EventHandler(ignoreCancelled = true, priority = EventPriority.LOWEST)
     public void onPrepareItemCraft(PrepareItemCraftEvent event) {
         for (ItemStack itemStack : event.getInventory().getMatrix()) {
-            if (isApplicableItem(itemStack)) {
-                event.getInventory().setResult(new ItemStack(Material.AIR));
-                return;
+            if (isApplicableItem(itemStack)) {    	
+                int xIndex = 0;
+                int zIndex = 0;
+                ItemStack[][] map = new ItemStack[3][3];
+                
+            	for (ItemStack s : event.getInventory().getMatrix()) {
+                    if(xIndex == 3) {
+                    	xIndex = 0;
+                    	zIndex++;
+                    }
+                    map[zIndex][xIndex] = s;
+                    xIndex++;
+                }	
+            
+            	if(!ClusterCore.getInstance().getItemManager().isMaterialsApplicable(map)) {
+            			event.getInventory().setResult(new ItemStack(Material.AIR));
+            	}
             }
         }
     }

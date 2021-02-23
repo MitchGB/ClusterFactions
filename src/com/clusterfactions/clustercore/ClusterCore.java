@@ -24,7 +24,10 @@ import com.clusterfactions.clustercore.listeners.block.BlockBreakEventListener;
 import com.clusterfactions.clustercore.listeners.block.BlockPlaceEventListener;
 import com.clusterfactions.clustercore.listeners.entity.EntityInteractEventListener;
 import com.clusterfactions.clustercore.listeners.events.updates.UpdateSecondEvent;
+import com.clusterfactions.clustercore.listeners.misc.CraftItemEventListener;
+import com.clusterfactions.clustercore.listeners.misc.PrepareItemCraftEventListener;
 import com.clusterfactions.clustercore.listeners.player.AsyncPlayerChatEventListener;
+import com.clusterfactions.clustercore.listeners.player.PlayerDeathEventListener;
 import com.clusterfactions.clustercore.listeners.player.PlayerInteractEventListener;
 import com.clusterfactions.clustercore.listeners.player.PlayerJoinEventListener;
 import com.clusterfactions.clustercore.listeners.player.PlayerMoveEventListener;
@@ -73,19 +76,22 @@ public class ClusterCore extends JavaPlugin{
 			
 		}.runTaskTimer(this, 0, 20);
 	}
-	
 	private void setupListeners() {
 		registerListener(
 				new PlayerJoinEventListener(),
 				new PlayerQuitEventListener(),
 				new PlayerInteractEventListener(),
-				new AsyncPlayerChatEventListener(),
+				new PlayerDeathEventListener(),
 				new PlayerMoveEventListener(),
+				new AsyncPlayerChatEventListener(),
 				
 				new BlockBreakEventListener(),
 				new BlockPlaceEventListener(),
 				
-				new EntityInteractEventListener()
+				new EntityInteractEventListener(),
+				
+				new PrepareItemCraftEventListener(),
+				new CraftItemEventListener()
 				);
 	}
 	

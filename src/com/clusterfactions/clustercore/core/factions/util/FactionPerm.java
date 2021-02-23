@@ -14,6 +14,7 @@ public enum FactionPerm {
 	CHECK("FACTION.CHECK", "Check", "", Material.DIRT),
 	CHEST("FACTION.CHEST", "Use Chests", "", Material.CHEST), //
 	CLAIM("FACTION.CLAIM", "Claim Land", "Allow player to claim faction chunks", Material.DIRT),//
+	COORDS("FACTION.COORDS", "Coordinates", "Allow player to check other faction members' coordinates", Material.COMPASS),//
 	CONTAINER("FACTION.CONTAINER", "Use Containers", "", Material.DISPENSER), //
 	DISBAND("FACTION.DISBAND", "Disband Faction", "", Material.DIRT),
 	DRAIN("FACTION.DRAIN", "Use Drain", "", Material.DIRT),

@@ -92,6 +92,18 @@ public class FactionMapGeneratorManager implements Listener {
 		}
 	}
 	
+	public void removeMap(Player player) {
+		if(itemCache.containsKey(player.getUniqueId()))
+		{
+			player.getInventory().setItem(0,itemCache.get(player.getUniqueId()).getLeft());
+			player.getInventory().setHeldItemSlot(itemCache.get(player.getUniqueId()).getRight());
+			itemCache.remove(player.getUniqueId());
+
+			if(playerCache.containsKey(player.getUniqueId()))
+				playerCache.remove(player.getUniqueId());	
+		}
+	}
+	
 	@EventHandler
 	public void PlayerMoveEvent(PlayerMoveEvent e) {
 		if(playerCache.containsKey(e.getPlayer().getUniqueId()))
@@ -122,12 +134,7 @@ public class FactionMapGeneratorManager implements Listener {
 		
 		if(itemCache.containsKey(e.getPlayer().getUniqueId()) && e.getPreviousSlot() == 0 && e.getNewSlot() != 0)
 		{
-			e.getPlayer().getInventory().setItem(0,itemCache.get(e.getPlayer().getUniqueId()).getLeft());
-			e.getPlayer().getInventory().setHeldItemSlot(itemCache.get(e.getPlayer().getUniqueId()).getRight());
-			itemCache.remove(e.getPlayer().getUniqueId());
-
-			if(playerCache.containsKey(e.getPlayer().getUniqueId()))
-				playerCache.remove(e.getPlayer().getUniqueId());	
+			removeMap(e.getPlayer());
 		}
 	}
 	
@@ -142,7 +149,7 @@ public class FactionMapGeneratorManager implements Listener {
 			
 
 			if(playerCache.containsKey(e.getPlayer().getUniqueId()))
-				playerCache.remove(e.getPlayer().getUniqueId());	
+				removeMap(e.getPlayer());
 		}
 	}
 	
@@ -157,7 +164,7 @@ public class FactionMapGeneratorManager implements Listener {
 			
 
 			if(playerCache.containsKey(e.getPlayer().getUniqueId()))
-				playerCache.remove(e.getPlayer().getUniqueId());	
+				removeMap(e.getPlayer());
 		}
 	}
 }

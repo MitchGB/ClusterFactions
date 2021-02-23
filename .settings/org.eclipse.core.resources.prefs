@@ -1,5 +1,16 @@
 eclipse.preferences.version=1
 encoding//src/com/clusterfactions/clustercore/core/inventory/impl/faction/perm/FactionPermissionMenu.java=UTF-8
 encoding//src/com/clusterfactions/clustercore/core/inventory/impl/faction/perm/MainPermissionMenu.java=UTF-8
+encoding//src/com/clusterfactions/clustercore/core/inventory/impl/player/settings/MainSettingsMenu.java=UTF-8
+encoding//src/com/clusterfactions/clustercore/core/inventory/impl/player/settings/lang/SettingsLanguageMenu.java=UTF-8
+encoding//src/com/clusterfactions/clustercore/core/inventory/impl/player/settings/map/MapMainSettingsMenu.java=UTF-8
+encoding//src/com/clusterfactions/clustercore/core/inventory/impl/player/settings/map/types/MapAllySettingsMenu.java=UTF-8
+encoding//src/com/clusterfactions/clustercore/core/inventory/impl/player/settings/map/types/MapEmptySettingsMenu.java=UTF-8
+encoding//src/com/clusterfactions/clustercore/core/inventory/impl/player/settings/map/types/MapEnemySettingsMenu.java=UTF-8
+encoding//src/com/clusterfactions/clustercore/core/inventory/impl/player/settings/map/types/MapFactionSettingsMenu.java=UTF-8
+encoding//src/com/clusterfactions/clustercore/core/inventory/impl/player/settings/map/types/MapNeutralSettingsMenu.java=UTF-8
 encoding//src/com/clusterfactions/clustercore/core/permission/PermissionGroup.java=UTF-8
 encoding//src/com/clusterfactions/clustercore/util/unicode/CharRepo.java=UTF-8
+encoding/<project>=UTF-8
+encoding/resources=UTF-8
+encoding/src=UTF-8

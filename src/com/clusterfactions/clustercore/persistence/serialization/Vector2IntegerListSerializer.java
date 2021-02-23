@@ -10,6 +10,7 @@ public class Vector2IntegerListSerializer extends VariableSerializer<ArrayList<V
 	@Override
 	public String serialize(ArrayList<Vector2Integer> obj) {
 	    StringBuilder builder = new StringBuilder();
+	    if(obj == null) return "";
 	    for(Vector2Integer vec : obj)
 	    	builder.append(vec.toString() + ",");
 	    return builder.toString();

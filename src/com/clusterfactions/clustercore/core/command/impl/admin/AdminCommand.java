@@ -1,11 +1,15 @@
 package com.clusterfactions.clustercore.core.command.impl.admin;
 
+import java.util.Locale;
+
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 import com.clusterfactions.clustercore.ClusterCore;
 import com.clusterfactions.clustercore.core.items.CustomItemType;
 import com.clusterfactions.clustercore.core.items.ItemManager;
+import com.clusterfactions.clustercore.core.lang.Lang;
+import com.clusterfactions.clustercore.core.player.PlayerData;
 
 import co.aikar.commands.BaseCommand;
 import co.aikar.commands.annotation.CommandAlias;
@@ -23,6 +27,19 @@ public class AdminCommand extends BaseCommand{
 	@HelpCommand
 	public void help(final CommandSender sender) {
 		
+	}
+	
+	@Subcommand("save|savedata")
+	public void save(final CommandSender sender, OnlinePlayer player) {
+		PlayerData playerData = ClusterCore.getInstance().getPlayerManager().getPlayerData(player.getPlayer());
+		playerData.saveData();
+	}
+	
+	@Subcommand("langtest")
+	@CommandCompletion("@langs")
+	public void langtest(final CommandSender sender, Lang lang){
+		PlayerData playerData = ClusterCore.getInstance().getPlayerManager().getPlayerData((Player)sender);
+		playerData.sendMessage(ClusterCore.getInstance().getLanguageManager().getString(Locale.ENGLISH, lang));
 	}
 	
 	@Subcommand("item")
@@ -46,9 +63,61 @@ public class AdminCommand extends BaseCommand{
 		}
 	}
 	
-
+	@Subcommand("power")
+	public class power extends BaseCommand{
+		
+		@Subcommand("give")
+		@CommandCompletion("@players")
+		public void give(final CommandSender sender, OnlinePlayer player, int amount) {
+			PlayerData playerData = ClusterCore.getInstance().getPlayerManager().getPlayerData(player.getPlayer());
+			playerData.setPower(playerData.getPower() + amount);
+			playerData.saveData("power");
+		}
+		
+		@Subcommand("remove")
+		@CommandCompletion("@players")
+		public void remove(final CommandSender sender, OnlinePlayer player, int amount) {
+			PlayerData playerData = ClusterCore.getInstance().getPlayerManager().getPlayerData(player.getPlayer());
+			playerData.setPower(playerData.getPower() - amount);
+			playerData.saveData("power");
+		}
+		
+		@Subcommand("set")
+		@CommandCompletion("@players")
+		public void set(final CommandSender sender, OnlinePlayer player, int amount) {
+			PlayerData playerData = ClusterCore.getInstance().getPlayerManager().getPlayerData(player.getPlayer());
+			playerData.setPower(amount);
+			playerData.saveData("power");
+		}
+		
+		@Subcommand("reset")
+		@CommandCompletion("@players")
+		public void reset(final CommandSender sender, OnlinePlayer player) {
+			PlayerData playerData = ClusterCore.getInstance().getPlayerManager().getPlayerData(player.getPlayer());
+			playerData.setPower(0);
+			playerData.saveData("power");
+		}
+		
+	}
 }
 	
 	
 	
 	
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

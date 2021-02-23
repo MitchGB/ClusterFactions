@@ -7,6 +7,7 @@ import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Player;
 
+import com.clusterfactions.clustercore.ClusterCore;
 import com.clusterfactions.clustercore.util.NumberUtil;
 
 public class LocationUtil {
@@ -24,6 +25,8 @@ public class LocationUtil {
 		location.setZ(z);
 		Block ground = location.getBlock().getRelative(BlockFace.DOWN);
 		Block head = location.getBlock().getRelative(BlockFace.UP);
+		if(ClusterCore.getInstance().getFactionClaimManager().isChunkClaimed(location))
+			return findSafeLoc(player);
 		if(location.getBlock().getRelative(BlockFace.DOWN).getType().equals(Material.WATER))
 			return findSafeLoc(player);		
 		if(location.getBlock().getRelative(BlockFace.DOWN).getType().equals(Material.LAVA))

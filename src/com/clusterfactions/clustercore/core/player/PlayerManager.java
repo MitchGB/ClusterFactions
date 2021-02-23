@@ -21,7 +21,8 @@ public class PlayerManager implements Listener{
 	@EventHandler
 	public void UpdateSecondEvent(UpdateSecondEvent e) {
 		for(PlayerData pd : cachedPlayers.values())
-			pd.secondUpdater(e);
+			if(pd != null)
+				pd.secondUpdater(e);
 	}
 	
 	public PlayerData getPlayerData(UUID playerUUID) {

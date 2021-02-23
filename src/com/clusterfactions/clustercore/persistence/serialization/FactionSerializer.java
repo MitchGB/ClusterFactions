@@ -5,7 +5,6 @@ import java.util.UUID;
 import com.clusterfactions.clustercore.ClusterCore;
 import com.clusterfactions.clustercore.core.factions.Faction;
 
-//Base64 Encoder
 public class FactionSerializer extends VariableSerializer<Faction>{
 
 	@Override

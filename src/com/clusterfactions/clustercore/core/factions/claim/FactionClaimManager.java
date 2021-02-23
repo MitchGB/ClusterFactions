@@ -12,7 +12,7 @@ import org.bukkit.event.player.PlayerMoveEvent;
 
 import com.clusterfactions.clustercore.ClusterCore;
 import com.clusterfactions.clustercore.core.factions.Faction;
-import com.clusterfactions.clustercore.core.lang.Lang_EN_US;
+import com.clusterfactions.clustercore.core.lang.Lang;
 import com.clusterfactions.clustercore.core.player.PlayerData;
 import com.clusterfactions.clustercore.listeners.events.claim.ClaimEnterEvent;
 import com.clusterfactions.clustercore.listeners.events.claim.ClaimExitEvent;
@@ -65,7 +65,7 @@ public class FactionClaimManager implements Listener{
 	public void ClaimEnterEvent(ClaimEnterEvent e) {
 		Player player = e.getPlayer();
 		Faction faction = ClusterCore.getInstance().getFactionsManager().getFaction(e.getFaction());
-		player.sendTitle(Colors.parseColors(faction.getFactionName()), Colors.parseColors(""), 5, 40, 5);
+		player.sendTitle(Colors.parseColors(faction.getFactionTag()), Colors.parseColors(""), 5, 40, 5);
 	}
 	
 	public FactionClaimManager() {
@@ -82,14 +82,18 @@ public class FactionClaimManager implements Listener{
 	
 	public UUID getChunkMongo(Vector2Integer chunkLoc) {
 
-		String ret = ClusterCore.getInstance().getMongoHook().getObject(chunkLoc.toString(), "owner", "chunks");
+		String ret = ClusterCore.getInstance().getMongoHook().getValue(chunkLoc.toString(), "owner", String.class , "chunks");
 		chunkCache.put(chunkLoc, ret == null || ret.isEmpty() ? null : UUID.fromString(ret));
 		return chunkCache.get(chunkLoc);	
 	}
 	
+	public UUID chunkClaimed(Location loc) {
+		return chunkClaimed(getChunkVector(loc));
+	}
+	
 	public UUID chunkClaimed(Vector2Integer chunkLoc)
 	{
-		String c =ClusterCore.getInstance().getMongoHook().getObject(chunkLoc.toString(), "owner", "chunks");
+		String c =ClusterCore.getInstance().getMongoHook().getValue(chunkLoc.toString(), "owner", String.class, "chunks");
 		chunkCache.put(chunkLoc, c == null || c.isEmpty() ? null : UUID.fromString(c));
 		return chunkCache.get(chunkLoc);	
 	}
@@ -97,11 +101,49 @@ public class FactionClaimManager implements Listener{
 	public UUID chunkClaimedCache(Vector2Integer chunkLoc)
 	{
 		if(chunkCache.containsKey(chunkLoc)) return chunkCache.get(chunkLoc);
-		String ret = ClusterCore.getInstance().getMongoHook().getObject(chunkLoc.toString(), "owner", "chunks");
+		String ret = ClusterCore.getInstance().getMongoHook().getValue(chunkLoc.toString(), "owner", String.class, "chunks");
 		chunkCache.put(chunkLoc, ret == null || ret.isEmpty() ? null : UUID.fromString(ret));
 		return chunkCache.get(chunkLoc);	
 	}
 	
+	public boolean isChunkClaimed(Location loc) {
+		return isChunkClaimed(getChunkVector(loc));
+	}
+	
+	public boolean isChunkClaimed(Vector2Integer chunkLoc) {
+		return chunkClaimed(chunkLoc) != null;
+	}
+	
+	public Vector2Integer[] getClaimNeighbours(Location claim) {
+		return getClaimNeighbours(getChunkVector(claim));
+	}
+	
+	public Vector2Integer[] getClaimNeighbours(Vector2Integer claim) {
+		return new Vector2Integer[] {
+				new Vector2Integer(claim.getX()+1,claim.getZ()+0),
+				new Vector2Integer(claim.getX()-1,claim.getZ()+0),
+				new Vector2Integer(claim.getX()+0,claim.getZ()+1),
+				new Vector2Integer(claim.getX()+0,claim.getZ()-1)
+		};
+	}
+	
+	public int getEmptyClaimNeighbours(Location claim) {
+		return getEmptyClaimNeighbours(getChunkVector(claim));
+	}
+	
+	public int getEmptyClaimNeighbours(Vector2Integer claim) {
+		UUID claimed = chunkClaimed(claim);
+		int empty = 0;
+		for(Vector2Integer neighbour : getClaimNeighbours(claim))
+		{
+			System.out.println(claimed);
+			System.out.println(chunkClaimed(neighbour));
+			if(chunkClaimed(neighbour) == null || !chunkClaimed(neighbour).toString().equals(claimed.toString()))
+				empty++;
+		}
+		System.out.println(empty);
+		return empty;
+	}
 	
 	public void claimArea(Player player, int xrad, int zrad) {
 		Bukkit.getScheduler().runTaskLaterAsynchronously(ClusterCore.getInstance(), new Runnable() {
@@ -143,7 +185,7 @@ public class FactionClaimManager implements Listener{
 
 	        					continue;
 	        				}
-	        				playerData.sendMessage(Lang_EN_US.CLAIM_RADIUS_OVERLAPPING);
+	        				playerData.sendMessage(Lang.CLAIM_RADIUS_OVERLAPPING);
 	        				return;
 	        			}
 
@@ -160,7 +202,7 @@ public class FactionClaimManager implements Listener{
 	        		}
 	        	}
 		
-	        	playerData.sendMessage(Lang_EN_US.SUCCESSFULL_CLAIM_AREA, (xrad*2)*(zrad*2) - overlapping + "", overlapping + "");
+	        	playerData.sendMessage(Lang.SUCCESSFULL_CLAIM_AREA, (xrad*2)*(zrad*2) - overlapping + "", overlapping + "");
 	        }
 		}, 1);
 	}
@@ -201,7 +243,7 @@ public class FactionClaimManager implements Listener{
 
 						continue;
 					}
-					playerData.sendMessage(Lang_EN_US.CLAIM_RADIUS_OVERLAPPING);
+					playerData.sendMessage(Lang.CLAIM_RADIUS_OVERLAPPING);
 					return;
 				}
 
@@ -218,20 +260,19 @@ public class FactionClaimManager implements Listener{
 			}
 		}
 		
-		playerData.sendMessage(Lang_EN_US.SUCCESSFULL_UNCLAIM_AREA, (xrad*2)*(zrad*2) - overlapping + "");
+		playerData.sendMessage(Lang.SUCCESSFULL_UNCLAIM_AREA, (xrad*2)*(zrad*2) - overlapping + "");
 	}
 	
 	public void claimChunk(Vector2Integer chunkLoc, Faction faction) {
-		ClusterCore.getInstance().getMongoHook().saveObject(chunkLoc.toString(), "owner", faction.getFactionID().toString(), "chunks");
+		ClusterCore.getInstance().getMongoHook().saveValue(chunkLoc.toString(), "owner", faction.getFactionID().toString(), "chunks");
 		if(chunkCache.containsKey(chunkLoc))chunkCache.remove(chunkLoc);
-		chunkCache.put(chunkLoc, getChunkMongo(chunkLoc));
 		faction.addClaimChunk(chunkLoc);
+		chunkCache.put(chunkLoc, getChunkMongo(chunkLoc));
 	}
 	
 	public void removeClaimChunk(Vector2Integer chunkLoc, Faction faction) {	
 		if(chunkCache.containsKey(chunkLoc))chunkCache.remove(chunkLoc);
-		ClusterCore.getInstance().getMongoHook().saveObject(chunkLoc.toString(), "owner", "", "chunks");
-		chunkCache.put(chunkLoc, getChunkMongo(chunkLoc));
+		ClusterCore.getInstance().getMongoHook().saveValue(chunkLoc.toString(), "owner", "", "chunks");
 		faction.removeClaimChunk(chunkLoc);
 	}
 }

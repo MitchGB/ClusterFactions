@@ -6,13 +6,13 @@ import java.util.List;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.map.MapCanvas;
-import org.bukkit.map.MapPalette;
 import org.bukkit.map.MapRenderer;
 import org.bukkit.map.MapView;
 
 import com.clusterfactions.clustercore.ClusterCore;
 import com.clusterfactions.clustercore.core.factions.Faction;
 import com.clusterfactions.clustercore.core.factions.claim.FactionClaimManager;
+import com.clusterfactions.clustercore.core.player.PlayerData;
 import com.clusterfactions.clustercore.util.location.Vector2Integer;
 import com.clusterfactions.clustercore.util.model.Pair;
 
@@ -27,11 +27,8 @@ public class Renderer extends MapRenderer{
 	int xMapCenter = -Integer.MAX_VALUE;
 	int zMapCenter = -Integer.MAX_VALUE;
 	
-	//static byte[][][][] colorMap = new byte[128][128][128][128]; //mapX, mapZ, x, z
-	
 	boolean canRender = true;
 	
-	@SuppressWarnings("deprecation")
 	@Override
 	public void render(MapView map, MapCanvas canvas, Player player) {
 		if(canRender != true) return;
@@ -46,41 +43,7 @@ public class Renderer extends MapRenderer{
 		}, 10);
 		
 		try {
-			/*WorldMap worldMap = null;
-			Field worldField = CraftMapView.class.getDeclaredField("worldMap");
-			worldField.setAccessible(true);
-			worldMap = (WorldMap)worldField.get((CraftMapView)map);
-			
-			int xCenter = map.getCenterX()/128+64;
-			int zCenter = map.getCenterZ()/128+64;
-			
-			
-			byte[][] mapColor = new byte[128][128];
-			
-			if(colorMap[xCenter] == null)
-				colorMap[xCenter] = new byte[128][128][128];
-				
-			if(colorMap[xCenter][zCenter] == null)
-				colorMap[xCenter][zCenter] = new byte[128][128];
-				
-			if(colorMap[xCenter] != null && colorMap[xCenter][zCenter] != null)
-				mapColor = colorMap[xCenter][zCenter];
-
-			for(int x = 0; x < 128; x++) {
-				for(int z = 0; z < 128; z++) {
-					if(mapColor[x][z] == Byte.valueOf("0"))
-					{
-						canvas.setPixel(x, z, worldMap.colors[z * 128 + x]);
-						mapColor[x][z] = worldMap.colors[z * 128 + x];
-					}
-					else
-					{
-						canvas.setPixel(x, z, mapColor[x][z]);
-					}
-				}
-			}
-			*/
-			
+			PlayerData playerData = ClusterCore.getInstance().getPlayerManager().getPlayerData(player);
 			int radius = 5;
 			
 			Vector2Integer centerChunk = claimManager.getChunkVector(map.getCenterX(), map.getCenterZ());
@@ -125,18 +88,32 @@ public class Renderer extends MapRenderer{
 	            	
 	            	Faction chunkFaction = ClusterCore.getInstance().getFactionsManager().getFaction(claimManager.chunkClaimedCache(chunkLoc));
 	            	Faction playerFaction = ClusterCore.getInstance().getFactionsManager().getFaction(ClusterCore.getInstance().getPlayerManager().getPlayerData(player).getFaction());
-	            	if(chunkFaction == null) 
-	            		continue;
-	            	else if(playerFaction.isAllied(chunkFaction))
-	            		setPixel(canvas, pixelMap, MapPalette.matchColor(232, 53, 129));
-	            	else
-	            		setPixel(canvas, pixelMap, MapPalette.RED);
+	            	if(chunkFaction == null) {
+	            		if(playerData.getMapEmptyColour() == MapColour.TRANSPARENT) continue;
+	            		setPixel(canvas, pixelMap, playerData.getMapEmptyColour());
+	            	}else if(playerFaction != null && playerFaction.isSame(chunkFaction)){
+	            		if(playerData.getMapFactionColour() == MapColour.TRANSPARENT) continue;
+	            		setPixel(canvas, pixelMap, playerData.getMapFactionColour());
+	            	}else if(playerFaction != null && playerFaction.isAlly(chunkFaction)){
+	            		if(playerData.getMapAllyColour() == MapColour.TRANSPARENT) continue;
+	            		setPixel(canvas, pixelMap, playerData.getMapAllyColour());
+	            	}else if(playerFaction != null && playerFaction.isEnemy(chunkFaction)) {
+	            		if(playerData.getMapEnemyColour() == MapColour.TRANSPARENT) continue;
+	            		setPixel(canvas, pixelMap, playerData.getMapEnemyColour());
+	            	}else {
+	            		if(playerData.getMapNeutralColour() == MapColour.TRANSPARENT) continue;
+	            		setPixel(canvas, pixelMap, playerData.getMapNeutralColour());
+	            	}
 	            }
 	        }
 			//colorMap[xCenter][zCenter] = mapColor;
 		}catch(Exception e) {
 			e.printStackTrace();
 		}
+	}
+	
+	private void setPixel(MapCanvas canvas, List<Pair<Integer, Integer>> pixels, MapColour colour) {
+		setPixel(canvas, pixels, colour.getValue());
 	}
 	
 	private void setPixel(MapCanvas canvas, List<Pair<Integer, Integer>> pixels, byte colour) {

@@ -17,7 +17,7 @@ import com.clusterfactions.clustercore.ClusterCore;
 import com.clusterfactions.clustercore.core.factions.util.FactionPerm;
 import com.clusterfactions.clustercore.core.factions.util.FactionPlayerRemoveReason;
 import com.clusterfactions.clustercore.core.factions.util.FactionRole;
-import com.clusterfactions.clustercore.core.lang.Lang_EN_US;
+import com.clusterfactions.clustercore.core.lang.Lang;
 import com.clusterfactions.clustercore.core.player.PlayerData;
 import com.clusterfactions.clustercore.persistence.serialization.LocationSerializer;
 import com.clusterfactions.clustercore.persistence.serialization.UUIDListSerializer;
@@ -26,19 +26,20 @@ import com.clusterfactions.clustercore.persistence.serialization.VariableSeriali
 import com.clusterfactions.clustercore.persistence.serialization.Vector2IntegerListSerializer;
 import com.clusterfactions.clustercore.persistence.serialization.WarpListSerializer;
 import com.clusterfactions.clustercore.util.annotation.AlternateSerializable;
+import com.clusterfactions.clustercore.util.annotation.DoNotSerialize;
 import com.clusterfactions.clustercore.util.location.Vector2Integer;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import net.md_5.bungee.api.ChatColor;
 
 @NoArgsConstructor
 public class Faction implements Listener{
 	
-	@Getter @Setter private String factionName;
-	@Getter @Setter private String factionTag;
+	@DoNotSerialize public static final int maxPlayers = 10;
 	
+	@Getter @Setter private String factionTag;
+	@Getter @Setter private String factionLower; //faction tag but lowercase
 
 	@Setter @AlternateSerializable(WarpListSerializer.class) private HashMap<String, Location> warpList;
 	@Getter @Setter @AlternateSerializable(LocationSerializer.class) private Location factionHome;
@@ -46,15 +47,16 @@ public class Faction implements Listener{
 	@Getter @AlternateSerializable(UUIDListSerializer.class) private List<UUID> allies = new ArrayList<>();
 	@Getter @AlternateSerializable(UUIDListSerializer.class) private List<UUID> enemies = new ArrayList<>(); 
 	
-	@Getter @AlternateSerializable(UUIDListSerializer.class) private List<UUID> players = new ArrayList<>();
+	@Getter @AlternateSerializable(UUIDListSerializer.class) private ArrayList<UUID> players = new ArrayList<>();
 	@Getter @AlternateSerializable(UUIDListSerializer.class) private List<UUID> bannedPlayers = new ArrayList<>();
 	@Getter @AlternateSerializable(Vector2IntegerListSerializer.class) private ArrayList<Vector2Integer> claimedChunks = new ArrayList<>();
 	@Getter @Setter private Map<String,Integer> permissionMap = new HashMap<>(); //PERMISSION, WEIGHT
 	@Getter @Setter private Map<String,Integer> roleMap = new HashMap<>(); //UUID,RANK
 	
 	@AlternateSerializable(UUIDListSerializer.class) private List<UUID> inviteList = new ArrayList<>();
-	@AlternateSerializable(UUIDListSerializer.class) private List<UUID> allyshipInviteList = new ArrayList<>();
 	
+	@AlternateSerializable(UUIDListSerializer.class) private List<UUID> inviteListAlly = new ArrayList<>();
+	@AlternateSerializable(UUIDListSerializer.class) private List<UUID> inviteListNeutral = new ArrayList<>();
 	
 	//CLAIMED CHUNKS
 	@Getter @AlternateSerializable(UUIDSerializer.class) private UUID factionID;
@@ -62,9 +64,9 @@ public class Faction implements Listener{
 	/*
 	 * CALLED WHEN A NEW FACTION IS MADE
 	*/
-	public Faction(Player owner, String name, String tag) {
-		this.factionName = name;
+	public Faction(Player owner, String tag) {
 		this.factionTag = tag;
+		this.factionLower = tag.toLowerCase();
 		this.factionID = UUID.randomUUID();
 		
 		this.players = new ArrayList<>();
@@ -94,40 +96,56 @@ public class Faction implements Listener{
 				}
 			}
 			if(data == null) return;
-			ClusterCore.getInstance().getMongoHook().saveObject(this.factionID.toString(), fieldName, data, "factions");
+			ClusterCore.getInstance().getMongoHook().saveValue(this.factionID.toString(), fieldName, data, "factions");
 		}catch(Exception e) {
 			e.printStackTrace();
 		}
 	}
 	
+	@SuppressWarnings("unchecked")
+	public void disband() {
+		messageAll(Lang.FACTION_DISBANDED);
+		if(getClaimedChunks() != null) {
+			ArrayList<Vector2Integer> chunks = (ArrayList<Vector2Integer>) getClaimedChunks().clone();
+			for(Vector2Integer claim : chunks)
+				ClusterCore.getInstance().getFactionClaimManager().removeClaimChunk(claim, this);
+		}
+		ArrayList<UUID> playerL = (ArrayList<UUID>) getPlayers().clone();
+		for(UUID uuid : playerL)
+			removePlayer(Bukkit.getPlayer(uuid), null);
+		
+		ClusterCore.getInstance().getMongoHook().deleteData(this.getFactionID().toString(), "factions");
+	}
+	
 	public void addPlayer(Player player) {
 		PlayerData data = ClusterCore.getInstance().getPlayerManager().getPlayerData(player);
 		data.setFaction(this.factionID);
-		data.saveData();
+		data.saveData("faction");
 		players.add(player.getUniqueId());
-		messageAll(String.format(Lang_EN_US.PLAYER_JOINED_FACTION, player.getName()) );
+		messageAll(Lang.PLAYER_JOINED_FACTION, player.getName());
 		saveData("players");
 	}
 	
 	public void removePlayer(Player player, FactionPlayerRemoveReason reason) {
 		PlayerData data = ClusterCore.getInstance().getPlayerManager().getPlayerData(player);
 		data.setFaction(null);
+		data.saveData("faction");
 		players.remove(player.getUniqueId());
-		data.saveData();
 		saveData("players");
 		
+		if(reason != null)
 		switch(reason) {
 		case KICKED:
-			data.sendMessage(Lang_EN_US.YOU_HAVE_BEEN_KICKED, this.factionName);
-			messageAll(String.format(Lang_EN_US.PLAYER_KICKED_FACTION, player.getName()));
+			data.sendMessage(Lang.YOU_HAVE_BEEN_KICKED, this.factionTag);
+			messageAll(Lang.PLAYER_KICKED_FACTION, player.getName());
 			break;
 		case BANNED:
-			data.sendMessage(Lang_EN_US.YOU_HAVE_BEEN_BANNED, this.factionName);
-			messageAll(String.format(Lang_EN_US.PLAYER_BANNED_FACTION, player.getName()));
+			data.sendMessage(Lang.YOU_HAVE_BEEN_BANNED, this.factionTag);
+			messageAll(Lang.PLAYER_BANNED_FACTION, player.getName());
 			break;
 		case LEFT:
-			data.sendMessage(Lang_EN_US.LEFT_FACTION, this.factionName);
-			messageAll(String.format(Lang_EN_US.PLAYER_LEFT_FACTION, player.getName()));
+			data.sendMessage(Lang.LEFT_FACTION, this.factionTag);
+			messageAll(Lang.PLAYER_LEFT_FACTION, player.getName());
 			break;
 		
 		}
@@ -159,81 +177,13 @@ public class Faction implements Listener{
 	{
 		PlayerData inviteeData = ClusterCore.getInstance().getPlayerManager().getPlayerData(invitee);
 		
-		messageAll(String.format(Lang_EN_US.PLAYER_INVITED_TO_FACTION, invitee.getName()));
-		inviteeData.sendMessage(Lang_EN_US.INVITED_TO_FACTION1, this.getFactionName());
-		inviteeData.sendMessage(Lang_EN_US.INVITED_TO_FACTION2, this.getFactionTag());
+		messageAll(Lang.PLAYER_INVITED_TO_FACTION, invitee.getName());
+		inviteeData.sendMessage(Lang.INVITED_TO_FACTION1, this.getFactionTag());
+		inviteeData.sendMessage(Lang.INVITED_TO_FACTION2, this.getFactionTag());
 
 		if(inviteList == null) inviteList = new ArrayList<>();
 		inviteList.add(invitee.getUniqueId());		
 		saveData("inviteList");
-	}
-	
-	public void inviteAllyFaction(Faction invitee)
-	{
-		messageAll(String.format(Lang_EN_US.FACTION_INVITED_TOALLY, invitee.getFactionName()));
-		invitee.messageAll(String.format(Lang_EN_US.INVITE_ALLY_FACTION1, this.getFactionName()), FactionPerm.ALLY);
-		invitee.messageAll(String.format(Lang_EN_US.INVITE_ALLY_FACTION2, this.getFactionTag()), FactionPerm.ALLY);
-
-		if(allyshipInviteList == null) allyshipInviteList = new ArrayList<>();
-		allyshipInviteList.add(invitee.getFactionID());		
-		saveData("allyshipInviteList");
-	}
-	
-	public boolean isAllied(Faction faction) {
-		if(allies == null) allies = new ArrayList<>();
-		return allies.contains(faction.getFactionID());	
-	}
-	
-	public void allyFaction(Faction faction) {
-		if(allyshipInviteList == null) allyshipInviteList = new ArrayList<>();
-		if(allies == null) allies = new ArrayList<>();
-		if(enemies == null) enemies = new ArrayList<>();
-		if(enemies.contains(faction.getFactionID())) enemies.remove(faction.getFactionID());
-		this.allyshipInviteList.remove(faction.getFactionID());
-		this.allies.add(faction.getFactionID());
-		saveData("allies");
-		saveData("allyshipInviteList");
-	}
-	
-	public void unally(Faction faction) {
-		if(allyshipInviteList == null) allyshipInviteList = new ArrayList<>();
-		if(allies == null) allies = new ArrayList<>();
-		UUID facId = faction.getFactionID();
-		
-		allies.remove(facId);
-		messageAll(String.format(Lang_EN_US.FACTION_NO_LONGER_ALLIES, faction.getFactionName()));
-		saveData("allies");
-	}
-	
-	public void enemy(Faction faction) {
-		if(allyshipInviteList == null) allyshipInviteList = new ArrayList<>();
-		if(allies == null) allies = new ArrayList<>();
-		if(enemies == null) enemies = new ArrayList<>();
-		UUID facId = faction.getFactionID();
-		
-		if(allyshipInviteList.contains(facId)) allyshipInviteList.remove(facId);
-		if(allies.contains(facId)) allies.remove(facId);
-		enemies.add(facId);
-		messageAll(String.format(Lang_EN_US.FACTION_ARE_NOW_ENEMIES, faction.getFactionName()));
-		saveData("enemies");		
-		saveData("allies");
-		saveData("allyshipInviteList");
-		
-	}
-	
-	public void unenemy(Faction faction) {
-		if(enemies == null) enemies = new ArrayList<>();
-		UUID facId = faction.getFactionID();
-		
-		enemies.remove(facId);
-		messageAll(String.format(Lang_EN_US.FACTION_NO_LONGER_ENEMIES, faction.getFactionName()));
-		saveData("enemies");
-		
-	}
-	
-	public boolean isEnemy(Faction faction) {
-		if(enemies == null) enemies = new ArrayList<>();
-		return enemies.contains(faction.getFactionID());	
 	}
 	
 	public int getPermWeight(FactionPerm perm) {
@@ -295,12 +245,6 @@ public class Faction implements Listener{
 		return inviteList.contains(player.getUniqueId());
 	}
 	
-	public boolean allyInviteListContains(Faction fac) {
-		if(allyshipInviteList == null) allyshipInviteList = new ArrayList<>();
-		if(fac == null) return false;
-		return allyshipInviteList.contains(fac.getFactionID());
-	}
-	
 	public void acceptInvite(Player player) {
 		inviteList.remove(player.getUniqueId());
 		addPlayer(player);
@@ -316,6 +260,12 @@ public class Faction implements Listener{
 		if(claimedChunks == null) claimedChunks = new ArrayList<>();
 		this.claimedChunks.add(chunkLoc);
 		saveData("claimedChunks");
+	}
+	
+	public int getClaimCount()
+	{
+		if(claimedChunks == null) claimedChunks = new ArrayList<>();
+		return claimedChunks.size();
 	}
 	
 	public void addWarp(String name, Location loc) {
@@ -352,16 +302,203 @@ public class Faction implements Listener{
 		return ret;
 	}
 	
-	public void messageAll(String message) {
+	public void messageAll(String message, Object... args) {
+		if(players == null) return;
 		for(UUID uuid : players) {
-			Bukkit.getPlayer(uuid).sendMessage(ChatColor.translateAlternateColorCodes('&', message));
+			PlayerData playerData = ClusterCore.getInstance().getPlayerManager().getPlayerData(uuid);
+			playerData.sendMessage(message, args);
 		}
 	}
-	public void messageAll(String message, FactionPerm perm) {
+	
+	public void messageAll(Lang message, Object... args) {
+		if(players == null) return;
+		for(UUID uuid : players) {
+			PlayerData playerData = ClusterCore.getInstance().getPlayerManager().getPlayerData(uuid);
+			playerData.sendMessage(message, args);
+		}
+	}
+	
+	public void messageAll(Lang message, FactionPerm perm, Object... args) {
+		if(players == null) return;
 		for(UUID uuid : players) {
 			if(!hasPerm(Bukkit.getPlayer(uuid), perm)) continue;
-			Bukkit.getPlayer(uuid).sendMessage(ChatColor.translateAlternateColorCodes('&', message));
+			PlayerData playerData = ClusterCore.getInstance().getPlayerManager().getPlayerData(uuid);
+			playerData.sendMessage(message, args);
 		}
+	}
+	
+	public int getFactionPower() {
+		int power = 0;
+		if(players == null) players = new ArrayList<>();
+		for(UUID uuid : players)
+		{
+			int playerPower = ClusterCore.getInstance().getMongoHook().getValue(uuid.toString(), "power", Integer.class, "players") == null ? 0 : ClusterCore.getInstance().getMongoHook().getValue(uuid.toString(), "power", Integer.class, "players");
+			power += playerPower;
+		}
+		return power;
+	}
+	
+	public int getSparePower() {
+		if(claimedChunks == null) claimedChunks = new ArrayList<>();
+		return getFactionPower() - getClaimedChunks().size();
+	}
+	
+	public int getPlayerCount() {
+		return players.size();
+	}
+	
+	public boolean isSame(Faction faction) {
+		return faction.getFactionID().equals(getFactionID());
+	}
+	
+	public boolean isInvitedAlly(Faction target) {
+		if(inviteListAlly == null) inviteListAlly = new ArrayList<>();
+		return inviteListAlly.contains(target.getFactionID());
+	}
+	
+	public boolean isAlly(Faction target) {
+		if(allies == null) allies = new ArrayList<>();
+		return allies.contains(target.getFactionID());
+	}
+	
+	public boolean isInvitedNeutral(Faction target) {
+		if(inviteListNeutral == null) inviteListNeutral = new ArrayList<>();
+		return inviteListNeutral.contains(target.getFactionID());
+	}
+	
+	public boolean isNeutral(Faction target) {
+		if(allies == null) allies = new ArrayList<>();
+		if(enemies == null) enemies = new ArrayList<>();
+		if(enemies.contains(target.getFactionID())) return false;
+		if(allies.contains(target.factionID)) return false;
+		return true;
+	}
+	
+	public boolean isEnemy(Faction target) {
+		if(enemies == null) enemies = new ArrayList<>();
+		return enemies.contains(target.getFactionID());		
+	}
+	
+	public void setFactionAlly(Faction target) {
+		if(inviteListAlly == null) inviteListAlly = new ArrayList<>();
+		if(target.inviteListAlly == null) target.inviteListAlly = new ArrayList<>();
+		
+		if(!target.inviteListAlly.contains(getFactionID())){
+			inviteListAlly.add(target.getFactionID());
+			
+			messageAll(Lang.FACTION_INVITED_ALLY, target.getFactionTag());
+			
+			target.messageAll(Lang.FACTION_INVITE_ALLY_REQUEST_1, getFactionTag());
+			target.messageAll(Lang.FACTION_INVITE_ALLY_REQUEST_2, getFactionTag());
+		}else{
+			target.messageAll(Lang.FACTION_FORMED_ALLY, getFactionTag());
+			messageAll(Lang.FACTION_FORMED_ALLY, target.getFactionTag());
+			
+			if(allies == null) allies = new ArrayList<>();
+			if(target.getAllies() == null) target.allies = new ArrayList<>();
+			
+			removeFactionEnemy(target);
+			target.removeFactionEnemy(this);
+			
+			target.allies.add(getFactionID());
+			allies.add(target.getFactionID());
+			
+			target.removeInvites(this);
+			removeInvites(target);
+			
+			target.saveData();
+			saveData();
+		}
+	}
+	
+	public void removeFactionAlly(Faction target) {
+		if(allies == null) allies = new ArrayList<>();
+		if(target.allies == null) target.allies = new ArrayList<>();
+		
+		if(!allies.contains(target.factionID)) return;
+		
+		allies.remove(target.getFactionID());
+		target.allies.remove(getFactionID());
+		
+		messageAll(Lang.FACTION_NO_LONGER_ALLY, target.getFactionTag());
+		target.messageAll(Lang.FACTION_NO_LONGER_ALLY, getFactionTag());
+		
+		target.saveData("allies");
+		target.saveData("enemies");
+		saveData("allies");
+		saveData("enemies");
+	}
+	
+	public void setFactionEnemy(Faction target) {
+		if(enemies == null) enemies = new ArrayList<>();
+		if(target.enemies == null) target.enemies = new ArrayList<>();
+		
+		target.removeFactionAlly(this);
+		removeFactionAlly(target);
+		
+		enemies.add(target.getFactionID());
+		target.enemies.add(getFactionID());
+		
+		target.messageAll(Lang.FACTION_FORMED_ENEMY, getFactionTag());
+		messageAll(Lang.FACTION_FORMED_ENEMY, target.getFactionTag());
+		
+		target.saveData("allies");
+		target.saveData("enemies");
+		saveData("allies");
+		saveData("enemies");
+	}
+	
+	public void removeFactionEnemy(Faction target) {
+		if(enemies == null) enemies = new ArrayList<>();
+		if(!enemies.contains(target.factionID)) return;
+		
+		enemies.remove(target.getFactionID());
+		target.enemies.remove(getFactionID());
+
+		messageAll(Lang.FACTION_NO_LONGER_ENEMY, target.getFactionTag());
+		target.messageAll(Lang.FACTION_NO_LONGER_ENEMY, getFactionTag());
+		
+		target.saveData("allies");
+		target.saveData("enemies");
+		saveData("allies");
+		saveData("enemies");
+	}
+	
+	public void setFactionNeutral(Faction target) {
+		if(inviteListNeutral == null) inviteListNeutral = new ArrayList<>();
+		if(target.inviteListNeutral == null) target.inviteListNeutral = new ArrayList<>();
+		if(!target.inviteListNeutral.contains(getFactionID()) && isEnemy(target)){
+			inviteListNeutral.add(target.getFactionID());
+			
+			messageAll(Lang.FACTION_INVITED_NEUTRAL, target.getFactionTag());
+			
+			target.messageAll(Lang.FACTION_INVITE_NEUTRAL_REQUEST_1, getFactionTag());
+			target.messageAll(Lang.FACTION_INVITE_NEUTRAL_REQUEST_2, getFactionTag());
+		}else{
+			target.messageAll(Lang.FACTION_FORMED_NEUTRAL, getFactionTag());
+			messageAll(Lang.FACTION_FORMED_NEUTRAL, target.getFactionTag());
+			
+			removeFactionEnemy(target);
+			removeFactionAlly(target);
+			
+			target.removeFactionAlly(this);
+			target.removeFactionEnemy(this);
+
+			target.removeInvites(this);
+			removeInvites(target);
+			
+			
+			target.saveData();
+			saveData();
+		}
+	}
+	
+	public void removeInvites(Faction target) {
+		if(inviteListNeutral == null) inviteListNeutral = new ArrayList<>();
+		if(inviteListAlly == null) inviteListAlly = new ArrayList<>();
+		if(inviteListAlly.contains(target.getFactionID())) inviteListAlly.remove(target.getFactionID());
+		if(inviteListNeutral.contains(target.getFactionID())) inviteListNeutral.remove(target.getFactionID());
+		saveData();
 	}
 	
 }

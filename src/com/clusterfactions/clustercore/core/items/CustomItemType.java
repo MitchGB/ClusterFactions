@@ -1,22 +1,20 @@
 package com.clusterfactions.clustercore.core.items;
 
-import java.util.ArrayList;
-import java.util.List;
+import org.bukkit.inventory.ItemStack;
+
+import com.clusterfactions.clustercore.ClusterCore;
 
 public enum CustomItemType {
 
 	TEST_ITEM;
-
-	public static List<String> getAllList(){
-		List<String> ret = new ArrayList<>();
-		for(CustomItemType t : CustomItemType.values())
-			ret.add(t.toString());
-		return ret;
-	}
 	
 	public static CustomItemType getById(String id)
 	{
 		return valueOf(id.toUpperCase().replace("-", "_"));
+	}
+	
+	public ItemStack getItem() {
+		return ClusterCore.getInstance().getItemManager().getCustomItemHandler(this).getNewStack();
 	}
 	
 	public String getId()

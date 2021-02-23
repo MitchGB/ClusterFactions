@@ -15,6 +15,11 @@ public class PlayerQuitEventListener implements Listener{
 		Player player = e.getPlayer();
 		PlayerData data = ClusterCore.getInstance().getPlayerManager().getPlayerData(player);
 		data.saveData();
+		
+		if(ClusterCore.getInstance().getCombatManager().isTagged(player))
+			player.setHealth(0);
+		
+		ClusterCore.getInstance().getFactionMapGeneratorManager().removeMap(player);
 	}
 	
 }

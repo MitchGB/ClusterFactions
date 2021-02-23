@@ -8,16 +8,14 @@ import org.bukkit.permissions.PermissionAttachment;
 
 import com.clusterfactions.clustercore.ClusterCore;
 import com.clusterfactions.clustercore.core.permission.PlayerPermissionManager;
-import com.clusterfactions.clustercore.core.player.PlayerData;
 
 public class PlayerJoinEventListener implements Listener{
 
 	@EventHandler
 	public void PlayerJoinEvent(PlayerJoinEvent e) {
 		Player player = e.getPlayer();
-		PlayerData data = ClusterCore.getInstance().getPlayerManager().getPlayerData(player);
-		data.saveData();
 		
+		ClusterCore.getInstance().getPlayerManager().getPlayerData(player);
 		
 		//PERMISSION MANAGEMENT
 		PermissionAttachment attachment = player.addAttachment(ClusterCore.getInstance());
