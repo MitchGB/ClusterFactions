@@ -89,7 +89,7 @@ public class MongoHook {
 	
 	@SuppressWarnings("unchecked")
 	public <T> T getValue(String id, String columnName, Class<T> clazz, String collectionName) {
-
+		if(mongoDatabase != null && collectionName != null)
 		this.collection = mongoDatabase.getCollection(collectionName);
 		Document document = (Document) collection.find(new Document("_id", id)).first();
 		if(document == null) return null;
@@ -208,5 +208,9 @@ public class MongoHook {
 	public <T> T getObject(String id, Class<T> clazz, String collectionName) {
 		return getObject(id, "_id", clazz, collectionName);
 
+	}
+	
+	public void disable() {
+		mongoClient.close();
 	}
 }

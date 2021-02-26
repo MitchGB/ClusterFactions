@@ -1,12 +1,20 @@
 package com.clusterfactions.clustercore.core.inventory.util.model.interfaces;
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+import java.util.List;
+import java.util.Set;
 
-@Retention(RetentionPolicy.RUNTIME)
-@Target(ElementType.TYPE)
-public @interface Interactable {
-	int[] excludeSlot() default {};
+public interface Interactable {
+	List<Integer> excludeSlot();
+	
+	public default boolean isExcluded(Set<Integer> slots) {
+		for(Integer i : slots) {
+			if(!excludeSlot().contains(i))
+				return false;
+		}
+		return true;
+	}
+	
+	public default boolean isExcluded(int slot) {
+		return excludeSlot().contains(slot);
+	}
 }

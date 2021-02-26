@@ -6,6 +6,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 import com.clusterfactions.clustercore.ClusterCore;
+import com.clusterfactions.clustercore.core.inventory.impl.block.FurnaceInventory;
 import com.clusterfactions.clustercore.core.items.CustomItemType;
 import com.clusterfactions.clustercore.core.items.ItemManager;
 import com.clusterfactions.clustercore.core.lang.Lang;
@@ -26,7 +27,6 @@ public class AdminCommand extends BaseCommand{
 
 	@HelpCommand
 	public void help(final CommandSender sender) {
-		
 	}
 	
 	@Subcommand("save|savedata")

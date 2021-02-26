@@ -9,7 +9,11 @@ import org.bukkit.inventory.ItemStack;
 
 import com.clusterfactions.clustercore.ClusterCore;
 import com.clusterfactions.clustercore.core.items.crafting.RecipeIngredient;
+import com.clusterfactions.clustercore.core.items.impl.TestCookableItem;
+import com.clusterfactions.clustercore.core.items.impl.TestCookedItem;
 import com.clusterfactions.clustercore.core.items.impl.TestItem;
+import com.clusterfactions.clustercore.core.items.impl.ingot.NickelIngot;
+import com.clusterfactions.clustercore.core.items.impl.ore.NickelOre;
 import com.clusterfactions.clustercore.core.items.types.CustomItem;
 import com.clusterfactions.clustercore.core.items.types.interfaces.CraftableItem;
 
@@ -21,13 +25,27 @@ public class ItemManager {
 	private static Map<RecipeIngredient[][], CustomItemType> craftingMap = new HashMap<>();
 	
 	public ItemManager() {
-		registerItemHandler(new TestItem());
+		registerItemHandler(
+				new TestItem(), 
+				new TestCookableItem(), 
+				new TestCookedItem(),
+				
+				new NickelIngot(),
+				new NickelOre());
 		registerRecipes();
 	}
 	
+	@SuppressWarnings("unused")
 	private void registerItemHandler(CustomItem itemHandler){
 		customItems.put(itemHandler.getType(), itemHandler);
 		ClusterCore.getInstance().registerListener(itemHandler);
+	}
+	
+	private void registerItemHandler(CustomItem... itemHandlers){
+		for(CustomItem itemHandler : itemHandlers) {
+			customItems.put(itemHandler.getType(), itemHandler);
+			ClusterCore.getInstance().registerListener(itemHandler);
+		}
 	}
 	
 	public void registerRecipes() {
@@ -96,6 +114,7 @@ public class ItemManager {
 	
 	public CustomItem getCustomItemHandler(CustomItemType itemType)
 	{
+		if(itemType == null) return null;
 		return customItems.get(itemType);
 	}
 	

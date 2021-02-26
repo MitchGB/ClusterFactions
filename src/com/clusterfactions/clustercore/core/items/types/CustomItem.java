@@ -4,6 +4,7 @@ import java.util.UUID;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
+import org.bukkit.block.Furnace;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 import org.bukkit.event.EventHandler;
@@ -12,6 +13,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.enchantment.EnchantItemEvent;
 import org.bukkit.event.entity.EntityPickupItemEvent;
+import org.bukkit.event.inventory.FurnaceSmeltEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.event.inventory.PrepareItemCraftEvent;
@@ -23,6 +25,7 @@ import org.bukkit.inventory.meta.ItemMeta;
 import com.clusterfactions.clustercore.ClusterCore;
 import com.clusterfactions.clustercore.core.items.CustomItemType;
 import com.clusterfactions.clustercore.core.items.types.interfaces.EnchantableItem;
+import com.clusterfactions.clustercore.core.items.types.interfaces.SmeltableItem;
 import com.clusterfactions.clustercore.core.items.types.interfaces.StackableItem;
 import com.clusterfactions.clustercore.util.ItemBuilder;
 
@@ -140,4 +143,27 @@ public class CustomItem implements Listener{
     public void dropEvent(PlayerDropItemEvent e) {
     	if(!this.isApplicableItem(e.getItemDrop().getItemStack())) return;
     }
+    
+	@EventHandler
+	public void furnaceSmeltEvent(FurnaceSmeltEvent event) {
+		if(!isApplicableItem(event.getSource())) return;
+		if(!(this instanceof SmeltableItem)) return;
+		event.setResult(((SmeltableItem)this).outputItem().getItem());
+	}
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

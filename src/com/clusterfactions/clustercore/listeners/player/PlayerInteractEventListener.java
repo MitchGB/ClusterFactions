@@ -6,13 +6,16 @@ import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
 
 import com.clusterfactions.clustercore.ClusterCore;
 import com.clusterfactions.clustercore.core.factions.Faction;
 import com.clusterfactions.clustercore.core.factions.claim.FactionClaimManager;
 import com.clusterfactions.clustercore.core.factions.util.FactionPerm;
+import com.clusterfactions.clustercore.core.inventory.impl.block.FurnaceInventory;
 import com.clusterfactions.clustercore.core.player.PlayerData;
 import com.clusterfactions.clustercore.util.location.Vector2Integer;
 import com.google.common.collect.ImmutableSet;
@@ -100,7 +103,7 @@ public class PlayerInteractEventListener implements Listener{
 			.add(Material.WARPED_PRESSURE_PLATE)
 			.build();
 	
-	@EventHandler
+	@EventHandler(priority = EventPriority.HIGHEST)
 	public void PlayerInteractEvent(PlayerInteractEvent e) {
 		Player player = e.getPlayer();
 		PlayerData playerData = ClusterCore.getInstance().getPlayerManager().getPlayerData(player);
@@ -140,6 +143,21 @@ public class PlayerInteractEventListener implements Listener{
 		{
 			e.setCancelled(true);
 			return;
+		}
+	}
+	
+	@EventHandler(priority = EventPriority.LOW)
+	public void PlayerInteractEventFurnace(PlayerInteractEvent e) {
+		Block block = e.getClickedBlock();
+		if(e.getAction() != Action.RIGHT_CLICK_BLOCK) return;
+		if(e.getPlayer().isSneaking()) return;
+		if(block == null) return;
+		if(block.getType() == Material.FURNACE){
+			e.setCancelled(true);
+			if(ClusterCore.getInstance().getInventoryManager().blockCache.containsKey(block)){
+				ClusterCore.getInstance().getInventoryManager().blockCache.get(block).openInventory(e.getPlayer());
+			}else
+				new FurnaceInventory(e.getPlayer(), block).openInventory(e.getPlayer());
 		}
 	}
 }

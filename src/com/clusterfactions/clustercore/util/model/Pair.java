@@ -4,8 +4,8 @@ import lombok.Getter;
 
 public class Pair<L, R> {
 	
-	@Getter public R right;
-	@Getter public L left;
+	@Getter private R right;
+	@Getter private L left;
 	
 	public Pair(L left, R right){
 		this.right = right;

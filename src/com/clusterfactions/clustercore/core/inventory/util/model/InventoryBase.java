@@ -9,9 +9,8 @@ import java.util.UUID;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
+import org.bukkit.craftbukkit.v1_16_R3.entity.CraftPlayer;
 import org.bukkit.entity.Player;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.Listener;
 import org.bukkit.event.Event.Result;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
@@ -25,12 +24,19 @@ import com.clusterfactions.clustercore.core.inventory.util.InventoryClickContext
 import com.clusterfactions.clustercore.core.inventory.util.InventoryClickHandler;
 import com.clusterfactions.clustercore.util.Colors;
 import com.clusterfactions.clustercore.util.model.Pair;
+import com.comphenix.protocol.PacketType;
+import com.comphenix.protocol.events.PacketContainer;
+import com.comphenix.protocol.reflect.StructureModifier;
 
 import de.tr7zw.changeme.nbtapi.NBTItem;
 import lombok.Getter;
 import lombok.Setter;
+import net.minecraft.server.v1_16_R3.ChatMessage;
+import net.minecraft.server.v1_16_R3.Containers;
+import net.minecraft.server.v1_16_R3.EntityPlayer;
+import net.minecraft.server.v1_16_R3.PacketPlayOutOpenWindow;
 
-public abstract class InventoryBase implements Listener{
+public abstract class InventoryBase{
 
 	public static String INVENTORY_TAG = "INVENTORY_KEY";
 	public static String ITEM_ID_TAG = "ITM_UUID";
@@ -48,7 +54,7 @@ public abstract class InventoryBase implements Listener{
 	Player player;
 	@Setter Map<Integer, ItemStack> itemList = new HashMap<>();
 	@Setter List<ItemStack> itemAddList = new ArrayList<>();
-	@Getter Inventory invInstance;
+	@Getter protected Inventory invInstance;
 	
 	public InventoryBase(Player player, String ID, String displayName, int inventorySize) {
 		this.uuid = UUID.randomUUID();
@@ -57,7 +63,6 @@ public abstract class InventoryBase implements Listener{
 		this.inventorySize = inventorySize;
 		this.player = player;
 		ClusterCore.getInstance().getInventoryManager().registerInstance(this, this.uuid.toString());
-		ClusterCore.getInstance().registerListener(this);
 	}
 	
 	protected void registerHandler(String uuid, InventoryClickHandler handlerL, InventoryClickHandler handlerR)
@@ -115,14 +120,6 @@ public abstract class InventoryBase implements Listener{
 		e.getPlayer().updateInventory();
 	}
 	
-	@EventHandler
-	public void inventoryCloseEvent(InventoryCloseEvent e) {
-		try {
-			if(!player.getUniqueId().equals(e.getPlayer().getUniqueId())) return;
-			//HytheCraft.getInstance().getInventoryManager().unregisterInstance(this.uuid.toString());
-		}catch(Exception z) {}
-	}
-	
 	public void playerInventoryClickEvent(InventoryClickEvent e) {
 		if(e.getInventory().getType() == InventoryType.CHEST) e.setResult(Result.DENY);
 		if(e.getCurrentItem() == null || e.getCurrentItem().getType() == Material.AIR) return;
@@ -146,7 +143,6 @@ public abstract class InventoryBase implements Listener{
 			if(this.defaultClickHandler != null)
 				this.defaultClickHandler.exec(context);
 		}
-		
 	}
 	
 	public void openInventory(Player player) {
@@ -187,5 +183,38 @@ public abstract class InventoryBase implements Listener{
 		item = setKey(item, RANDOM_UUID, uuid.toString());
 		return item;
 	}
+	
+	protected void renameWindow(Player p, Inventory inv, String title) {
+
+		try {
+			EntityPlayer ep = (EntityPlayer) ((CraftPlayer) p).getHandle();
+			
+			PacketPlayOutOpenWindow windowPacket = new PacketPlayOutOpenWindow(ep.activeContainer.windowId, Containers.GENERIC_9X3, new ChatMessage(title));
+		    ep.playerConnection.sendPacket(windowPacket);
+			
+			PacketContainer windowItemPacket = new PacketContainer(PacketType.Play.Server.WINDOW_ITEMS);
+			windowItemPacket.getIntegers().write(0, ep.activeContainer.windowId);
+			List<ItemStack> items = new ArrayList<>();
+			for(ItemStack i : inv.getContents())
+				items.add(i == null ? new ItemStack(Material.AIR) : i);
+			
+			StructureModifier<List<ItemStack>> structMod = windowItemPacket.getItemListModifier();
+			structMod.write(0, items);
+			ClusterCore.getInstance().getProtocolManager().sendServerPacket(p, windowItemPacket);
+			
+			ItemStack cursor = p.getItemOnCursor();
+			PacketContainer setSlotPacket = new PacketContainer(PacketType.Play.Server.SET_SLOT);
+			setSlotPacket.getIntegers().write(0, -1);
+			setSlotPacket.getIntegers().write(1, -1);
+			StructureModifier<ItemStack> structMod2 = setSlotPacket.getItemModifier();
+			structMod2.write(0, cursor);
+			ClusterCore.getInstance().getProtocolManager().sendServerPacket(p, setSlotPacket);
+			
+		}catch(Exception e) {
+			e.printStackTrace();
+		}
+	}
+	
+	public void closeInventory(InventoryCloseEvent e) {}
 
 }

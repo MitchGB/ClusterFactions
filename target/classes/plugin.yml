@@ -1,4 +1,4 @@
-softdepend: [NBTAPI]
+softdepend: [NBTAPI, ProtocolLib]
 name: ClusterFactions
 version: Alpha v1.0
 author: ClusterFactions

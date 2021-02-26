@@ -92,6 +92,10 @@
         <id>aikar</id>
         <url>https://repo.aikar.co/content/groups/aikar/</url>
     </repository>
+    <repository>
+        <id>spigot-repo</id>
+        <url>https://hub.spigotmc.org/nexus/content/repositories/snapshots/</url>
+    </repository>
    </repositories>
    <dependencies>
        <dependency>
@@ -126,6 +130,11 @@
          <artifactId>craftbukkit</artifactId>
          <version>1.16.5-R0.1-SNAPSHOT</version>
          <scope>provided</scope>
+      </dependency>
+      <dependency>
+         <groupId>com.comphenix.protocol</groupId>
+         <artifactId>ProtocolLib</artifactId>
+         <version>4.6.0</version>
       </dependency>
    </dependencies>
 </project>

@@ -18,12 +18,14 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.LeatherArmorMeta;
 import org.bukkit.inventory.meta.SkullMeta;
 
+import com.clusterfactions.clustercore.core.items.ItemRepo;
+
 import de.tr7zw.changeme.nbtapi.NBTCompound;
 import de.tr7zw.changeme.nbtapi.NBTItem;
 
 public class ItemBuilder {
 	 private ItemStack item;
-	  
+	 
 	  public ItemBuilder(Material material) {
 	    this.item = new ItemStack(material);	   
 	    ItemMeta meta = this.item.getItemMeta();
@@ -34,6 +36,7 @@ public class ItemBuilder {
 	  public ItemBuilder(ItemRepo repo) {
 		  this.item = new ItemStack(repo.mat);
 		  ItemMeta meta = this.item.getItemMeta();
+		  meta.setCustomModelData(repo.customModelData);
 		  meta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
 		  item.setItemMeta(meta);
 	  }

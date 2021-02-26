@@ -4,6 +4,7 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 
 import org.bukkit.Bukkit;
+import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -17,6 +18,7 @@ import com.clusterfactions.clustercore.core.factions.claim.FactionClaimManager;
 import com.clusterfactions.clustercore.core.factions.map.FactionMapGeneratorManager;
 import com.clusterfactions.clustercore.core.inventory.util.InventoryManager;
 import com.clusterfactions.clustercore.core.items.ItemManager;
+import com.clusterfactions.clustercore.core.items.block.CustomBlockManager;
 import com.clusterfactions.clustercore.core.lang.LanguageManager;
 import com.clusterfactions.clustercore.core.permission.PlayerPermissionManager;
 import com.clusterfactions.clustercore.core.player.PlayerManager;
@@ -34,24 +36,30 @@ import com.clusterfactions.clustercore.listeners.player.PlayerMoveEventListener;
 import com.clusterfactions.clustercore.listeners.player.PlayerQuitEventListener;
 import com.clusterfactions.clustercore.persistence.database.MongoHook;
 import com.clusterfactions.clustercore.util.annotation.Manager;
+import com.comphenix.protocol.ProtocolLibrary;
+import com.comphenix.protocol.ProtocolManager;
 
 import lombok.Getter;
 
 public class ClusterCore extends JavaPlugin{
-	
+
+	@Manager @Getter private MongoHook mongoHook;
 	@Manager @Getter private InventoryManager inventoryManager;
 	@Manager @Getter private CommandManager commandManager;
 	@Manager @Getter private FactionsManager factionsManager;
 	@Manager @Getter private PlayerManager playerManager;
-	@Manager @Getter private MongoHook mongoHook;
 	@Manager @Getter private LanguageManager languageManager;
 	@Manager @Getter private PlayerPermissionManager playerPermissionManager;
 	@Manager @Getter private FactionMapGeneratorManager factionMapGeneratorManager;
 	@Manager @Getter private FactionClaimManager factionClaimManager;
 	@Manager @Getter private CombatManager combatManager;
 	@Manager @Getter private ItemManager itemManager;
+	@Manager @Getter private CustomBlockManager customBlockManager;
 	
 	@Manager @Getter private TeleportQueue teleportQueue;
+	
+	@Getter private ProtocolManager protocolManager;
+	
 	
 	private static ClusterCore instance;
 	
@@ -62,6 +70,7 @@ public class ClusterCore extends JavaPlugin{
 	@Override
 	public void onEnable(){
 		instance = this;
+		protocolManager = ProtocolLibrary.getProtocolManager();
 		setupManagers();
 		setupListeners();
 		setupTimers();
@@ -95,10 +104,21 @@ public class ClusterCore extends JavaPlugin{
 				);
 	}
 	
+	public void onDisable() {
+		getMongoHook().disable();
+	}
+	
 	public void registerListener(Listener... listeners) {
 		PluginManager manager = getServer().getPluginManager();
 		for(Listener l : listeners) {
 			manager.registerEvents(l, this);
+		}
+	}
+	
+	public void unregisterListener(Listener... listeners) {
+		for(Listener l : listeners)
+		{
+			HandlerList.unregisterAll(l);	
 		}
 	}
 	
