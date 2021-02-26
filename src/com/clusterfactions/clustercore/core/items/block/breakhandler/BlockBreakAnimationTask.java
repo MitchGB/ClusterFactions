@@ -54,8 +54,8 @@ public class BlockBreakAnimationTask extends BukkitRunnable {
 				e.printStackTrace();
 			}
 
-			float durationMultiplier = 3;
-			f -= durationMultiplier;
+			float durationMultiplier = 20;
+			f /= durationMultiplier;
 			
 			if (f >= 1.0f) {
 				player.playerInteractManager.a(context.getBlockPos(),
