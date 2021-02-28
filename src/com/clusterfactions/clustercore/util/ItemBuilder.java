@@ -18,6 +18,7 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.LeatherArmorMeta;
 import org.bukkit.inventory.meta.SkullMeta;
 
+import com.clusterfactions.clustercore.core.items.CustomItemType;
 import com.clusterfactions.clustercore.core.items.ItemRepo;
 
 import de.tr7zw.changeme.nbtapi.NBTCompound;
@@ -31,6 +32,13 @@ public class ItemBuilder {
 	    ItemMeta meta = this.item.getItemMeta();
 	    meta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
 	    item.setItemMeta(meta);
+	  }
+	  
+	  public ItemBuilder(CustomItemType repo) {
+		  this.item = new ItemStack(repo.getItem());
+		  ItemMeta meta = this.item.getItemMeta();
+		  meta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
+		  item.setItemMeta(meta);
 	  }
 	  
 	  public ItemBuilder(ItemRepo repo) {

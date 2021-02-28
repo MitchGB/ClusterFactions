@@ -1,25 +1,16 @@
 package com.clusterfactions.clustercore.core.items.block.breakhandler;
 
+import lombok.Getter;
+import lombok.Setter;
 import net.minecraft.server.v1_16_R3.BlockPosition;
 
 public class BlockAnimationContext {
 
-	private BlockPosition blockPos;
-	private int stage = -1;
-
+	@Getter private BlockPosition blockPos;
+	@Getter @Setter private int stage = -1;
+	@Getter @Setter private int ticksTaken = 0;
+	
 	public BlockAnimationContext(BlockPosition pos) {
 		this.blockPos = pos;
-	}
-
-	public BlockPosition getBlockPos() {
-		return blockPos;
-	}
-
-	public int getStage() {
-		return stage;
-	}
-
-	public void setStage(int stage) {
-		this.stage = stage;
 	}
 }

@@ -6,6 +6,7 @@ import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.block.Block;
 import org.bukkit.block.TileState;
+import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -21,10 +22,11 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.persistence.PersistentDataType;
 
 import com.clusterfactions.clustercore.ClusterCore;
-import com.clusterfactions.clustercore.core.inventory.impl.block.FurnaceInventory;
+import com.clusterfactions.clustercore.core.inventory.util.model.BlockAsyncInventory;
 import com.clusterfactions.clustercore.core.inventory.util.model.InventoryBase;
 import com.clusterfactions.clustercore.core.inventory.util.model.interfaces.FilteredSlots;
 import com.clusterfactions.clustercore.core.inventory.util.model.interfaces.Interactable;
+import com.clusterfactions.clustercore.listeners.events.updates.UpdateTickEvent;
 import com.clusterfactions.clustercore.persistence.serialization.ItemStackSerializer;
 
 import de.tr7zw.changeme.nbtapi.NBTItem;
@@ -48,6 +50,7 @@ public class InventoryManager implements Listener{
 	public InventoryBase getHandler(Inventory inv) {
 		for(InventoryBase b : inventoryCache.values())
 		{
+			if(b.getInvInstance() == null) continue;
 			if(b.getInvInstance().equals(inv))
 				return b;
 		}
@@ -153,7 +156,13 @@ public class InventoryManager implements Listener{
 	@EventHandler
 	public void closeInventoryEvent(InventoryCloseEvent e) {
 		if(!applicableInventory(e.getInventory())) return;
+		if(getHandler(e.getInventory()) instanceof BlockAsyncInventory){
+			((BlockAsyncInventory)getHandler(e.getInventory())).removeHandler((Player)e.getPlayer());
+			return;
+		}
 		getHandler(e.getInventory()).closeInventory(e);
+		getHandler(e.getInventory()).setPlayer(null);
+		inventoryCache.remove(getHandler(e.getInventory()).getUuid().toString() ); //Let GC pickup inventory
 	}
 
 	/*
@@ -180,6 +189,15 @@ public class InventoryManager implements Listener{
 		if(e.getSource().getType() != InventoryType.HOPPER) return;
 		if(e.getDestination().getType() != InventoryType.FURNACE) return;
 		e.setCancelled(true);
+	}
+	
+	@EventHandler
+	public void tickUpdateEvent(UpdateTickEvent e) {
+		//Delegate runnable to event rather than runnable for each inventory
+		for(InventoryBase inv : blockCache.values()){
+			if(!(inv instanceof BlockAsyncInventory)) return;
+			((BlockAsyncInventory)inv).update();
+		}
 	}
 	
 	/*

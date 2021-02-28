@@ -1,5 +1,7 @@
 package com.clusterfactions.clustercore.core.items.block.breakhandler;
 
+import org.bukkit.Bukkit;
+import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.craftbukkit.v1_16_R3.entity.CraftPlayer;
@@ -17,6 +19,7 @@ import net.minecraft.server.v1_16_R3.BlockPosition;
 import net.minecraft.server.v1_16_R3.EntityPlayer;
 import net.minecraft.server.v1_16_R3.MobEffect;
 import net.minecraft.server.v1_16_R3.MobEffects;
+import net.minecraft.server.v1_16_R3.PacketPlayOutBlockBreakAnimation;
 import net.minecraft.server.v1_16_R3.PacketPlayOutEntityEffect;
 
 public class BlockBreakHandler {
@@ -43,11 +46,16 @@ public class BlockBreakHandler {
 				EntityPlayer player = ((CraftPlayer) event.getPlayer()).getHandle();
 
 				if (type == PlayerDigType.START_DESTROY_BLOCK && getLocation(pos, player.getBukkitEntity()).getBlock().getType() == Material.NOTE_BLOCK ) {
+					if(player.getBukkitEntity().getGameMode() == GameMode.CREATIVE) return;
 					task.addEntry(player, pos);
 					player.playerConnection.sendPacket(new PacketPlayOutEntityEffect(player.getId(),
 							new MobEffect(MobEffects.SLOWER_DIG, Integer.MAX_VALUE, -1, true, false)));
 				} else if (type == PlayerDigType.ABORT_DESTROY_BLOCK || type == PlayerDigType.STOP_DESTROY_BLOCK) {
 					task.removeEntry(player);
+					for(Player p : Bukkit.getOnlinePlayers())
+					{
+						((CraftPlayer) p).getHandle().playerConnection.sendPacket(new PacketPlayOutBlockBreakAnimation(123, pos, -1));
+					}
 				}
 			}
 

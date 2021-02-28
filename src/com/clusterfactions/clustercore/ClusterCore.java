@@ -26,8 +26,7 @@ import com.clusterfactions.clustercore.listeners.block.BlockBreakEventListener;
 import com.clusterfactions.clustercore.listeners.block.BlockPlaceEventListener;
 import com.clusterfactions.clustercore.listeners.entity.EntityInteractEventListener;
 import com.clusterfactions.clustercore.listeners.events.updates.UpdateSecondEvent;
-import com.clusterfactions.clustercore.listeners.misc.CraftItemEventListener;
-import com.clusterfactions.clustercore.listeners.misc.PrepareItemCraftEventListener;
+import com.clusterfactions.clustercore.listeners.events.updates.UpdateTickEvent;
 import com.clusterfactions.clustercore.listeners.player.AsyncPlayerChatEventListener;
 import com.clusterfactions.clustercore.listeners.player.PlayerDeathEventListener;
 import com.clusterfactions.clustercore.listeners.player.PlayerInteractEventListener;
@@ -53,6 +52,7 @@ public class ClusterCore extends JavaPlugin{
 	@Manager @Getter private FactionMapGeneratorManager factionMapGeneratorManager;
 	@Manager @Getter private FactionClaimManager factionClaimManager;
 	@Manager @Getter private CombatManager combatManager;
+	
 	@Manager @Getter private ItemManager itemManager;
 	@Manager @Getter private CustomBlockManager customBlockManager;
 	
@@ -83,7 +83,14 @@ public class ClusterCore extends JavaPlugin{
 				Bukkit.getPluginManager().callEvent(new UpdateSecondEvent());
 			}
 			
-		}.runTaskTimer(this, 0, 20);
+		}.runTaskTimer(this, 0, 20);		
+		new BukkitRunnable() {
+			@Override
+			public void run() {
+				Bukkit.getPluginManager().callEvent(new UpdateTickEvent());
+			}
+			
+		}.runTaskTimer(this, 0, 1);
 	}
 	private void setupListeners() {
 		registerListener(
@@ -97,10 +104,7 @@ public class ClusterCore extends JavaPlugin{
 				new BlockBreakEventListener(),
 				new BlockPlaceEventListener(),
 				
-				new EntityInteractEventListener(),
-				
-				new PrepareItemCraftEventListener(),
-				new CraftItemEventListener()
+				new EntityInteractEventListener()
 				);
 	}
 	

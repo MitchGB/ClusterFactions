@@ -46,12 +46,12 @@ public abstract class InventoryBase{
 	
 	protected InventoryClickHandler defaultClickHandler;
 	
-	UUID uuid;
+	@Getter UUID uuid;
 	
 	String inventoryID;
 	String displayName;
 	int inventorySize;
-	Player player;
+	@Setter protected Player player;
 	@Setter Map<Integer, ItemStack> itemList = new HashMap<>();
 	@Setter List<ItemStack> itemAddList = new ArrayList<>();
 	@Getter protected Inventory invInstance;
@@ -184,12 +184,12 @@ public abstract class InventoryBase{
 		return item;
 	}
 	
-	protected void renameWindow(Player p, Inventory inv, String title) {
+	protected void renameWindow(Player p, Inventory inv, String title, Containers<?> cont) {
 
 		try {
 			EntityPlayer ep = (EntityPlayer) ((CraftPlayer) p).getHandle();
 			
-			PacketPlayOutOpenWindow windowPacket = new PacketPlayOutOpenWindow(ep.activeContainer.windowId, Containers.GENERIC_9X3, new ChatMessage(title));
+			PacketPlayOutOpenWindow windowPacket = new PacketPlayOutOpenWindow(ep.activeContainer.windowId, cont, new ChatMessage(title));
 		    ep.playerConnection.sendPacket(windowPacket);
 			
 			PacketContainer windowItemPacket = new PacketContainer(PacketType.Play.Server.WINDOW_ITEMS);

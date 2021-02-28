@@ -3,36 +3,48 @@ package com.clusterfactions.clustercore.core.items;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.UUID;
 
 import org.bukkit.Bukkit;
+import org.bukkit.Material;
+import org.bukkit.NamespacedKey;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
+import org.bukkit.event.Listener;
+import org.bukkit.event.inventory.PrepareItemCraftEvent;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.ShapelessRecipe;
 
 import com.clusterfactions.clustercore.ClusterCore;
 import com.clusterfactions.clustercore.core.items.crafting.RecipeIngredient;
-import com.clusterfactions.clustercore.core.items.impl.TestCookableItem;
-import com.clusterfactions.clustercore.core.items.impl.TestCookedItem;
 import com.clusterfactions.clustercore.core.items.impl.TestItem;
 import com.clusterfactions.clustercore.core.items.impl.ingot.NickelIngot;
+import com.clusterfactions.clustercore.core.items.impl.ingot.TitaniumIngot;
 import com.clusterfactions.clustercore.core.items.impl.ore.NickelOre;
+import com.clusterfactions.clustercore.core.items.impl.ore.TitaniumOre;
 import com.clusterfactions.clustercore.core.items.types.CustomItem;
 import com.clusterfactions.clustercore.core.items.types.interfaces.CraftableItem;
+import com.clusterfactions.clustercore.util.ItemBuilder;
 
 import de.tr7zw.changeme.nbtapi.NBTItem;
 
-public class ItemManager {
+public class ItemManager implements Listener{
 
 	private static Map<CustomItemType, CustomItem> customItems = new HashMap<>();
 	private static Map<RecipeIngredient[][], CustomItemType> craftingMap = new HashMap<>();
 	
 	public ItemManager() {
 		registerItemHandler(
-				new TestItem(), 
-				new TestCookableItem(), 
-				new TestCookedItem(),
+				new TestItem(),
 				
 				new NickelIngot(),
-				new NickelOre());
+				new NickelOre(),
+				
+				new TitaniumIngot(),
+				new TitaniumOre()
+				);
 		registerRecipes();
+		ClusterCore.getInstance().registerListener(this);
 	}
 	
 	@SuppressWarnings("unused")
@@ -49,14 +61,22 @@ public class ItemManager {
 	}
 	
 	public void registerRecipes() {
+		/*
+		 * Register all instances that take paper
+		 */
+		int registered = 0;
+
+		Bukkit.getConsoleSender().sendMessage("[ClusterCore] Registered " + registered + " custom recipes.");
 		for(Entry<CustomItemType, CustomItem> entrySet : customItems.entrySet())
 		{
 			if(entrySet.getValue() instanceof CraftableItem) 
 			{
 				craftingMap.put(((CraftableItem)entrySet.getValue()).recipe(), entrySet.getKey());
 				Bukkit.addRecipe(RecipeIngredient.fromMap(entrySet.getValue().getNewStack(), ((CraftableItem)entrySet.getValue()).recipe() ));
+				registered++;
 			}
 		}
+		Bukkit.getConsoleSender().sendMessage("[ClusterCore] Registered " + registered + " custom recipes.");
 	}
 	
 	public ItemStack getRecipeOutput(ItemStack[][] map){
@@ -133,6 +153,28 @@ public class ItemManager {
 		return CustomItemType.values()[customItemTypeOrdinal];
 	}
 	
+    @EventHandler(ignoreCancelled = true, priority = EventPriority.HIGHEST)
+    public void onPrepareItemCraft(PrepareItemCraftEvent e) {
+        int xIndex = 0;
+        int zIndex = 0;
+        ItemStack[][] map = new ItemStack[3][3];
+        
+    	for (ItemStack itemStack : e.getInventory().getMatrix()) {
+            if(xIndex == 3) {
+            	xIndex = 0;
+            	zIndex++;
+            }
+            map[zIndex][xIndex] = itemStack;
+            xIndex++;
+        }
+    	if(ClusterCore.getInstance().getItemManager().isMaterialsApplicable(map)) {
+    		if(!ClusterCore.getInstance().getItemManager().isRecipeApplicable(map))
+    			e.getInventory().setResult(null);
+    		else
+    			e.getInventory().setResult(new ItemBuilder(Material.PAPER).coloredName("TEST").create());
+    	}
+    	
+    }
 }
 
 

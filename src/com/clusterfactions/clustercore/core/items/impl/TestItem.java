@@ -14,7 +14,7 @@ import com.clusterfactions.clustercore.util.ItemBuilder;
 public class TestItem extends CustomItem implements InteractableItem, StackableItem, CraftableItem{
 
 	public TestItem() {
-		super(CustomItemType.TEST_ITEM, new ItemBuilder(Material.STICK).setCustomModelData(1).coloredName("&dA Very Useful Stick").coloredLore("&7This stick seems to be very useful", "&7When right clicked, a bolt of lightning is struck").create());
+		super(CustomItemType.TEST_ITEM, new ItemBuilder(Material.ACACIA_BUTTON).create());
 		
 	}
 
@@ -31,7 +31,7 @@ public class TestItem extends CustomItem implements InteractableItem, StackableI
 
 	@Override
 	public RecipeIngredient[][] recipe() {
-		return RecipeIngredient.getMap(new RecipeIngredient(Material.STICK, 1));
+		return RecipeIngredient.getMap(new RecipeIngredient(Material.PAPER));
 	}
 
 }

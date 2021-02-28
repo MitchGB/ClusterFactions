@@ -52,6 +52,10 @@ public abstract class BlockAsyncInventory extends InventoryBase{
 		return l;
 	}
 	
+	public void removeHandler(Player player) {
+		handlers.remove(player.getUniqueId());
+	}
+	
 	@Override
 	public void openInventory(Player player) {
 		player.closeInventory();
@@ -78,6 +82,8 @@ public abstract class BlockAsyncInventory extends InventoryBase{
 		tile.getPersistentDataContainer().set(new NamespacedKey(ClusterCore.getInstance(), "contents"), PersistentDataType.STRING, new ItemStackSerializer().serialize(invInstance.getContents()));
 		tile.update();
 	}
+	
+	public abstract void update();
 }
 
 

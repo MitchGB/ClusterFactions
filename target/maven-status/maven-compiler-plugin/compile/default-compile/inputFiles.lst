@@ -1,6 +1,6 @@
+C:\Users\Mitchell\eclipse-workspace\ClusterFactions\src\com\clusterfactions\clustercore\core\inventory\impl\guide\props\GuideFurnaceInventory.java
 C:\Users\Mitchell\eclipse-workspace\ClusterFactions\src\com\clusterfactions\clustercore\persistence\serialization\SerializerUtil.java
 C:\Users\Mitchell\eclipse-workspace\ClusterFactions\src\com\clusterfactions\clustercore\core\inventory\impl\player\settings\map\types\MapFactionSettingsMenu.java
-C:\Users\Mitchell\eclipse-workspace\ClusterFactions\src\com\clusterfactions\clustercore\core\items\block\util\SolidCustomBlock.java
 C:\Users\Mitchell\eclipse-workspace\ClusterFactions\src\com\clusterfactions\clustercore\core\factions\util\FactionPlayerRemoveReason.java
 C:\Users\Mitchell\eclipse-workspace\ClusterFactions\src\com\clusterfactions\clustercore\core\permission\PlayerPermissionManager.java
 C:\Users\Mitchell\eclipse-workspace\ClusterFactions\src\com\clusterfactions\clustercore\core\factions\util\FactionPerm.java
@@ -9,7 +9,6 @@ C:\Users\Mitchell\eclipse-workspace\ClusterFactions\src\com\clusterfactions\clus
 C:\Users\Mitchell\eclipse-workspace\ClusterFactions\src\com\clusterfactions\clustercore\core\inventory\impl\player\settings\lang\SettingsLanguageMenu.java
 C:\Users\Mitchell\eclipse-workspace\ClusterFactions\src\com\clusterfactions\clustercore\core\items\types\interfaces\SmeltableItem.java
 C:\Users\Mitchell\eclipse-workspace\ClusterFactions\src\com\clusterfactions\clustercore\listeners\events\claim\ClaimExitEvent.java
-C:\Users\Mitchell\eclipse-workspace\ClusterFactions\src\com\clusterfactions\clustercore\listeners\misc\CraftItemEventListener.java
 C:\Users\Mitchell\eclipse-workspace\ClusterFactions\src\com\clusterfactions\clustercore\core\inventory\util\model\BlockAsyncInventory.java
 C:\Users\Mitchell\eclipse-workspace\ClusterFactions\src\com\clusterfactions\clustercore\core\items\types\interfaces\PlaceableItem.java
 C:\Users\Mitchell\eclipse-workspace\ClusterFactions\src\com\clusterfactions\clustercore\listeners\block\BlockPlaceEventListener.java
@@ -18,7 +17,6 @@ C:\Users\Mitchell\eclipse-workspace\ClusterFactions\src\com\clusterfactions\clus
 C:\Users\Mitchell\eclipse-workspace\ClusterFactions\src\com\clusterfactions\clustercore\listeners\events\player\PlayerCombatTagEvent.java
 C:\Users\Mitchell\eclipse-workspace\ClusterFactions\src\com\clusterfactions\clustercore\util\NumberUtil.java
 C:\Users\Mitchell\eclipse-workspace\ClusterFactions\src\com\clusterfactions\clustercore\core\factions\claim\Chunk.java
-C:\Users\Mitchell\eclipse-workspace\ClusterFactions\src\com\clusterfactions\clustercore\core\items\block\CustomBlockRegistry.java
 C:\Users\Mitchell\eclipse-workspace\ClusterFactions\src\com\clusterfactions\clustercore\core\command\impl\factions\FactionsCommand.java
 C:\Users\Mitchell\eclipse-workspace\ClusterFactions\src\com\clusterfactions\clustercore\core\chat\ChatMessageMode.java
 C:\Users\Mitchell\eclipse-workspace\ClusterFactions\src\com\clusterfactions\clustercore\core\items\impl\TestItem.java
@@ -26,6 +24,7 @@ C:\Users\Mitchell\eclipse-workspace\ClusterFactions\src\com\clusterfactions\clus
 C:\Users\Mitchell\eclipse-workspace\ClusterFactions\src\com\clusterfactions\clustercore\persistence\serialization\PermissionGroupSerializer.java
 C:\Users\Mitchell\eclipse-workspace\ClusterFactions\src\com\clusterfactions\clustercore\util\model\Pair.java
 C:\Users\Mitchell\eclipse-workspace\ClusterFactions\src\com\clusterfactions\clustercore\core\items\block\CustomBlockType.java
+C:\Users\Mitchell\eclipse-workspace\ClusterFactions\src\com\clusterfactions\clustercore\core\inventory\impl\guide\MainGuideMenu.java
 C:\Users\Mitchell\eclipse-workspace\ClusterFactions\src\com\clusterfactions\clustercore\util\annotation\Manager.java
 C:\Users\Mitchell\eclipse-workspace\ClusterFactions\src\com\clusterfactions\clustercore\listeners\entity\EntityInteractEventListener.java
 C:\Users\Mitchell\eclipse-workspace\ClusterFactions\src\com\clusterfactions\clustercore\util\location\Vector2Integer.java
@@ -37,8 +36,10 @@ C:\Users\Mitchell\eclipse-workspace\ClusterFactions\src\com\clusterfactions\clus
 C:\Users\Mitchell\eclipse-workspace\ClusterFactions\src\com\clusterfactions\clustercore\persistence\serialization\ItemStackSerializer.java
 C:\Users\Mitchell\eclipse-workspace\ClusterFactions\src\com\clusterfactions\clustercore\core\factions\FactionsManager.java
 C:\Users\Mitchell\eclipse-workspace\ClusterFactions\src\com\clusterfactions\clustercore\core\inventory\util\InventoryClickHandler.java
+C:\Users\Mitchell\eclipse-workspace\ClusterFactions\src\com\clusterfactions\clustercore\listeners\events\updates\UpdateTickEvent.java
 C:\Users\Mitchell\eclipse-workspace\ClusterFactions\src\com\clusterfactions\clustercore\core\items\block\breakhandler\BlockAnimationContext.java
 C:\Users\Mitchell\eclipse-workspace\ClusterFactions\src\com\clusterfactions\clustercore\core\items\types\interfaces\StackableItem.java
+C:\Users\Mitchell\eclipse-workspace\ClusterFactions\src\com\clusterfactions\clustercore\core\command\impl\GuideCommand.java
 C:\Users\Mitchell\eclipse-workspace\ClusterFactions\src\com\clusterfactions\clustercore\util\Colors.java
 C:\Users\Mitchell\eclipse-workspace\ClusterFactions\src\com\clusterfactions\clustercore\util\annotation\DoNotSerialize.java
 C:\Users\Mitchell\eclipse-workspace\ClusterFactions\src\com\clusterfactions\clustercore\util\ItemBuilder.java
@@ -55,6 +56,7 @@ C:\Users\Mitchell\eclipse-workspace\ClusterFactions\src\com\clusterfactions\clus
 C:\Users\Mitchell\eclipse-workspace\ClusterFactions\src\com\clusterfactions\clustercore\core\items\types\interfaces\InteractableItem.java
 C:\Users\Mitchell\eclipse-workspace\ClusterFactions\src\com\clusterfactions\clustercore\listeners\events\updates\UpdateSecondEvent.java
 C:\Users\Mitchell\eclipse-workspace\ClusterFactions\src\com\clusterfactions\clustercore\util\unicode\CharRepo.java
+C:\Users\Mitchell\eclipse-workspace\ClusterFactions\src\com\clusterfactions\clustercore\core\items\block\util\ItemGroupGenerics.java
 C:\Users\Mitchell\eclipse-workspace\ClusterFactions\src\com\clusterfactions\clustercore\core\items\ItemManager.java
 C:\Users\Mitchell\eclipse-workspace\ClusterFactions\src\com\clusterfactions\clustercore\persistence\serialization\UUIDListSerializer.java
 C:\Users\Mitchell\eclipse-workspace\ClusterFactions\src\com\clusterfactions\clustercore\persistence\serialization\LocaleSerializer.java
@@ -80,6 +82,8 @@ C:\Users\Mitchell\eclipse-workspace\ClusterFactions\src\com\clusterfactions\clus
 C:\Users\Mitchell\eclipse-workspace\ClusterFactions\src\com\clusterfactions\clustercore\core\command\impl\permission\PermissionCommand.java
 C:\Users\Mitchell\eclipse-workspace\ClusterFactions\src\com\clusterfactions\clustercore\persistence\serialization\WarpListSerializer.java
 C:\Users\Mitchell\eclipse-workspace\ClusterFactions\src\com\clusterfactions\clustercore\core\inventory\impl\player\settings\map\MapMainSettingsMenu.java
+C:\Users\Mitchell\eclipse-workspace\ClusterFactions\src\com\clusterfactions\clustercore\core\items\impl\ingot\TitaniumIngot.java
+C:\Users\Mitchell\eclipse-workspace\ClusterFactions\src\com\clusterfactions\clustercore\core\inventory\impl\guide\OresGuideMenu.java
 C:\Users\Mitchell\eclipse-workspace\ClusterFactions\src\com\clusterfactions\clustercore\core\items\crafting\RecipeIngredient.java
 C:\Users\Mitchell\eclipse-workspace\ClusterFactions\src\com\clusterfactions\clustercore\core\lang\Lang.java
 C:\Users\Mitchell\eclipse-workspace\ClusterFactions\src\com\clusterfactions\clustercore\core\command\CommandManager.java
@@ -89,7 +93,6 @@ C:\Users\Mitchell\eclipse-workspace\ClusterFactions\src\com\clusterfactions\clus
 C:\Users\Mitchell\eclipse-workspace\ClusterFactions\src\com\clusterfactions\clustercore\core\inventory\impl\player\settings\map\types\MapNeutralSettingsMenu.java
 C:\Users\Mitchell\eclipse-workspace\ClusterFactions\src\com\clusterfactions\clustercore\ClusterCore.java
 C:\Users\Mitchell\eclipse-workspace\ClusterFactions\src\com\clusterfactions\clustercore\listeners\player\PlayerInteractEventListener.java
-C:\Users\Mitchell\eclipse-workspace\ClusterFactions\src\com\clusterfactions\clustercore\core\items\block\util\ICustomBlock.java
 C:\Users\Mitchell\eclipse-workspace\ClusterFactions\src\com\clusterfactions\clustercore\listeners\events\claim\ClaimEnterEvent.java
 C:\Users\Mitchell\eclipse-workspace\ClusterFactions\src\com\clusterfactions\clustercore\core\items\CustomItemType.java
 C:\Users\Mitchell\eclipse-workspace\ClusterFactions\src\com\clusterfactions\clustercore\listeners\player\PlayerJoinEventListener.java
@@ -97,16 +100,14 @@ C:\Users\Mitchell\eclipse-workspace\ClusterFactions\src\com\clusterfactions\clus
 C:\Users\Mitchell\eclipse-workspace\ClusterFactions\src\com\clusterfactions\clustercore\core\permission\PermissionGroup.java
 C:\Users\Mitchell\eclipse-workspace\ClusterFactions\src\com\clusterfactions\clustercore\core\items\ItemRepo.java
 C:\Users\Mitchell\eclipse-workspace\ClusterFactions\src\com\clusterfactions\clustercore\core\inventory\util\model\interfaces\FilteredSlots.java
-C:\Users\Mitchell\eclipse-workspace\ClusterFactions\src\com\clusterfactions\clustercore\core\items\impl\TestCookableItem.java
 C:\Users\Mitchell\eclipse-workspace\ClusterFactions\src\com\clusterfactions\clustercore\listeners\player\AsyncPlayerChatEventListener.java
+C:\Users\Mitchell\eclipse-workspace\ClusterFactions\src\com\clusterfactions\clustercore\core\items\impl\ore\TitaniumOre.java
 C:\Users\Mitchell\eclipse-workspace\ClusterFactions\src\com\clusterfactions\clustercore\persistence\serialization\LocationSerializer.java
 C:\Users\Mitchell\eclipse-workspace\ClusterFactions\src\com\clusterfactions\clustercore\core\factions\util\FactionRole.java
 C:\Users\Mitchell\eclipse-workspace\ClusterFactions\src\com\clusterfactions\clustercore\core\player\PlayerData.java
 C:\Users\Mitchell\eclipse-workspace\ClusterFactions\src\com\clusterfactions\clustercore\core\items\impl\ore\NickelOre.java
-C:\Users\Mitchell\eclipse-workspace\ClusterFactions\src\com\clusterfactions\clustercore\core\items\impl\TestCookedItem.java
 C:\Users\Mitchell\eclipse-workspace\ClusterFactions\src\com\clusterfactions\clustercore\util\JSONUtil.java
 C:\Users\Mitchell\eclipse-workspace\ClusterFactions\src\com\clusterfactions\clustercore\core\inventory\impl\player\settings\map\types\MapAllySettingsMenu.java
 C:\Users\Mitchell\eclipse-workspace\ClusterFactions\src\com\clusterfactions\clustercore\core\inventory\impl\block\FurnaceInventory.java
-C:\Users\Mitchell\eclipse-workspace\ClusterFactions\src\com\clusterfactions\clustercore\listeners\misc\PrepareItemCraftEventListener.java
 C:\Users\Mitchell\eclipse-workspace\ClusterFactions\src\com\clusterfactions\clustercore\listeners\player\PlayerQuitEventListener.java
 C:\Users\Mitchell\eclipse-workspace\ClusterFactions\src\com\clusterfactions\clustercore\util\EnumUtil.java

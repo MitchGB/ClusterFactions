@@ -1,6 +1,8 @@
 eclipse.preferences.version=1
 encoding//src/com/clusterfactions/clustercore/core/inventory/impl/faction/perm/FactionPermissionMenu.java=UTF-8
 encoding//src/com/clusterfactions/clustercore/core/inventory/impl/faction/perm/MainPermissionMenu.java=UTF-8
+encoding//src/com/clusterfactions/clustercore/core/inventory/impl/guide/MainGuideMenu.java=UTF-8
+encoding//src/com/clusterfactions/clustercore/core/inventory/impl/guide/OresGuideMenu.java=UTF-8
 encoding//src/com/clusterfactions/clustercore/core/inventory/impl/player/settings/MainSettingsMenu.java=UTF-8
 encoding//src/com/clusterfactions/clustercore/core/inventory/impl/player/settings/lang/SettingsLanguageMenu.java=UTF-8
 encoding//src/com/clusterfactions/clustercore/core/inventory/impl/player/settings/map/MapMainSettingsMenu.java=UTF-8

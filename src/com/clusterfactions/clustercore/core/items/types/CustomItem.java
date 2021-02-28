@@ -4,7 +4,6 @@ import java.util.UUID;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
-import org.bukkit.block.Furnace;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 import org.bukkit.event.EventHandler;
@@ -58,6 +57,10 @@ public class CustomItem implements Listener{
     public Material getItemType() {
         return item.getType();
     }   
+    
+    public int getCustomModelData() {
+    	return item.getItemMeta().hasCustomModelData() ? item.getItemMeta().getCustomModelData() : 0;
+    }
     
     public CustomItemType getType() {
         return itemCustomType;

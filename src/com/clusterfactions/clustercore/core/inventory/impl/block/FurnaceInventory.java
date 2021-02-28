@@ -33,6 +33,7 @@ import com.clusterfactions.clustercore.util.Colors;
 import com.clusterfactions.clustercore.util.NumberUtil;
 import com.clusterfactions.clustercore.util.unicode.CharRepo;
 
+import net.minecraft.server.v1_16_R3.Containers;
 import net.minecraft.server.v1_16_R3.TileEntityFurnace;
 
 public class FurnaceInventory extends BlockAsyncInventory implements Interactable, FilteredSlots{
@@ -51,15 +52,9 @@ public class FurnaceInventory extends BlockAsyncInventory implements Interactabl
 	
 	public FurnaceInventory(Player player, Block block) {
 		super(player, "FURNACE_OVERRIDE_MENU", "&f" + CharRepo.FURNACE_OVERRIDE_CONTAINER_27, 27, block);
-		new BukkitRunnable() {
-			@Override
-			public void run() {
-				update();
-			}
-			
-		}.runTaskTimer(ClusterCore.getInstance(), 0, tickRate);
 	}
 	
+	@Override
 	public void update() {
 		if(!ClusterCore.getInstance().getInventoryManager().blockCache.containsKey(this.block)) return;
 		if(!(this.block.getState() instanceof TileState)) return;
@@ -156,7 +151,7 @@ public class FurnaceInventory extends BlockAsyncInventory implements Interactabl
 		{
 			for(Player p : this.getHandlers()) {
 				int burnProgress = Math.round((float)burnDuration/(float)maxBurnDuration*14);
-				renameWindow(p, invInstance, Colors.parseColors("&f" + CharRepo.FURNACE_OVERRIDE_CONTAINER_27 + getFuelProgressString(NumberUtil.clamp(burnProgress, 0, 14)) + getProgressString(NumberUtil.clamp(currentProgress, 0, 22)) ));
+				renameWindow(p, invInstance, Colors.parseColors("&f" + CharRepo.FURNACE_OVERRIDE_CONTAINER_27 + getFuelProgressString(NumberUtil.clamp(burnProgress, 0, 14)) + getProgressString(NumberUtil.clamp(currentProgress, 0, 22)) ), Containers.GENERIC_9X3);
 				bar_empty = currentProgress == 0;
 			}
 		}

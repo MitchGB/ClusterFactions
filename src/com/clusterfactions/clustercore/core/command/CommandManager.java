@@ -11,6 +11,7 @@ import org.bukkit.Bukkit;
 import com.clusterfactions.clustercore.ClusterCore;
 import com.clusterfactions.clustercore.core.chat.ChatMessageMode;
 import com.clusterfactions.clustercore.core.command.impl.ClusterFactionsCommand;
+import com.clusterfactions.clustercore.core.command.impl.GuideCommand;
 import com.clusterfactions.clustercore.core.command.impl.admin.AdminCommand;
 import com.clusterfactions.clustercore.core.command.impl.factions.FactionsCommand;
 import com.clusterfactions.clustercore.core.command.impl.factions.SettingsCommand;
@@ -61,7 +62,8 @@ public class CommandManager {
 				new PermissionCommand(),
 				new AdminCommand(),
 				new SettingsCommand(),
-				new ClusterFactionsCommand()
+				new ClusterFactionsCommand(),
+				new GuideCommand()
 
 		);
 		instance.getCommandCompletions().registerAsyncCompletion("faction-warps", c -> {

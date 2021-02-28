@@ -9,6 +9,8 @@ import org.bukkit.inventory.ShapedRecipe;
 import org.bukkit.inventory.meta.ItemMeta;
 
 import com.clusterfactions.clustercore.ClusterCore;
+import com.clusterfactions.clustercore.core.items.CustomItemType;
+import com.clusterfactions.clustercore.core.items.types.CustomItem;
 
 import lombok.Getter;
 
@@ -21,6 +23,15 @@ public class RecipeIngredient {
 	{
 		this.mat = mat;
 		this.modelData = modelData;
+	}
+	
+	public RecipeIngredient(CustomItemType item) {
+		this(item.getHandler());
+	}
+	
+	public RecipeIngredient(CustomItem item) {
+		this.mat = item.getItemType();
+		this.modelData = item.getCustomModelData();
 	}
 	
 	public RecipeIngredient(Material mat) {

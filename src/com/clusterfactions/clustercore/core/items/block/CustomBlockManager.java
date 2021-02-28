@@ -9,18 +9,15 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Note;
 import org.bukkit.Sound;
-import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.data.Directional;
 import org.bukkit.block.data.type.NoteBlock;
-import org.bukkit.craftbukkit.v1_16_R3.CraftWorld;
-import org.bukkit.craftbukkit.v1_16_R3.entity.CraftPlayer;
-import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.event.block.BlockPhysicsEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.block.NotePlayEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
@@ -32,16 +29,11 @@ import com.clusterfactions.clustercore.core.items.block.breakhandler.BlockBreakH
 import com.clusterfactions.clustercore.core.items.types.CustomItem;
 import com.clusterfactions.clustercore.core.items.types.interfaces.PlaceableItem;
 import com.clusterfactions.clustercore.util.ItemBuilder;
-import com.google.common.base.Preconditions;
-
-import net.minecraft.server.v1_16_R3.BlockPosition;
-import net.minecraft.server.v1_16_R3.PacketPlayOutBlockBreakAnimation;
 
 public class CustomBlockManager implements Listener{
 	
 	private HashMap<UUID, Long> timerMap = new HashMap<>();
 	
-	public CustomBlockRegistry itemRegistry = new CustomBlockRegistry();
 	public BlockBreakHandler itemBreakHandler = new BlockBreakHandler();
 	
 	public CustomBlockManager() {
@@ -51,6 +43,7 @@ public class CustomBlockManager implements Listener{
 	public void placeBlock(PlayerInteractEvent e, ItemStack item) {
 		if(e.isCancelled()) return;
 		ItemManager itemManager = ClusterCore.getInstance().getItemManager();
+		if(item == null || item.getType() == Material.AIR) return;
 		CustomItem customItem = itemManager.getCustomItemHandler(itemManager.getCustomItemType(item));
 		if(e.getAction() != Action.RIGHT_CLICK_BLOCK) return;
 		if(e.isBlockInHand())
@@ -125,40 +118,37 @@ public class CustomBlockManager implements Listener{
 		CustomBlockType blockType = CustomBlockType.getType(nb.getInstrument(), Byte.toUnsignedInt(nb.getNote().getId()));
 		if(blockType == null) {e.setCancelled(false); return;}
 		
-		Sound blockSound = blockType.getBlockSound();
-		e.getBlock().getLocation().getWorld().playSound(e.getBlock().getLocation(), blockSound, 10, 10);
 		e.getBlock().setType(Material.AIR);
 		
 		if(timerMap.containsKey(e.getPlayer().getUniqueId()))
 			timerMap.remove(e.getPlayer().getUniqueId());
 		
-		if(blockType.consumer != null && e.getPlayer().getGameMode() != GameMode.CREATIVE)	
+		if(blockType.consumer != null && e.getPlayer().getGameMode() != GameMode.CREATIVE && blockType.consumer.exec(e.getPlayer()) != null)	
 			e.getBlock().getLocation().getWorld().dropItemNaturally(e.getBlock().getLocation(), blockType.consumer.exec(e.getPlayer()));
 	}
 	
-	public void timerHandler(Player player, Block block) {		
-		if(block.getType() != Material.NOTE_BLOCK) return;
-
-		NoteBlock nb = (NoteBlock) block.getBlockData();
-		CustomBlockType blockType = CustomBlockType.getType(nb.getInstrument(), Byte.toUnsignedInt(nb.getNote().getId()));
-		if(blockType == null) return;
-		
-		int breakDuration = blockType.breakDuration;
-		if(!timerMap.containsKey(player.getUniqueId())) timerMap.put(player.getUniqueId(), System.currentTimeMillis() + breakDuration);
-		if(timerMap.get(player.getUniqueId()) < 0) timerMap.put(player.getUniqueId(), System.currentTimeMillis() + breakDuration);
-		Bukkit.broadcastMessage(((double)System.currentTimeMillis() - (double)timerMap.get(player.getUniqueId())) / (double)breakDuration * 1D + "");
-		sendBlockDamage(player, block.getLocation(), ((float)System.currentTimeMillis() - (float)timerMap.get(player.getUniqueId())) / (float)breakDuration * 1F);
+	private CustomBlockType blockType;
+	private NoteBlock nb;
+	
+	@EventHandler(priority = EventPriority.HIGHEST)
+	public void physics(BlockPhysicsEvent e) {
+		if(e.getBlock().getType() == Material.NOTE_BLOCK) {
+			if(!e.getSourceBlock().getRelative(BlockFace.UP).equals(e.getBlock())) return;
+			
+			nb = (NoteBlock) e.getBlock().getBlockData();			
+			if(CustomBlockType.getType(nb.getInstrument(), Byte.toUnsignedInt(nb.getNote().getId())) != null)
+				blockType = CustomBlockType.getType(nb.getInstrument(), Byte.toUnsignedInt(nb.getNote().getId()));
+			
+			Bukkit.getScheduler().runTaskLater(ClusterCore.getInstance(), new Runnable() {
+		        @Override
+		        public void run() {	
+					nb.setInstrument(blockType.instrument);
+					nb.setNote(new Note(blockType.note));
+					e.getBlock().setBlockData(nb);
+		        }
+			}, 1);
+		}
 	}
-
-    public static void sendBlockDamage(Player player, Location loc, float progress) {
-        Preconditions.checkArgument(player != null, "player must not be null");
-        Preconditions.checkArgument(loc != null, "loc must not be null");
-        Preconditions.checkArgument(progress >= 0.0 && progress <= 1.0, "progress must be between 0.0 and 1.0 (inclusive)");
-
-        int stage = (int) (9 * progress); // There are 0 - 9 damage states
-        PacketPlayOutBlockBreakAnimation packet = new PacketPlayOutBlockBreakAnimation(((CraftPlayer) player).getHandle().getId(), new BlockPosition(loc.getBlockX(), loc.getBlockY(), loc.getBlockZ()), stage);
-        ((CraftPlayer) player).getHandle().playerConnection.sendPacket(packet);
-    }
 }
 
 

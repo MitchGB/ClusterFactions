@@ -3,6 +3,7 @@ package com.clusterfactions.clustercore.core.items;
 import org.bukkit.inventory.ItemStack;
 
 import com.clusterfactions.clustercore.ClusterCore;
+import com.clusterfactions.clustercore.core.items.types.CustomItem;
 
 public enum CustomItemType {
 
@@ -11,7 +12,10 @@ public enum CustomItemType {
 	TEST_COOKED_ITEM,
 	
 	NICKEL_ORE,
-	NICKEL_INGOT;
+	NICKEL_INGOT,
+	
+	TITANIUM_ORE,
+	TITANIUM_INGOT;
 	
 	public static CustomItemType getById(String id)
 	{
@@ -20,6 +24,10 @@ public enum CustomItemType {
 	
 	public ItemStack getItem() {
 		return ClusterCore.getInstance().getItemManager().getCustomItemHandler(this).getNewStack();
+	}
+	
+	public CustomItem getHandler() {
+		return ClusterCore.getInstance().getItemManager().getCustomItemHandler(this);
 	}
 	
 	public String getId()

@@ -11,4 +11,9 @@ public class Pair<L, R> {
 		this.right = right;
 		this.left = left;
 	}
+	
+	public static <E,T> Pair<E, T> of(E l, T r) {
+		return new Pair<E,T>(l, r);
+		
+	}
 }

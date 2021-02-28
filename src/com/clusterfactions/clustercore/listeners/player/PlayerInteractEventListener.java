@@ -103,7 +103,7 @@ public class PlayerInteractEventListener implements Listener{
 			.add(Material.WARPED_PRESSURE_PLATE)
 			.build();
 	
-	@EventHandler(priority = EventPriority.HIGHEST)
+	@EventHandler(priority = EventPriority.HIGH)
 	public void PlayerInteractEvent(PlayerInteractEvent e) {
 		Player player = e.getPlayer();
 		PlayerData playerData = ClusterCore.getInstance().getPlayerManager().getPlayerData(player);
@@ -146,11 +146,12 @@ public class PlayerInteractEventListener implements Listener{
 		}
 	}
 	
-	@EventHandler(priority = EventPriority.LOW)
+	@EventHandler(priority = EventPriority.HIGHEST)
 	public void PlayerInteractEventFurnace(PlayerInteractEvent e) {
 		Block block = e.getClickedBlock();
 		if(e.getAction() != Action.RIGHT_CLICK_BLOCK) return;
 		if(e.getPlayer().isSneaking()) return;
+		if(e.isCancelled()) return;
 		if(block == null) return;
 		if(block.getType() == Material.FURNACE){
 			e.setCancelled(true);
@@ -158,6 +159,17 @@ public class PlayerInteractEventListener implements Listener{
 				ClusterCore.getInstance().getInventoryManager().blockCache.get(block).openInventory(e.getPlayer());
 			}else
 				new FurnaceInventory(e.getPlayer(), block).openInventory(e.getPlayer());
+		}
+	}	
+	
+	@EventHandler(priority = EventPriority.NORMAL)
+	public void PlayerInteractEventNoteblock(PlayerInteractEvent e) {
+		Block block = e.getClickedBlock();
+		if(e.getAction() != Action.RIGHT_CLICK_BLOCK) return;
+		if(e.getPlayer().isSneaking()) return;
+		if(block == null) return;
+		if(block.getType() == Material.NOTE_BLOCK){
+			e.setCancelled(true);
 		}
 	}
 }

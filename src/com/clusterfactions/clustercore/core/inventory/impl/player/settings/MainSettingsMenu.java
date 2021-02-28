@@ -14,8 +14,8 @@ public class MainSettingsMenu extends InventoryBase{
 	public MainSettingsMenu(Player player) {
 
 		super(player, "PLAYER_SETTINGS", "&f" + CharRepo.MENU_CONTAINER_27, 27);
-		this.addItem(new ItemBuilder(Material.ACACIA_BOAT).coloredName("Language Settings").create(), e_-> { new SettingsLanguageMenu(player).openInventory(player);});
-		this.addItem(new ItemBuilder(Material.FILLED_MAP).coloredName("Map Settings").create(), e_-> { new MapMainSettingsMenu(player).openInventory(player);});
+		this.addItem(new ItemBuilder(Material.ACACIA_BOAT).coloredName("Language Settings").create(), e -> { new SettingsLanguageMenu(player).openInventory(player);});
+		this.addItem(new ItemBuilder(Material.FILLED_MAP).coloredName("Map Settings").create(), e -> { new MapMainSettingsMenu(player).openInventory(player);});
 		 
 	}
 }
