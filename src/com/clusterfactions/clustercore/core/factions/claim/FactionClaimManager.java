@@ -136,12 +136,9 @@ public class FactionClaimManager implements Listener{
 		int empty = 0;
 		for(Vector2Integer neighbour : getClaimNeighbours(claim))
 		{
-			System.out.println(claimed);
-			System.out.println(chunkClaimed(neighbour));
 			if(chunkClaimed(neighbour) == null || !chunkClaimed(neighbour).toString().equals(claimed.toString()))
 				empty++;
 		}
-		System.out.println(empty);
 		return empty;
 	}
 	

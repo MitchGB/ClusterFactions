@@ -15,6 +15,7 @@ import com.clusterfactions.clustercore.ClusterCore;
 import com.clusterfactions.clustercore.core.factions.Faction;
 import com.clusterfactions.clustercore.core.factions.claim.FactionClaimManager;
 import com.clusterfactions.clustercore.core.factions.util.FactionPerm;
+import com.clusterfactions.clustercore.core.inventory.impl.block.CraftingTableInventory;
 import com.clusterfactions.clustercore.core.inventory.impl.block.FurnaceInventory;
 import com.clusterfactions.clustercore.core.player.PlayerData;
 import com.clusterfactions.clustercore.util.location.Vector2Integer;
@@ -159,6 +160,19 @@ public class PlayerInteractEventListener implements Listener{
 				ClusterCore.getInstance().getInventoryManager().blockCache.get(block).openInventory(e.getPlayer());
 			}else
 				new FurnaceInventory(e.getPlayer(), block).openInventory(e.getPlayer());
+		}
+	}	
+	
+	@EventHandler(priority = EventPriority.HIGHEST)
+	public void PlayerInteractEventCraftingTable(PlayerInteractEvent e) {
+		Block block = e.getClickedBlock();
+		if(e.getAction() != Action.RIGHT_CLICK_BLOCK) return;
+		if(e.getPlayer().isSneaking()) return;
+		if(e.isCancelled()) return;
+		if(block == null) return;
+		if(block.getType() == Material.CRAFTING_TABLE){
+			e.setCancelled(true);
+			new CraftingTableInventory(e.getPlayer(), block).openInventory(e.getPlayer());
 		}
 	}	
 	

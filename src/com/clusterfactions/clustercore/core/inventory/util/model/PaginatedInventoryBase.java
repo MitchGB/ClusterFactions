@@ -2,8 +2,8 @@ package com.clusterfactions.clustercore.core.inventory.util.model;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.UUID;
+import java.util.Map.Entry;
 
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -16,7 +16,7 @@ import com.clusterfactions.clustercore.util.model.Pair;
 
 import de.tr7zw.changeme.nbtapi.NBTItem;
 
-public abstract class PaginatedInventory extends InventoryBase{
+public abstract class PaginatedInventoryBase extends InventoryBase{
 	public static final String PAGENUMBER = "$PAGE_NUMBER";
 	public static final String PAGEMAX = "$PAGE_MAX";
 	public static final String PAGE_TAG = "PAGE";
@@ -25,7 +25,7 @@ public abstract class PaginatedInventory extends InventoryBase{
 	private int pageAmount;
 	private int occupiedSlots;  //Amount of slots occupied by static Items
 	
-	public PaginatedInventory(Player player, String ID, String displayName, int inventorySize) {
+	public PaginatedInventoryBase(Player player, String ID, String displayName, int inventorySize) {
 		super(player, ID, displayName, inventorySize);
 		setStaticItem(nextPageButton().getRight(), 
 				l -> {
@@ -62,12 +62,12 @@ public abstract class PaginatedInventory extends InventoryBase{
 	public void setStaticItem(ItemStack item, InventoryClickHandler handlerL, InventoryClickHandler handlerR, int... index)
 	{
 		String rid = UUID.randomUUID().toString();
-		registerHandler(rid, handlerL, handlerR);
+		registerItemHandler(rid, handlerL, handlerR);
 		
 		NBTItem nbtItem = new NBTItem(item);
 		nbtItem.setString(ITEM_ID_TAG, rid);
-		nbtItem.setString(INVENTORY_TAG, inventoryID);
-		nbtItem.setString(RANDOM_UUID, uuid.toString());
+		nbtItem.setString(INVENTORY_TAG, this.getInventoryTag());
+		nbtItem.setString(INVENTORY_UUID, this.getInventoryUUID());
 		for(int i = 0; i < index.length; i++)
 			staticItems.put(index[i], nbtItem.getItem());	
 	}
@@ -95,6 +95,7 @@ public abstract class PaginatedInventory extends InventoryBase{
 		return getInventory(player, 0);
 	}
 	
+	@SuppressWarnings("deprecation")
 	public Inventory getInventory(Player player, int page) {
 		//index start at 1
 		getPageAmount();
@@ -125,24 +126,3 @@ public abstract class PaginatedInventory extends InventoryBase{
 	protected abstract Pair<Integer, ItemStack> previousPageButton();
 	protected abstract ItemStack emptyPageButton();
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

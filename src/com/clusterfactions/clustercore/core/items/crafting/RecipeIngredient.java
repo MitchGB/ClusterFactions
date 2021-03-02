@@ -4,6 +4,7 @@ import java.util.UUID;
 
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
+import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.ShapedRecipe;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -66,6 +67,20 @@ public class RecipeIngredient {
 			}
 		}
 		return ret;
+	}
+	
+	public static ItemStack[][] mapFromSlots(Inventory inv, Integer... map) {
+
+		ItemStack[][] itemMap = new ItemStack[3][3];
+		int index = 0;
+		for(int x = 0; x < 3; x++) {
+			for(int y = 0; y < 3; y++) {
+				itemMap[x][y] = inv.getItem(map[index]);
+				index++;
+			}
+		}
+		
+		return itemMap;
 	}
 	
 	public static ShapedRecipe fromMap(ItemStack output, RecipeIngredient[][] map) {

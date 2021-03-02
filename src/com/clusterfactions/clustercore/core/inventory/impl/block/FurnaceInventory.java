@@ -1,6 +1,5 @@
 package com.clusterfactions.clustercore.core.inventory.impl.block;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
@@ -16,19 +15,19 @@ import org.bukkit.block.data.Directional;
 import org.bukkit.craftbukkit.v1_16_R3.inventory.CraftItemStack;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.FurnaceRecipe;
-import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.Recipe;
-import org.bukkit.scheduler.BukkitRunnable;
 
 import com.clusterfactions.clustercore.ClusterCore;
-import com.clusterfactions.clustercore.core.inventory.util.model.BlockAsyncInventory;
+import com.clusterfactions.clustercore.core.inventory.util.InventoryManager;
+import com.clusterfactions.clustercore.core.inventory.util.model.BlockAsyncInventoryBase;
 import com.clusterfactions.clustercore.core.inventory.util.model.interfaces.FilteredSlots;
-import com.clusterfactions.clustercore.core.inventory.util.model.interfaces.Interactable;
+import com.clusterfactions.clustercore.core.inventory.util.model.interfaces.InteractableSlots;
 import com.clusterfactions.clustercore.core.items.CustomItemType;
 import com.clusterfactions.clustercore.core.items.ItemManager;
 import com.clusterfactions.clustercore.core.items.types.CustomItem;
 import com.clusterfactions.clustercore.core.items.types.interfaces.SmeltableItem;
+import com.clusterfactions.clustercore.listeners.events.updates.UpdateTickEvent;
 import com.clusterfactions.clustercore.util.Colors;
 import com.clusterfactions.clustercore.util.NumberUtil;
 import com.clusterfactions.clustercore.util.unicode.CharRepo;
@@ -36,13 +35,16 @@ import com.clusterfactions.clustercore.util.unicode.CharRepo;
 import net.minecraft.server.v1_16_R3.Containers;
 import net.minecraft.server.v1_16_R3.TileEntityFurnace;
 
-public class FurnaceInventory extends BlockAsyncInventory implements Interactable, FilteredSlots{
+public class FurnaceInventory extends BlockAsyncInventoryBase implements InteractableSlots, FilteredSlots{
 
 	final static int tickRate = 10;
+	private int lastTick = 0;
 	
 	public static final Integer[] exclusionSlots = new Integer[] {2, 5, 6, 7, 8, 14, 15, 16, 17, 20, 23, 24 ,25 ,26};
 	public static final Integer[] inventorySlots = new Integer[] {5, 6, 7, 8, 14, 15, 16, 17, 23, 24, 25, 26};
 	public static final Integer[] restrictedSlots = new Integer[] {2, 20};
+	public static final Integer[] smeltableSlots = new Integer[] {2};
+	public static final Integer[] fuelSlots = new Integer[] {20};
 	
 	private int currentProgress = 0;
 	private int burnDuration = 0;
@@ -55,39 +57,43 @@ public class FurnaceInventory extends BlockAsyncInventory implements Interactabl
 	}
 	
 	@Override
-	public void update() {
+	public void updateTickEvent(UpdateTickEvent e) {
+		lastTick++;
+		if(lastTick != tickRate) return;
 		if(!ClusterCore.getInstance().getInventoryManager().blockCache.containsKey(this.block)) return;
 		if(!(this.block.getState() instanceof TileState)) return;
-		
+		lastTick = 0;
 		
 		if(block.getRelative(BlockFace.DOWN).getType() == Material.HOPPER){
-			ItemStack nextItem = getNextItem(getItemsFromSlot(invInstance, inventorySlots));
-			if(nextItem != null){
-				Hopper hopper = (Hopper)(TileState)block.getRelative(BlockFace.DOWN).getState();
-				if(canFitItem(getItemsFromSlot(hopper.getInventory(), 0, 1, 2, 3 ,4), nextItem))
-				{
-					ItemStack addItem = nextItem.clone();
-					addItem.setAmount(1);
-					hopper.getInventory().addItem(addItem);
+
+			Hopper hopper = (Hopper)(TileState)block.getRelative(BlockFace.DOWN).getState();
+			ItemStack nextItem = InventoryManager.getNextItem(invInstance, inventorySlots);
+			if(nextItem != null) {
+				ItemStack addItem = nextItem.clone();
+				addItem.setAmount(1);
+			
+				if(InventoryManager.canFitItem(hopper.getInventory(), nextItem, 0, 1, 2, 3)) {
+					InventoryManager.addItemInto(hopper.getInventory(), nextItem, 0, 1, 2, 3);
 					nextItem.add(-1);
 				}
 			}
 		}
+		
 		for(BlockFace bf : new BlockFace[] {BlockFace.UP, BlockFace.NORTH, BlockFace.EAST, BlockFace.SOUTH,BlockFace.WEST}){
 			if(block.getRelative(bf).getType() == Material.HOPPER){
 				Hopper hopper = (Hopper)(TileState)block.getRelative(bf).getState();
-				ItemStack nextItem = getNextItem(getItemsFromSlot(hopper.getInventory(), 0, 1, 2, 3, 4));
+				ItemStack nextItem = InventoryManager.getNextItem(hopper.getInventory(), 0, 1, 2, 3);
+
 				if(((Directional)hopper.getBlockData()).getFacing() != bf.getOppositeFace()) continue;
 				if(nextItem == null) continue;
-				if(getSlotBelonging(nextItem) == -1) continue;
-
 				ItemStack addItem = nextItem.clone();
 				addItem.setAmount(1);
 				
-				if(!canFitItem(getItemsFromSlot(invInstance, getSlotBelonging(nextItem)), addItem)) continue;
-				addItemInto(addItem, getSlotBelonging(nextItem));
-				nextItem.add(-1);
+
+				if(getSlotBelonging(nextItem) == null) continue;
 				
+				addItemInto(addItem, getSlotBelonging(nextItem).get(0));
+				nextItem.add(-1);
 			}
 		}
 		
@@ -105,7 +111,7 @@ public class FurnaceInventory extends BlockAsyncInventory implements Interactabl
 			int smeltTime = smeltable != null ? smeltable.smeltTime() : getSmeltTime(smeltingItem.getType());	
 			ItemStack output = smeltable != null ? smeltable.outputItem().getItem() : getFurnaceRecipe(smeltingItem.getType()).getResult();
 			
-			if(!canFitItem(getItemsFromSlot(invInstance, inventorySlots), output ) || burnDuration == 0){
+			if(!canFitItem(output, inventorySlots) || burnDuration == 0){
 				if(burnDuration == 0){
 					if(fuelItem != null && fuelItem.getType() != Material.AIR){
 						burnDuration = getVanillaBurnDuration(fuelItem);
@@ -149,48 +155,12 @@ public class FurnaceInventory extends BlockAsyncInventory implements Interactabl
 		
 		if(currentProgress != 0 || !bar_empty)
 		{
-			for(Player p : this.getHandlers()) {
-				int burnProgress = Math.round((float)burnDuration/(float)maxBurnDuration*14);
-				renameWindow(p, invInstance, Colors.parseColors("&f" + CharRepo.FURNACE_OVERRIDE_CONTAINER_27 + getFuelProgressString(NumberUtil.clamp(burnProgress, 0, 14)) + getProgressString(NumberUtil.clamp(currentProgress, 0, 22)) ), Containers.GENERIC_9X3);
-				bar_empty = currentProgress == 0;
-			}
+			int burnProgress = Math.round((float)burnDuration/(float)maxBurnDuration*14);
+			renameWindow(invInstance, Colors.parseColors("&f" + CharRepo.FURNACE_OVERRIDE_CONTAINER_27 + getFuelProgressString(NumberUtil.clamp(burnProgress, 0, 14)) + getProgressString(NumberUtil.clamp(currentProgress, 0, 22)) ), Containers.GENERIC_9X3);
+			bar_empty = currentProgress == 0;
+			
 		}
 		
-	}
-	
-	private ItemStack getNextItem(ItemStack[] items){
-		for(ItemStack i : items) {
-			if(i == null) continue;
-			return i;
-		}
-		return null;
-	}
-	
-	public boolean canFitItem(ItemStack[] items, ItemStack item) {
-		for(ItemStack i : items) {
-			if(i == null) return true;
-			if(i.isSimilar(item))
-				if(i.getAmount() < i.getMaxStackSize())
-					return true;
-		}
-		return false;
-	}
-	
-	public void addItemInto(ItemStack item, Integer... slots) {
-		for(int i : slots) {
-			ItemStack it = invInstance.getItem(i);
-			if(it == null)
-			{
-				invInstance.setItem(i, item);
-				return;
-			}
-			if(it.isSimilar(item))
-				if(it.getAmount() < it.getMaxStackSize())
-				{
-					it.add(item.getAmount());
-					return;
-				}
-		}
 	}
 	
 	private String getProgressString(int progress) {
@@ -200,18 +170,10 @@ public class FurnaceInventory extends BlockAsyncInventory implements Interactabl
 	private String getFuelProgressString(int progress) {
 		return CharRepo.fromName("FURNACE_PROGRESS_FUEL_"+progress);
 	}
-	
-	@Override
-	public List<Integer> excludeSlot() {
-		return Arrays.asList(exclusionSlots);
-	}
 
 	@Override
-	public boolean isRestricted(int slot, ItemStack item) {
-		if(slot != 2 && slot != 20) return true;
-		if(item == null) return false;
-		
-		if(slot == 20 && item.getType().isFuel()) return false;
+	public List<Integer> getSlotBelonging(ItemStack item) {
+		if(item == null) return null;
 		boolean smeltable = isSmeltable(item.getType());
 		CustomItemType customItemType = ClusterCore.getInstance().getItemManager().getCustomItemType(item);
 		if(!smeltable && customItemType != null){
@@ -219,37 +181,10 @@ public class FurnaceInventory extends BlockAsyncInventory implements Interactabl
 			if(handler instanceof SmeltableItem) 
 				smeltable = true;
 		}
-		return !smeltable;
-	}
-
-	@Override
-	public int getSlotBelonging(ItemStack item) {
-		if(item == null) return -1;
+		if(smeltable) return Arrays.asList(smeltableSlots);
 		
-		boolean smeltable = isSmeltable(item.getType());
-		CustomItemType customItemType = ClusterCore.getInstance().getItemManager().getCustomItemType(item);
-		if(!smeltable && customItemType != null){
-			CustomItem handler = ClusterCore.getInstance().getItemManager().getCustomItemHandler(customItemType);
-			if(handler instanceof SmeltableItem) 
-				smeltable = true;
-		}
-		if(smeltable) return 2;
-		
-		if(item.getType().isFuel()) return 20;
-		return -1;
-	}
-	
-	@Override
-	public List<Integer> restrictedSlots() {
-		return Arrays.asList(restrictedSlots);
-	}
-	
-	public ItemStack[] getItemsFromSlot(Inventory inv, Integer... slots) {
-		List<ItemStack> items = new ArrayList<>();
-		for(int i : slots) {
-			items.add(inv.getItem(i));
-		}
-		return items.toArray(new ItemStack[items.size()]);
+		if(item.getType().isFuel()) return Arrays.asList(fuelSlots);
+		return null;
 	}
 	
 	private boolean isSmeltable(Material mat) {
@@ -274,6 +209,33 @@ public class FurnaceInventory extends BlockAsyncInventory implements Interactabl
 	public static int getVanillaBurnDuration(final ItemStack itemStack) {
 		return TileEntityFurnace.f().get(CraftItemStack.asNMSCopy(itemStack).getItem());
 	}
+
+	@Override
+	public List<Integer> filteredSlots() {
+		return Arrays.asList(restrictedSlots);
+	}
+
+	@Override
+	public boolean satisfiesFilter(int slot, ItemStack item) {
+		if(slot != 2 && slot != 20) return true;
+		if(item == null) return false;
+		if(item.getType() == Material.AIR) return false;
+		if(slot == 20 && item.getType().isFuel()) return false;
+		boolean smeltable = isSmeltable(item.getType());
+		CustomItemType customItemType = ClusterCore.getInstance().getItemManager().getCustomItemType(item);
+		if(!smeltable && customItemType != null){
+			CustomItem handler = ClusterCore.getInstance().getItemManager().getCustomItemHandler(customItemType);
+			if(handler instanceof SmeltableItem) 
+				smeltable = true;
+		}
+		return !smeltable;
+	}
+
+	@Override
+	public List<Integer> interactableSlots() {
+		return Arrays.asList(exclusionSlots);
+	}
+
 }
 
 

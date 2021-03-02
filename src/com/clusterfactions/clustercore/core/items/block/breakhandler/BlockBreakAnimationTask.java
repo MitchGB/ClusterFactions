@@ -81,7 +81,6 @@ public class BlockBreakAnimationTask extends BukkitRunnable {
 
 			int stage = (int) (f * 10.0f);
 			if (stage != context.getStage()) {
-				System.out.println(stage);
 				for(Player p : Bukkit.getOnlinePlayers())
 				{
 					((CraftPlayer) p).getHandle().playerConnection.sendPacket(new PacketPlayOutBlockBreakAnimation(123, context.getBlockPos(), stage));

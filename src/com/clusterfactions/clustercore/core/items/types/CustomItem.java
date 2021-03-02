@@ -15,7 +15,6 @@ import org.bukkit.event.entity.EntityPickupItemEvent;
 import org.bukkit.event.inventory.FurnaceSmeltEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryType;
-import org.bukkit.event.inventory.PrepareItemCraftEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
@@ -107,31 +106,6 @@ public class CustomItem implements Listener{
     	Player player = (Player)event.getEntity();
     	if(!isApplicableItem(item)) return;
     	player.updateInventory();
-    }
-
-    
-    @EventHandler(ignoreCancelled = true, priority = EventPriority.LOWEST)
-    public void onPrepareItemCraft(PrepareItemCraftEvent event) {
-        for (ItemStack itemStack : event.getInventory().getMatrix()) {
-            if (isApplicableItem(itemStack)) {    	
-                int xIndex = 0;
-                int zIndex = 0;
-                ItemStack[][] map = new ItemStack[3][3];
-                
-            	for (ItemStack s : event.getInventory().getMatrix()) {
-                    if(xIndex == 3) {
-                    	xIndex = 0;
-                    	zIndex++;
-                    }
-                    map[zIndex][xIndex] = s;
-                    xIndex++;
-                }	
-            
-            	if(!ClusterCore.getInstance().getItemManager().isMaterialsApplicable(map)) {
-            			event.getInventory().setResult(new ItemStack(Material.AIR));
-            	}
-            }
-        }
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)

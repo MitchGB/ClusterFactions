@@ -24,7 +24,6 @@ public class JSONUtil {
 		String add = toAdd.toString();
 		add = add.substring(0, add.length() -1);
 		BaseComponent[] components = new ComponentBuilder(add).create();
-		
 		msg.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, components));
 
 		return msg;
