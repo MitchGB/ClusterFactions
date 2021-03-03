@@ -2,8 +2,10 @@ package com.clusterfactions.clustercore.listeners.player;
 
 import java.util.UUID;
 
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -15,9 +17,11 @@ import com.clusterfactions.clustercore.ClusterCore;
 import com.clusterfactions.clustercore.core.factions.Faction;
 import com.clusterfactions.clustercore.core.factions.claim.FactionClaimManager;
 import com.clusterfactions.clustercore.core.factions.util.FactionPerm;
+import com.clusterfactions.clustercore.core.fx.spectator.cinematic.CinematicSequence;
 import com.clusterfactions.clustercore.core.inventory.impl.block.CraftingTableInventory;
 import com.clusterfactions.clustercore.core.inventory.impl.block.FurnaceInventory;
 import com.clusterfactions.clustercore.core.player.PlayerData;
+import com.clusterfactions.clustercore.util.location.LocationUtil;
 import com.clusterfactions.clustercore.util.location.Vector2Integer;
 import com.google.common.collect.ImmutableSet;
 
@@ -151,7 +155,6 @@ public class PlayerInteractEventListener implements Listener{
 	public void PlayerInteractEventFurnace(PlayerInteractEvent e) {
 		Block block = e.getClickedBlock();
 		if(e.getAction() != Action.RIGHT_CLICK_BLOCK) return;
-		if(e.getPlayer().isSneaking()) return;
 		if(e.isCancelled()) return;
 		if(block == null) return;
 		if(block.getType() == Material.FURNACE){
@@ -192,11 +195,24 @@ public class PlayerInteractEventListener implements Listener{
 		Block block = e.getClickedBlock();
 		if(e.getAction() != Action.RIGHT_CLICK_BLOCK) return;
 		if(block == null) return;
-		if(block.getType() == Material.COAL_BLOCK){
-			ClusterCore.getInstance().getSpectatorManager().viewLoc(e.getPlayer(), block.getLocation().add(.5, -1 , -3));
-		}
+		if(block.getType() != Material.COAL_BLOCK) return;
+		Player player = e.getPlayer();
+		Entity stand = ClusterCore.getInstance().getSpectatorManager().viewLoc(e.getPlayer(), block.getLocation().clone().add(.5, -1, -10));
+		Location loc = block.getLocation();
+		
+
+		new CinematicSequence(true, LocationUtil.lerp(stand.getLocation(), loc.clone().add(.5, -1, -2), 100, stand) ).execute(player);
+
+
+
 	}
 }
+
+
+
+
+
+
 
 
 

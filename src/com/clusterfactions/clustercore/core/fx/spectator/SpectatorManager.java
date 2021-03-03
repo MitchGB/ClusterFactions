@@ -7,7 +7,6 @@ import java.util.UUID;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.Sound;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
@@ -19,17 +18,15 @@ import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.ItemStack;
 
 import com.clusterfactions.clustercore.ClusterCore;
-import com.clusterfactions.clustercore.core.fx.spectator.cinematic.CinematicSequence;
-import com.clusterfactions.clustercore.core.fx.spectator.cinematic.util.CinematicFrame;
 import com.clusterfactions.clustercore.core.fx.spectator.util.EntityHider;
 import com.clusterfactions.clustercore.core.fx.spectator.util.EntityHider.Policy;
-import com.clusterfactions.clustercore.util.Colors;
-import com.clusterfactions.clustercore.util.unicode.CharRepo;
+import com.clusterfactions.clustercore.util.ItemBuilder;
+import com.clusterfactions.clustercore.util.model.Pair;
 import com.destroystokyo.paper.event.player.PlayerStopSpectatingEntityEvent;
 
 public class SpectatorManager implements Listener{
 	Map<UUID, Entity> entityMap = new HashMap<>();
-	Map<UUID, Location> lastLoc = new HashMap<>();
+	Map<UUID, Pair<Location, ItemStack>> lastLoc = new HashMap<>();
 	EntityHider entityHider;
 	
 	public SpectatorManager() {
@@ -60,28 +57,16 @@ public class SpectatorManager implements Listener{
 		}
 	}
 
-	public void viewLoc(Player player, Location loc) {
-		lastLoc.put(player.getUniqueId(), player.getLocation());
+	public Entity viewLoc(Player player, Location loc) {
+		if(entityMap.containsKey(player.getUniqueId())) return null;
+		lastLoc.put(player.getUniqueId(), Pair.of(player.getLocation(),player.getInventory().getHelmet()));
 		player.setGameMode(GameMode.SPECTATOR);
 		Entity stand = getStand(player, loc);
 		player.setSpectatorTarget(stand);
-		new CinematicSequence(
-				new CinematicFrame(5, e -> {player.playSound(loc, Sound.UI_TOAST_IN, 10, 10);}),
-				new CinematicFrame(5, e -> {player.playSound(loc, Sound.UI_TOAST_IN, 10, 10);}),
-				new CinematicFrame(5, e -> {player.playSound(loc, Sound.UI_TOAST_IN, 10, 10);}),
-				new CinematicFrame(5, e -> {player.playSound(loc, Sound.UI_TOAST_IN, 10, 10);}),
-				new CinematicFrame(5, e -> {player.playSound(loc, Sound.UI_TOAST_IN, 10, 10);}),
-				new CinematicFrame(5, e -> {player.playSound(loc, Sound.UI_TOAST_IN, 10, 10);}),
-				new CinematicFrame(5, e -> {player.playSound(loc, Sound.UI_TOAST_IN, 10, 10);}),
-				new CinematicFrame(5, e -> {player.playSound(loc, Sound.UI_TOAST_IN, 10, 10);}),
-				new CinematicFrame(5, e -> {player.playSound(loc, Sound.UI_TOAST_IN, 10, 10);}),
-				new CinematicFrame(5, e -> {player.playSound(loc, Sound.UI_TOAST_IN, 10, 10);}),
-				new CinematicFrame(30, e -> {player.getWorld().createExplosion(loc, 10, false, false); }),
-				new CinematicFrame(1, e -> {player.getWorld().dropItem(new Location(player.getWorld(), -136.5, 68.5, -13.5), new ItemStack(Material.NETHERITE_SWORD));}),
-				new CinematicFrame(40, e -> {stopSpectatorMode(player);})
-				).execute(player);
-		player.sendTitle("", Colors.parseColors("&f" + CharRepo.BLACK_BORDER), 0, Integer.MAX_VALUE, 0);
+		player.getInventory().setHelmet(new ItemBuilder(Material.CARVED_PUMPKIN).coloredName("There was no better way lol").create());
 		
+		
+		return stand;
 	}
 	
 	public void stopSpectatorMode(Player player) {
@@ -90,7 +75,8 @@ public class SpectatorManager implements Listener{
 		player.setGameMode(GameMode.SURVIVAL);
 
 		player.sendTitle(" ", " ", 0, 1, 0);
-		player.teleport(lastLoc.get(player.getUniqueId()));
+		player.teleport(lastLoc.get(player.getUniqueId()).getLeft());
+		player.getInventory().setHelmet(lastLoc.get(player.getUniqueId()).getRight());
 		lastLoc.remove(player.getUniqueId());
 		entityMap.get(player.getUniqueId()).remove();
 		entityMap.remove(player.getUniqueId());

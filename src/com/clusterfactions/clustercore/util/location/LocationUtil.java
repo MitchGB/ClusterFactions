@@ -1,16 +1,62 @@
 package com.clusterfactions.clustercore.util.location;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 
 import com.clusterfactions.clustercore.ClusterCore;
+import com.clusterfactions.clustercore.core.fx.spectator.cinematic.util.CinematicFrame;
 import com.clusterfactions.clustercore.util.NumberUtil;
 
 public class LocationUtil {
+
+	public static CinematicFrame[] lerp(Location from, Location to, int ticks, Entity toTeleport) {
+		double xDiff = to.getX() - from.getX();
+		double yDiff = to.getY() - from.getY();
+		double zDiff = to.getZ() - from.getZ();
+		float yawDiff = to.getYaw() - from.getYaw();
+		float pitchDiff = to.getPitch() - from.getPitch();
+		Location framePos = from.clone();
+		List<CinematicFrame> sequences = new ArrayList<>();
+		for(int i = 1; i <= ticks; i++) {
+			sequences.add(new CinematicFrame(1, e -> toTeleport.teleport(add(framePos, xDiff/ticks, yDiff/ticks, zDiff/ticks, yawDiff/ticks, pitchDiff/ticks)) ));
+		}
+		return sequences.toArray(new CinematicFrame[sequences.size()]);
+	}
+	
+	public static CinematicFrame[] lerpBlock(Location from, Location to, int ticks, Material block, Player player) {
+		double xDiff = to.getX() - from.getX();
+		double yDiff = to.getY() - from.getY();
+		double zDiff = to.getZ() - from.getZ();
+		float yawDiff = to.getYaw() - from.getYaw();
+		float pitchDiff = to.getPitch() - from.getPitch();
+		
+		Location framePos = from.clone();
+		List<CinematicFrame> sequences = new ArrayList<>();
+		
+		for(int i = 1; i <= ticks; i++) {
+			sequences.add(
+					new CinematicFrame(1, e -> {
+						Location nextLoc = cloneAdd(framePos, xDiff/ticks, yDiff/ticks, zDiff/ticks, yawDiff/ticks, pitchDiff/ticks);
+						if(nextLoc.getBlock().getType() == Material.AIR)
+							player.sendBlockChange(framePos, Material.AIR.createBlockData());
+						
+						add(framePos, xDiff/ticks, yDiff/ticks, zDiff/ticks, yawDiff/ticks, pitchDiff/ticks);
+						
+						if(framePos.getBlock().getType() != block)
+							player.sendBlockChange(framePos, block.createBlockData());
+					} ));
+		}
+		return sequences.toArray(new CinematicFrame[sequences.size()]);
+	}
 
 	public static String formatString(Location loc) {
 		return "("+String.format("%.2f",loc.getX())+","+String.format("%.2f",loc.getY())+","+String.format("%.2f",loc.getZ())+")";
@@ -70,7 +116,6 @@ public class LocationUtil {
 		return withinBounds(obj, new Location(w, loc1.getX(), 256, loc1.getZ()), new Location(w, loc2.getX(), -256, loc2.getZ()));
 	}
 	
-
 	//disregards z axis
 	public static boolean withinBounds(World w, Vector2Integer obj, Vector2Integer loc1, Vector2Integer loc2)
 	{
@@ -113,7 +158,20 @@ public class LocationUtil {
         return "";
 	}
 
+	public static Location add(Location loc, double x, double y, double z, float yaw, float pitch) {
+		loc.add(x, y, z);
+		loc.setYaw(loc.getYaw() + yaw);
+		loc.setPitch(loc.getPitch() + pitch);
+		return loc;
+	}
 	
+	public static Location cloneAdd(Location loc, double x, double y, double z, float yaw, float pitch) {
+		Location ret = loc.clone();
+		ret.add(x, y, z);
+		ret.setYaw(ret.getYaw() + yaw);
+		ret.setPitch(ret.getPitch() + pitch);
+		return ret;
+	}
 	
 	
 }

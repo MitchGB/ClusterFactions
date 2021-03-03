@@ -58,8 +58,6 @@ public class CharRepo {
 	public static final String MENU_CONTAINER_54 = NEG8 +"\uF001";
 	public static final String MENU_CONTAINER_27 = NEG8+"\uF002";
 
-	public static final String BLACK_BORDER = "\uC0FF";
-	
 	public static final String CRAFTING_TABLE_OVERRIDE_CONTAINER_36 = NEG8 + "\uF004";
 	
 	public static final String FURNACE_OVERRIDE_CONTAINER_27 = NEG8 + "\uF003";
