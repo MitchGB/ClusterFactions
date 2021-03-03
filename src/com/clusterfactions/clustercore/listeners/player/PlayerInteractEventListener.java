@@ -185,6 +185,16 @@ public class PlayerInteractEventListener implements Listener{
 		if(block.getType() == Material.NOTE_BLOCK){
 			e.setCancelled(true);
 		}
+	}	
+	
+	@EventHandler(priority = EventPriority.NORMAL)
+	public void PlayerInteractEventCoalBlock(PlayerInteractEvent e) {
+		Block block = e.getClickedBlock();
+		if(e.getAction() != Action.RIGHT_CLICK_BLOCK) return;
+		if(block == null) return;
+		if(block.getType() == Material.COAL_BLOCK){
+			ClusterCore.getInstance().getSpectatorManager().viewLoc(e.getPlayer(), block.getLocation().add(.5, -1 , -3));
+		}
 	}
 }
 

@@ -11,6 +11,7 @@ C:\Users\Mitchell\eclipse-workspace\ClusterFactions\src\com\clusterfactions\clus
 C:\Users\Mitchell\eclipse-workspace\ClusterFactions\src\com\clusterfactions\clustercore\core\inventory\impl\player\settings\lang\SettingsLanguageMenu.java
 C:\Users\Mitchell\eclipse-workspace\ClusterFactions\src\com\clusterfactions\clustercore\core\items\types\interfaces\SmeltableItem.java
 C:\Users\Mitchell\eclipse-workspace\ClusterFactions\src\com\clusterfactions\clustercore\listeners\events\claim\ClaimExitEvent.java
+C:\Users\Mitchell\eclipse-workspace\ClusterFactions\src\com\clusterfactions\clustercore\core\fx\spectator\cinematic\util\CinematicFrame.java
 C:\Users\Mitchell\eclipse-workspace\ClusterFactions\src\com\clusterfactions\clustercore\core\items\types\interfaces\PlaceableItem.java
 C:\Users\Mitchell\eclipse-workspace\ClusterFactions\src\com\clusterfactions\clustercore\listeners\block\BlockPlaceEventListener.java
 C:\Users\Mitchell\eclipse-workspace\ClusterFactions\src\com\clusterfactions\clustercore\core\command\impl\factions\SettingsCommand.java
@@ -42,9 +43,11 @@ C:\Users\Mitchell\eclipse-workspace\ClusterFactions\src\com\clusterfactions\clus
 C:\Users\Mitchell\eclipse-workspace\ClusterFactions\src\com\clusterfactions\clustercore\core\items\types\interfaces\StackableItem.java
 C:\Users\Mitchell\eclipse-workspace\ClusterFactions\src\com\clusterfactions\clustercore\core\command\impl\GuideCommand.java
 C:\Users\Mitchell\eclipse-workspace\ClusterFactions\src\com\clusterfactions\clustercore\util\Colors.java
+C:\Users\Mitchell\eclipse-workspace\ClusterFactions\src\com\clusterfactions\clustercore\core\fx\spectator\cinematic\CinematicSequence.java
 C:\Users\Mitchell\eclipse-workspace\ClusterFactions\src\com\clusterfactions\clustercore\util\annotation\DoNotSerialize.java
 C:\Users\Mitchell\eclipse-workspace\ClusterFactions\src\com\clusterfactions\clustercore\util\ItemBuilder.java
 C:\Users\Mitchell\eclipse-workspace\ClusterFactions\src\com\clusterfactions\clustercore\core\command\impl\admin\AdminCommand.java
+C:\Users\Mitchell\eclipse-workspace\ClusterFactions\src\com\clusterfactions\clustercore\core\fx\spectator\util\EntityHider.java
 C:\Users\Mitchell\eclipse-workspace\ClusterFactions\src\com\clusterfactions\clustercore\core\items\types\CustomItem.java
 C:\Users\Mitchell\eclipse-workspace\ClusterFactions\src\com\clusterfactions\clustercore\core\inventory\util\InventoryManager.java
 C:\Users\Mitchell\eclipse-workspace\ClusterFactions\src\com\clusterfactions\clustercore\persistence\serialization\Vector2IntegerSerializer.java
@@ -54,6 +57,7 @@ C:\Users\Mitchell\eclipse-workspace\ClusterFactions\src\com\clusterfactions\clus
 C:\Users\Mitchell\eclipse-workspace\ClusterFactions\src\com\clusterfactions\clustercore\core\items\block\breakhandler\BlockBreakHandler.java
 C:\Users\Mitchell\eclipse-workspace\ClusterFactions\src\com\clusterfactions\clustercore\core\items\types\interfaces\EnchantableItem.java
 C:\Users\Mitchell\eclipse-workspace\ClusterFactions\src\com\clusterfactions\clustercore\core\items\types\interfaces\InteractableItem.java
+C:\Users\Mitchell\eclipse-workspace\ClusterFactions\src\com\clusterfactions\clustercore\core\fx\spectator\SpectatorManager.java
 C:\Users\Mitchell\eclipse-workspace\ClusterFactions\src\com\clusterfactions\clustercore\listeners\events\updates\UpdateSecondEvent.java
 C:\Users\Mitchell\eclipse-workspace\ClusterFactions\src\com\clusterfactions\clustercore\util\unicode\CharRepo.java
 C:\Users\Mitchell\eclipse-workspace\ClusterFactions\src\com\clusterfactions\clustercore\core\items\block\util\ItemGroupGenerics.java
@@ -94,6 +98,7 @@ C:\Users\Mitchell\eclipse-workspace\ClusterFactions\src\com\clusterfactions\clus
 C:\Users\Mitchell\eclipse-workspace\ClusterFactions\src\com\clusterfactions\clustercore\core\inventory\impl\player\settings\map\types\MapNeutralSettingsMenu.java
 C:\Users\Mitchell\eclipse-workspace\ClusterFactions\src\com\clusterfactions\clustercore\ClusterCore.java
 C:\Users\Mitchell\eclipse-workspace\ClusterFactions\src\com\clusterfactions\clustercore\listeners\player\PlayerInteractEventListener.java
+C:\Users\Mitchell\eclipse-workspace\ClusterFactions\src\com\clusterfactions\clustercore\core\fx\spectator\cinematic\util\CinematicFunction.java
 C:\Users\Mitchell\eclipse-workspace\ClusterFactions\src\com\clusterfactions\clustercore\listeners\events\claim\ClaimEnterEvent.java
 C:\Users\Mitchell\eclipse-workspace\ClusterFactions\src\com\clusterfactions\clustercore\core\items\CustomItemType.java
 C:\Users\Mitchell\eclipse-workspace\ClusterFactions\src\com\clusterfactions\clustercore\listeners\player\PlayerJoinEventListener.java

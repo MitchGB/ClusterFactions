@@ -14,6 +14,7 @@ public class PlayerJoinEventListener implements Listener{
 	@EventHandler
 	public void PlayerJoinEvent(PlayerJoinEvent e) {
 		Player player = e.getPlayer();
+		player.sendTitle(" ", " ", 0, 1, 0);
 		
 		ClusterCore.getInstance().getPlayerManager().getPlayerData(player);
 		

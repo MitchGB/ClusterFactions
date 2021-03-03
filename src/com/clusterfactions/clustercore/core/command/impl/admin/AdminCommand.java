@@ -2,15 +2,20 @@ package com.clusterfactions.clustercore.core.command.impl.admin;
 
 import java.util.Locale;
 
+import org.bukkit.Bukkit;
+import org.bukkit.GameMode;
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.ArmorStand;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 
 import com.clusterfactions.clustercore.ClusterCore;
-import com.clusterfactions.clustercore.core.inventory.impl.block.FurnaceInventory;
 import com.clusterfactions.clustercore.core.items.CustomItemType;
 import com.clusterfactions.clustercore.core.items.ItemManager;
 import com.clusterfactions.clustercore.core.lang.Lang;
 import com.clusterfactions.clustercore.core.player.PlayerData;
+import com.clusterfactions.clustercore.util.Colors;
+import com.clusterfactions.clustercore.util.unicode.CharRepo;
 
 import co.aikar.commands.BaseCommand;
 import co.aikar.commands.annotation.CommandAlias;
@@ -40,6 +45,28 @@ public class AdminCommand extends BaseCommand{
 	public void langtest(final CommandSender sender, Lang lang){
 		PlayerData playerData = ClusterCore.getInstance().getPlayerManager().getPlayerData((Player)sender);
 		playerData.sendMessage(ClusterCore.getInstance().getLanguageManager().getString(Locale.ENGLISH, lang));
+	}
+	
+	@Subcommand("fix-spectator")
+	@CommandCompletion("@players")
+	public void fixSpectator(final CommandSender sender, OnlinePlayer player){
+		Player p = player.getPlayer();
+		p.setGameMode(GameMode.SPECTATOR);
+		p.setSpectatorTarget(null);
+		p.setGameMode(GameMode.SURVIVAL);
+
+		p.sendTitle(" ", " ", 0, 1, 0);
+
+		
+	}
+	
+	@Subcommand("debug-armorstands")
+	public void debugArmorStand(final CommandSender sender){
+		if(!(sender instanceof Player)) return;
+		for(Entity e : ((Player)sender).getWorld().getEntities()) {
+			if(e instanceof ArmorStand)
+				e.remove();
+		}
 	}
 	
 	@Subcommand("item")

@@ -1,2 +1,3 @@
 com\clusterfactions\clustercore\listeners\player\AsyncPlayerChatEventListener$1.class
 com\clusterfactions\clustercore\core\factions\Faction$1.class
+com\clusterfactions\clustercore\core\fx\spectator\util\EntityHider$3.class
