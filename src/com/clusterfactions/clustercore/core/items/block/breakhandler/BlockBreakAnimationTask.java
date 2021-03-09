@@ -71,8 +71,11 @@ public class BlockBreakAnimationTask extends BukkitRunnable {
 			float f = ((float)context.getTicksTaken() / (float)breakSpeed) * (float)1;
 			
 			if (f >= 1.0f) {
+				if(!ClusterCore.getInstance().getFactionClaimManager().canManipulateBlock(bukkitLoc, player.getBukkitEntity())) {
+					f = 0;
+					return;
+				}
 				player.playerInteractManager.a(context.getBlockPos(), PacketPlayInBlockDig.EnumPlayerDigType.STOP_DESTROY_BLOCK, "destroyed");
-				System.out.println(context.getTicksTaken() + " Time taken");
 				
 				bukkitLoc.getWorld().spawnParticle(Particle.BLOCK_CRACK, bukkitLoc, 10, 1, 1, 1, 1, type.getBlockBreakParticle().createBlockData());
 				player.getBukkitEntity().playSound(bukkitLoc, Sound.BLOCK_STONE_BREAK, 10, 10);

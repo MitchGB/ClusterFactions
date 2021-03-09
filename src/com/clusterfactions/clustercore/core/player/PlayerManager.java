@@ -9,7 +9,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 
 import com.clusterfactions.clustercore.ClusterCore;
-import com.clusterfactions.clustercore.listeners.events.updates.UpdateSecondEvent;
+import com.clusterfactions.clustercore.core.listeners.events.updates.UpdateSecondEvent;
 
 public class PlayerManager implements Listener{
 	HashMap<UUID, PlayerData> cachedPlayers = new HashMap<>();

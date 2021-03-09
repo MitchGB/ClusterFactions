@@ -108,13 +108,19 @@ public class Faction implements Listener{
 		if(getClaimedChunks() != null) {
 			ArrayList<Vector2Integer> chunks = (ArrayList<Vector2Integer>) getClaimedChunks().clone();
 			for(Vector2Integer claim : chunks)
-				ClusterCore.getInstance().getFactionClaimManager().removeClaimChunk(claim, this);
+				ClusterCore.getInstance().getFactionClaimManager().unclaimChunk(claim, this);
 		}
 		ArrayList<UUID> playerL = (ArrayList<UUID>) getPlayers().clone();
 		for(UUID uuid : playerL)
 			removePlayer(Bukkit.getPlayer(uuid), null);
 		
 		ClusterCore.getInstance().getMongoHook().deleteData(this.getFactionID().toString(), "factions");
+	}
+	
+	public boolean containsPlayer(Player player) {
+		for(UUID uuid : this.players)
+			if(player.getUniqueId().equals(uuid)) return true;
+		return false;
 	}
 	
 	public void addPlayer(Player player) {

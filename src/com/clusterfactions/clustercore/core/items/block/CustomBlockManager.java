@@ -24,6 +24,7 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
 
 import com.clusterfactions.clustercore.ClusterCore;
+import com.clusterfactions.clustercore.core.factions.claim.FactionClaimManager;
 import com.clusterfactions.clustercore.core.items.ItemManager;
 import com.clusterfactions.clustercore.core.items.block.breakhandler.BlockBreakHandler;
 import com.clusterfactions.clustercore.core.items.types.CustomItem;
@@ -46,13 +47,21 @@ public class CustomBlockManager implements Listener{
 		if(item == null || item.getType() == Material.AIR) return;
 		CustomItem customItem = itemManager.getCustomItemHandler(itemManager.getCustomItemType(item));
 		if(e.getAction() != Action.RIGHT_CLICK_BLOCK) return;
-		if(e.isBlockInHand())
-		{
-			if(e.getClickedBlock().getType() == Material.NOTE_BLOCK) 
-				{
-					e.setCancelled(true);
-					placeBlockAt(e, e.getMaterial());
-				}
+		FactionClaimManager claimManager = ClusterCore.getInstance().getFactionClaimManager();
+		
+		BlockFace bf = e.getBlockFace();
+		bf.getDirection();
+		Location loc = e.getClickedBlock().getLocation().add(bf.getDirection());
+		if(!claimManager.canManipulateBlock(loc, e.getPlayer())) {
+			e.setCancelled(true);
+			return;
+		}
+		
+		if(e.isBlockInHand()){
+			if(e.getClickedBlock().getType() == Material.NOTE_BLOCK) {
+				e.setCancelled(true);
+				placeBlockAt(e, e.getMaterial());
+			}
 			return;
 		}
 		
@@ -61,12 +70,14 @@ public class CustomBlockManager implements Listener{
 		
 		if(customItem == null) return;
 		if(!(customItem instanceof PlaceableItem)) return;
+		
 		placeBlock(e, (PlaceableItem)customItem);
 	}
 	
 	public void placeBlock(PlayerInteractEvent e, PlaceableItem item) {
 		if(e.getClickedBlock() == null) return;
 
+		e.setCancelled(true);
 		Location loc = placeBlockAt(e, Material.NOTE_BLOCK, item.blockType().blockSound);
 		
 		NoteBlock nb = (NoteBlock) loc.getBlock().getBlockData();

@@ -42,14 +42,9 @@
               <include>de.tr7zw:item-nbt-api</include>
               <include>co.aikar:acf-paper</include>
               <include>org.mongodb:mongo-java-driver</include>
-              <include>com.google.guava:guava</include>
             </includes>
           </artifactSet>
           <relocations>
-            <relocation>
-              <pattern>com.google.common</pattern>
-              <shadedPattern>com.clusterfactions.factionscore.util.common</shadedPattern>
-            </relocation>
             <relocation>
               <pattern>de.tr7zw.changeme.nbtapi</pattern>
               <shadedPattern>com.clusterfactions.factionscore.core.items.nbtapi</shadedPattern>
@@ -170,6 +165,12 @@
       <groupId>com.comphenix.protocol</groupId>
       <artifactId>ProtocolLib</artifactId>
       <version>4.6.0</version>
+      <scope>compile</scope>
+    </dependency>
+    <dependency>
+      <groupId>com.google.guava</groupId>
+      <artifactId>guava</artifactId>
+      <version>30.1-jre</version>
       <scope>compile</scope>
     </dependency>
   </dependencies>

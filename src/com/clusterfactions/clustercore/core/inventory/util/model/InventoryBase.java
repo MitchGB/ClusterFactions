@@ -26,7 +26,7 @@ import com.clusterfactions.clustercore.core.inventory.util.InventoryClickContext
 import com.clusterfactions.clustercore.core.inventory.util.InventoryClickHandler;
 import com.clusterfactions.clustercore.core.inventory.util.model.interfaces.FilteredSlots;
 import com.clusterfactions.clustercore.core.inventory.util.model.interfaces.InteractableSlots;
-import com.clusterfactions.clustercore.listeners.events.updates.UpdateTickEvent;
+import com.clusterfactions.clustercore.core.listeners.events.updates.UpdateTickEvent;
 import com.clusterfactions.clustercore.util.Colors;
 import com.clusterfactions.clustercore.util.model.Pair;
 import com.comphenix.protocol.PacketType;

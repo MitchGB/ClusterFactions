@@ -12,9 +12,9 @@ import org.bukkit.event.Listener;
 
 import com.clusterfactions.clustercore.ClusterCore;
 import com.clusterfactions.clustercore.core.lang.Lang;
+import com.clusterfactions.clustercore.core.listeners.events.player.PlayerCombatTagEvent;
+import com.clusterfactions.clustercore.core.listeners.events.updates.UpdateSecondEvent;
 import com.clusterfactions.clustercore.core.player.PlayerData;
-import com.clusterfactions.clustercore.listeners.events.player.PlayerCombatTagEvent;
-import com.clusterfactions.clustercore.listeners.events.updates.UpdateSecondEvent;
 import com.clusterfactions.clustercore.util.model.Pair;
 
 public class TeleportQueue implements Listener{

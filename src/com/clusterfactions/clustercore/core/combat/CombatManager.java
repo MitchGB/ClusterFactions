@@ -12,10 +12,11 @@ import org.bukkit.event.entity.EntityDamageByEntityEvent;
 
 import com.clusterfactions.clustercore.ClusterCore;
 import com.clusterfactions.clustercore.core.factions.Faction;
+import com.clusterfactions.clustercore.core.factions.claim.ChunkOwner;
 import com.clusterfactions.clustercore.core.lang.Lang;
+import com.clusterfactions.clustercore.core.listeners.events.player.PlayerCombatTagEvent;
+import com.clusterfactions.clustercore.core.listeners.events.updates.UpdateSecondEvent;
 import com.clusterfactions.clustercore.core.player.PlayerData;
-import com.clusterfactions.clustercore.listeners.events.player.PlayerCombatTagEvent;
-import com.clusterfactions.clustercore.listeners.events.updates.UpdateSecondEvent;
 
 public class CombatManager implements Listener{
 	HashMap<UUID, Long> combatLog = new HashMap<>();
@@ -37,6 +38,18 @@ public class CombatManager implements Listener{
 	public void EntityDamageByEntityEvent(EntityDamageByEntityEvent e) {
 		if (!(e.getDamager() instanceof Player)) return;
 		if (e.getEntity() instanceof  Player) {
+			Player p = (Player) e.getEntity();
+			
+			if(ClusterCore.getInstance().getFactionClaimManager().playerCache.containsKey(p.getUniqueId())) {
+				ChunkOwner owner = ClusterCore.getInstance().getFactionClaimManager().playerCache.get(p.getUniqueId());
+				if(owner.isAdmin()) {
+					if(owner.getOwnerUUID().toUpperCase().equals("SAFEZONE")){
+						e.setCancelled(true);
+						return;
+					}
+				}
+			}
+			
 			Faction damagerFaction = ClusterCore.getInstance().getFactionsManager().getFaction((Player)e.getDamager());
 			Faction playerFaction = ClusterCore.getInstance().getFactionsManager().getFaction((Player)e.getEntity());
 			if(damagerFaction != null && playerFaction != null)
@@ -46,7 +59,6 @@ public class CombatManager implements Listener{
 					return;
 				}
 					
-			Player p = (Player) e.getEntity();
 			PlayerData data = ClusterCore.getInstance().getPlayerManager().getPlayerData(p);
 			if(!isTagged(p))
 				data.sendMessage(Lang.PLAYER_BEEN_COMBAT_TAGGED, "5");

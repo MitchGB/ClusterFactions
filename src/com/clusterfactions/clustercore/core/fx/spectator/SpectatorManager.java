@@ -7,6 +7,7 @@ import java.util.UUID;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.block.data.BlockData;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
@@ -74,7 +75,7 @@ public class SpectatorManager implements Listener{
 		player.setSpectatorTarget(null);
 		player.setGameMode(GameMode.SURVIVAL);
 
-		player.sendTitle(" ", " ", 0, 1, 0);
+		if(!entityMap.containsKey(player.getUniqueId())) return;
 		player.teleport(lastLoc.get(player.getUniqueId()).getLeft());
 		player.getInventory().setHelmet(lastLoc.get(player.getUniqueId()).getRight());
 		lastLoc.remove(player.getUniqueId());
@@ -98,6 +99,12 @@ public class SpectatorManager implements Listener{
 	public void playerQuitEvent(PlayerQuitEvent e) {
 		if(entityMap.containsKey(e.getPlayer().getUniqueId())){
 			stopSpectatorMode(e.getPlayer());
+		}
+	}
+	
+	public static void changeAllBlocks(Player player, BlockData mat, Location... locs) {
+		for(Location loc : locs) {
+			player.sendBlockChange(loc, mat);
 		}
 	}
 

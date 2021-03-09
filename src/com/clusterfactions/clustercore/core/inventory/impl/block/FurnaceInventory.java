@@ -27,7 +27,7 @@ import com.clusterfactions.clustercore.core.items.CustomItemType;
 import com.clusterfactions.clustercore.core.items.ItemManager;
 import com.clusterfactions.clustercore.core.items.types.CustomItem;
 import com.clusterfactions.clustercore.core.items.types.interfaces.SmeltableItem;
-import com.clusterfactions.clustercore.listeners.events.updates.UpdateTickEvent;
+import com.clusterfactions.clustercore.core.listeners.events.updates.UpdateTickEvent;
 import com.clusterfactions.clustercore.util.Colors;
 import com.clusterfactions.clustercore.util.NumberUtil;
 import com.clusterfactions.clustercore.util.unicode.CharRepo;

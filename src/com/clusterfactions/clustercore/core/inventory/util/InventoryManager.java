@@ -26,7 +26,7 @@ import com.clusterfactions.clustercore.core.inventory.util.model.BlockInventoryB
 import com.clusterfactions.clustercore.core.inventory.util.model.InventoryBase;
 import com.clusterfactions.clustercore.core.inventory.util.model.interfaces.FilteredSlots;
 import com.clusterfactions.clustercore.core.inventory.util.model.interfaces.InteractableSlots;
-import com.clusterfactions.clustercore.listeners.events.updates.UpdateTickEvent;
+import com.clusterfactions.clustercore.core.listeners.events.updates.UpdateTickEvent;
 import com.clusterfactions.clustercore.persistence.serialization.ItemStackSerializer;
 
 public class InventoryManager implements Listener{

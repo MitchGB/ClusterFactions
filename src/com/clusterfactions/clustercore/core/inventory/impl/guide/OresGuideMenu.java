@@ -24,14 +24,16 @@ public class OresGuideMenu extends InventoryBase{
 		this.setItem(new ItemBuilder(Material.GOLD_ORE).coloredName("&fGold Ore").create(), e -> { new GuideFurnaceInventory(player, new ItemBuilder(Material.GOLD_ORE).create(), new ItemBuilder(Material.GOLD_INGOT).create()).openInventory(player);}, 11);
 		
 		this.setItem(new ItemBuilder(CustomItemType.NICKEL_ORE).coloredName("&fNickel Ore").create(), e -> { new GuideFurnaceInventory(player, new ItemBuilder(CustomItemType.NICKEL_ORE).create(), new ItemBuilder(CustomItemType.NICKEL_INGOT).create()).openInventory(player);}, 11);
+
+		this.setItem(new ItemBuilder(CustomItemType.TITANIUM_ORE).coloredName("&fTitanium Ore").create(), e -> { new GuideFurnaceInventory(player, new ItemBuilder(CustomItemType.TITANIUM_ORE).create(), new ItemBuilder(CustomItemType.TITANIUM_INGOT).create()).openInventory(player);}, 12);
 		
-		this.setItem(new ItemBuilder(Material.REDSTONE_ORE).coloredName("&fRedstone Ore").create(), e -> { new GuideFurnaceInventory(player, new ItemBuilder(Material.REDSTONE_ORE).create(), new ItemBuilder(Material.REDSTONE).create()).openInventory(player);}, 12);
+		this.setItem(new ItemBuilder(Material.REDSTONE_ORE).coloredName("&fRedstone Ore").create(), e -> { new GuideFurnaceInventory(player, new ItemBuilder(Material.REDSTONE_ORE).create(), new ItemBuilder(Material.REDSTONE).create()).openInventory(player);}, 13);
 		
-		this.setItem(new ItemBuilder(Material.LAPIS_ORE).coloredName("&fLapis Ore").create(), e -> { new GuideFurnaceInventory(player, new ItemBuilder(Material.LAPIS_ORE).create(), new ItemBuilder(Material.LAPIS_LAZULI).create()).openInventory(player);}, 13);
+		this.setItem(new ItemBuilder(Material.LAPIS_ORE).coloredName("&fLapis Ore").create(), e -> { new GuideFurnaceInventory(player, new ItemBuilder(Material.LAPIS_ORE).create(), new ItemBuilder(Material.LAPIS_LAZULI).create()).openInventory(player);}, 14);
 		
-		this.setItem(new ItemBuilder(Material.DIAMOND_ORE).coloredName("&fDiamond Ore").create(), e -> { new GuideFurnaceInventory(player, new ItemBuilder(Material.DIAMOND_ORE).create(), new ItemBuilder(Material.DIAMOND).create()).openInventory(player);}, 14);
+		this.setItem(new ItemBuilder(Material.DIAMOND_ORE).coloredName("&fDiamond Ore").create(), e -> { new GuideFurnaceInventory(player, new ItemBuilder(Material.DIAMOND_ORE).create(), new ItemBuilder(Material.DIAMOND).create()).openInventory(player);}, 15);
 		
-		this.setItem(new ItemBuilder(Material.EMERALD_ORE).coloredName("&fEmerald Ore").create(), e -> { new GuideFurnaceInventory(player, new ItemBuilder(Material.EMERALD_ORE).create(), new ItemBuilder(Material.EMERALD).create()).openInventory(player);}, 15);
+		this.setItem(new ItemBuilder(Material.EMERALD_ORE).coloredName("&fEmerald Ore").create(), e -> { new GuideFurnaceInventory(player, new ItemBuilder(Material.EMERALD_ORE).create(), new ItemBuilder(Material.EMERALD).create()).openInventory(player);}, 16);
 		
 		
 	}

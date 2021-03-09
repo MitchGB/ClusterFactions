@@ -21,19 +21,20 @@ import com.clusterfactions.clustercore.core.inventory.util.InventoryManager;
 import com.clusterfactions.clustercore.core.items.ItemManager;
 import com.clusterfactions.clustercore.core.items.block.CustomBlockManager;
 import com.clusterfactions.clustercore.core.lang.LanguageManager;
+import com.clusterfactions.clustercore.core.listeners.block.BlockBreakEventListener;
+import com.clusterfactions.clustercore.core.listeners.block.BlockPlaceEventListener;
+import com.clusterfactions.clustercore.core.listeners.entity.EntityInteractEventListener;
+import com.clusterfactions.clustercore.core.listeners.events.updates.UpdateSecondEvent;
+import com.clusterfactions.clustercore.core.listeners.events.updates.UpdateTickEvent;
+import com.clusterfactions.clustercore.core.listeners.player.AsyncPlayerChatEventListener;
+import com.clusterfactions.clustercore.core.listeners.player.PlayerDeathEventListener;
+import com.clusterfactions.clustercore.core.listeners.player.PlayerInteractEventListener;
+import com.clusterfactions.clustercore.core.listeners.player.PlayerJoinEventListener;
+import com.clusterfactions.clustercore.core.listeners.player.PlayerMoveEventListener;
+import com.clusterfactions.clustercore.core.listeners.player.PlayerQuitEventListener;
+import com.clusterfactions.clustercore.core.listeners.server.ServerListPingEventListener;
 import com.clusterfactions.clustercore.core.permission.PlayerPermissionManager;
 import com.clusterfactions.clustercore.core.player.PlayerManager;
-import com.clusterfactions.clustercore.listeners.block.BlockBreakEventListener;
-import com.clusterfactions.clustercore.listeners.block.BlockPlaceEventListener;
-import com.clusterfactions.clustercore.listeners.entity.EntityInteractEventListener;
-import com.clusterfactions.clustercore.listeners.events.updates.UpdateSecondEvent;
-import com.clusterfactions.clustercore.listeners.events.updates.UpdateTickEvent;
-import com.clusterfactions.clustercore.listeners.player.AsyncPlayerChatEventListener;
-import com.clusterfactions.clustercore.listeners.player.PlayerDeathEventListener;
-import com.clusterfactions.clustercore.listeners.player.PlayerInteractEventListener;
-import com.clusterfactions.clustercore.listeners.player.PlayerJoinEventListener;
-import com.clusterfactions.clustercore.listeners.player.PlayerMoveEventListener;
-import com.clusterfactions.clustercore.listeners.player.PlayerQuitEventListener;
 import com.clusterfactions.clustercore.persistence.database.MongoHook;
 import com.clusterfactions.clustercore.util.annotation.Manager;
 import com.comphenix.protocol.ProtocolLibrary;
@@ -43,7 +44,7 @@ import lombok.Getter;
 
 public class ClusterCore extends JavaPlugin{
 
-	@Manager @Getter private MongoHook mongoHook;
+	@Manager @Getter  private MongoHook mongoHook;
 	@Manager @Getter private InventoryManager inventoryManager;
 	@Manager @Getter private CommandManager commandManager;
 	@Manager @Getter private FactionsManager factionsManager;
@@ -106,7 +107,9 @@ public class ClusterCore extends JavaPlugin{
 				new BlockBreakEventListener(),
 				new BlockPlaceEventListener(),
 				
-				new EntityInteractEventListener()
+				new EntityInteractEventListener(),
+				
+				new ServerListPingEventListener()
 				);
 	}
 	

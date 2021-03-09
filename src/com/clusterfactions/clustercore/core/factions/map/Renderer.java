@@ -11,6 +11,7 @@ import org.bukkit.map.MapView;
 
 import com.clusterfactions.clustercore.ClusterCore;
 import com.clusterfactions.clustercore.core.factions.Faction;
+import com.clusterfactions.clustercore.core.factions.claim.ChunkOwner;
 import com.clusterfactions.clustercore.core.factions.claim.FactionClaimManager;
 import com.clusterfactions.clustercore.core.player.PlayerData;
 import com.clusterfactions.clustercore.util.location.Vector2Integer;
@@ -86,18 +87,18 @@ public class Renderer extends MapRenderer{
 	            		}
 	            	}
 	            	
-	            	Faction chunkFaction = ClusterCore.getInstance().getFactionsManager().getFaction(claimManager.chunkClaimedCache(chunkLoc));
+	            	ChunkOwner chunkOwner = claimManager.getChunkOwner(chunkLoc);
 	            	Faction playerFaction = ClusterCore.getInstance().getFactionsManager().getFaction(ClusterCore.getInstance().getPlayerManager().getPlayerData(player).getFaction());
-	            	if(chunkFaction == null) {
+	            	if(chunkOwner.isNull()) {
 	            		if(playerData.getMapEmptyColour() == MapColour.TRANSPARENT) continue;
 	            		setPixel(canvas, pixelMap, playerData.getMapEmptyColour());
-	            	}else if(playerFaction != null && playerFaction.isSame(chunkFaction)){
+	            	}else if(playerFaction != null && !chunkOwner.isAdmin() && playerFaction.isSame(chunkOwner.getFaction())){
 	            		if(playerData.getMapFactionColour() == MapColour.TRANSPARENT) continue;
 	            		setPixel(canvas, pixelMap, playerData.getMapFactionColour());
-	            	}else if(playerFaction != null && playerFaction.isAlly(chunkFaction)){
+	            	}else if(playerFaction != null && !chunkOwner.isAdmin()&& playerFaction.isAlly(chunkOwner.getFaction())){
 	            		if(playerData.getMapAllyColour() == MapColour.TRANSPARENT) continue;
 	            		setPixel(canvas, pixelMap, playerData.getMapAllyColour());
-	            	}else if(playerFaction != null && playerFaction.isEnemy(chunkFaction)) {
+	            	}else if(playerFaction != null && !chunkOwner.isAdmin() && playerFaction.isEnemy(chunkOwner.getFaction())) {
 	            		if(playerData.getMapEnemyColour() == MapColour.TRANSPARENT) continue;
 	            		setPixel(canvas, pixelMap, playerData.getMapEnemyColour());
 	            	}else {

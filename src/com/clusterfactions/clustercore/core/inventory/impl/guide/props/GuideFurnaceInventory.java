@@ -7,7 +7,7 @@ import org.bukkit.inventory.ItemStack;
 import com.clusterfactions.clustercore.core.inventory.impl.guide.OresGuideMenu;
 import com.clusterfactions.clustercore.core.inventory.util.model.InventoryBase;
 import com.clusterfactions.clustercore.core.items.ItemRepo;
-import com.clusterfactions.clustercore.listeners.events.updates.UpdateTickEvent;
+import com.clusterfactions.clustercore.core.listeners.events.updates.UpdateTickEvent;
 import com.clusterfactions.clustercore.util.Colors;
 import com.clusterfactions.clustercore.util.ItemBuilder;
 import com.clusterfactions.clustercore.util.NumberUtil;

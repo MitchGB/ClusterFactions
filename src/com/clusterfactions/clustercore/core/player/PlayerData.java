@@ -13,8 +13,8 @@ import com.clusterfactions.clustercore.ClusterCore;
 import com.clusterfactions.clustercore.core.chat.ChatMessageMode;
 import com.clusterfactions.clustercore.core.factions.map.MapColour;
 import com.clusterfactions.clustercore.core.lang.Lang;
+import com.clusterfactions.clustercore.core.listeners.events.updates.UpdateSecondEvent;
 import com.clusterfactions.clustercore.core.permission.PermissionGroup;
-import com.clusterfactions.clustercore.listeners.events.updates.UpdateSecondEvent;
 import com.clusterfactions.clustercore.persistence.serialization.LocaleSerializer;
 import com.clusterfactions.clustercore.persistence.serialization.MapColourSerializer;
 import com.clusterfactions.clustercore.persistence.serialization.PermissionGroupSerializer;
@@ -42,6 +42,7 @@ public class PlayerData{
 	@Getter @DoNotSerialize UUID playerUUID;
 	
 	@Getter @Setter private int power = 1;
+	@Getter @Setter private boolean adminOverrideMode = false;
 	
 	@Getter @Setter @AlternateSerializable(PermissionGroupSerializer.class) private PermissionGroup group = PermissionGroup.MEMBER;
 	@Getter @Setter @AlternateSerializable(UUIDSerializer.class) private UUID faction;

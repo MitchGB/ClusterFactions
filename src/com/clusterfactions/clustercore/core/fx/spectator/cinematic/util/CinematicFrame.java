@@ -10,4 +10,8 @@ public class CinematicFrame {
 		this.delay = delay;
 		this.function = function;
 	}
+	
+	public CinematicFrame[] singleArray() {
+		return new CinematicFrame[] {this};
+	}
 }
