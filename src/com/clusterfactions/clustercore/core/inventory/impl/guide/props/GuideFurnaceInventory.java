@@ -39,7 +39,7 @@ public class GuideFurnaceInventory extends InventoryBase{
 		if(currentProgress >= 22)
 			currentProgress = 0;
 		if(handlers.size() == 0) return;
-		this.renameWindow(invInstance, Colors.parseColors("&f" + CharRepo.FURNACE_OVERRIDE_CONTAINER_27 + getFuelProgressString(14) + getProgressString(NumberUtil.clamp(currentProgress, 0, 22)) ), Containers.GENERIC_9X3);
+		this.renameWindow(invInstance, Colors.parseColors("&f" + CharRepo.FURNACE_OVERRIDE_CONTAINER_27 + getFuelProgressString(14) + getProgressString(NumberUtil.clamp(currentProgress, 0, 22)) ));
 	}
 	
 	private String getProgressString(int progress) {

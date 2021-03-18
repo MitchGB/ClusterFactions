@@ -6,6 +6,7 @@ import java.util.List;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
+import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.Furnace;
@@ -13,10 +14,14 @@ import org.bukkit.block.Hopper;
 import org.bukkit.block.TileState;
 import org.bukkit.block.data.Directional;
 import org.bukkit.craftbukkit.v1_16_R3.inventory.CraftItemStack;
+import org.bukkit.entity.ExperienceOrb;
 import org.bukkit.entity.Player;
+import org.bukkit.event.inventory.InventoryAction;
+import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.FurnaceRecipe;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.Recipe;
+import org.bukkit.persistence.PersistentDataType;
 
 import com.clusterfactions.clustercore.ClusterCore;
 import com.clusterfactions.clustercore.core.inventory.util.InventoryManager;
@@ -28,11 +33,11 @@ import com.clusterfactions.clustercore.core.items.ItemManager;
 import com.clusterfactions.clustercore.core.items.types.CustomItem;
 import com.clusterfactions.clustercore.core.items.types.interfaces.SmeltableItem;
 import com.clusterfactions.clustercore.core.listeners.events.updates.UpdateTickEvent;
+import com.clusterfactions.clustercore.persistence.serialization.ItemStackSerializer;
 import com.clusterfactions.clustercore.util.Colors;
 import com.clusterfactions.clustercore.util.NumberUtil;
 import com.clusterfactions.clustercore.util.unicode.CharRepo;
 
-import net.minecraft.server.v1_16_R3.Containers;
 import net.minecraft.server.v1_16_R3.TileEntityFurnace;
 
 public class FurnaceInventory extends BlockAsyncInventoryBase implements InteractableSlots, FilteredSlots{
@@ -50,10 +55,14 @@ public class FurnaceInventory extends BlockAsyncInventoryBase implements Interac
 	private int burnDuration = 0;
 	private int maxBurnDuration = 0;
 	private long nextDone = 0;
+	
+	private float storedExp = 0;
+	
 	private boolean bar_empty = false;
 	
 	public FurnaceInventory(Player player, Block block) {
-		super(player, "FURNACE_OVERRIDE_MENU", "&f" + CharRepo.FURNACE_OVERRIDE_CONTAINER_27, 27, block);
+		super(null, "FURNACE_OVERRIDE_MENU", "&f" + CharRepo.FURNACE_OVERRIDE_CONTAINER_27, 27, block);
+
 	}
 	
 	@Override
@@ -63,7 +72,6 @@ public class FurnaceInventory extends BlockAsyncInventoryBase implements Interac
 		if(!ClusterCore.getInstance().getInventoryManager().blockCache.containsKey(this.block)) return;
 		if(!(this.block.getState() instanceof TileState)) return;
 		lastTick = 0;
-		
 		if(block.getRelative(BlockFace.DOWN).getType() == Material.HOPPER){
 
 			Hopper hopper = (Hopper)(TileState)block.getRelative(BlockFace.DOWN).getState();
@@ -109,6 +117,8 @@ public class FurnaceInventory extends BlockAsyncInventoryBase implements Interac
 					smeltable = (SmeltableItem) manager.getCustomItemHandler(manager.getCustomItemType(smeltingItem));
 			
 			int smeltTime = smeltable != null ? smeltable.smeltTime() : getSmeltTime(smeltingItem.getType());	
+			float outputExp = smeltable != null ? smeltable.expOutput() : getSmeltExp(smeltingItem.getType());
+			
 			ItemStack output = smeltable != null ? smeltable.outputItem().getItem() : getFurnaceRecipe(smeltingItem.getType()).getResult();
 			
 			if(!canFitItem(output, inventorySlots) || burnDuration == 0){
@@ -143,7 +153,11 @@ public class FurnaceInventory extends BlockAsyncInventoryBase implements Interac
 			if(nextDone == 0 || (currentProgress == 0 &&  timeDiff > smeltTime) || currentProgress > 22){
 				if(nextDone != 0 && currentProgress > 22 && ((float)(System.currentTimeMillis()+smeltTime - nextDone) >= smeltTime)){
 					smeltingItem.add(-1);
+					storedExp += outputExp;
 					addItemInto(output, inventorySlots);
+
+					setPersistentData("contents", PersistentDataType.STRING, new ItemStackSerializer().serialize(invInstance.getContents()));
+					setPersistentData("exp", PersistentDataType.FLOAT, storedExp);
 				}
 				nextDone = System.currentTimeMillis() + smeltTime;
 				currentProgress = 0;
@@ -156,7 +170,7 @@ public class FurnaceInventory extends BlockAsyncInventoryBase implements Interac
 		if(currentProgress != 0 || !bar_empty)
 		{
 			int burnProgress = Math.round((float)burnDuration/(float)maxBurnDuration*14);
-			renameWindow(invInstance, Colors.parseColors("&f" + CharRepo.FURNACE_OVERRIDE_CONTAINER_27 + getFuelProgressString(NumberUtil.clamp(burnProgress, 0, 14)) + getProgressString(NumberUtil.clamp(currentProgress, 0, 22)) ), Containers.GENERIC_9X3);
+			renameWindow(invInstance, Colors.parseColors("&f" + CharRepo.FURNACE_OVERRIDE_CONTAINER_27 + getFuelProgressString(NumberUtil.clamp(burnProgress, 0, 14)) + getProgressString(NumberUtil.clamp(currentProgress, 0, 22)) ));
 			bar_empty = currentProgress == 0;
 			
 		}
@@ -171,6 +185,16 @@ public class FurnaceInventory extends BlockAsyncInventoryBase implements Interac
 		return CharRepo.fromName("FURNACE_PROGRESS_FUEL_"+progress);
 	}
 
+	@Override
+	public void inventoryClickEvent(InventoryClickEvent e) {
+		if(e.getAction() == InventoryAction.PICKUP_ALL || e.getAction() == InventoryAction.PICKUP_HALF 
+				|| e.getAction() == InventoryAction.PICKUP_ONE || e.getAction() == InventoryAction.PICKUP_SOME) {
+            ((ExperienceOrb)block.getWorld().spawn(block.getLocation(), ExperienceOrb.class)).setExperience(Math.round(this.storedExp));
+			setPersistentData("exp", PersistentDataType.FLOAT, storedExp);
+			this.storedExp = 0;
+		}
+	}
+	
 	@Override
 	public List<Integer> getSlotBelonging(ItemStack item) {
 		if(item == null) return null;
@@ -193,6 +217,10 @@ public class FurnaceInventory extends BlockAsyncInventoryBase implements Interac
 	
 	private int getSmeltTime(Material mat) {    
 		return getFurnaceRecipe(mat) != null ? getFurnaceRecipe(mat).getCookingTime()/20*1000 : 0;
+	}
+	
+	private float getSmeltExp(Material mat) {
+		return getFurnaceRecipe(mat) != null ? getFurnaceRecipe(mat).getExperience() : 0;
 	}
 	
 	private FurnaceRecipe getFurnaceRecipe(Material mat) {    

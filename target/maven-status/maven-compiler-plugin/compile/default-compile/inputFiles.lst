@@ -29,6 +29,7 @@ C:\Users\Mitchell\eclipse-workspace\ClusterFactions\src\com\clusterfactions\clus
 C:\Users\Mitchell\eclipse-workspace\ClusterFactions\src\com\clusterfactions\clustercore\core\items\block\CustomBlockType.java
 C:\Users\Mitchell\eclipse-workspace\ClusterFactions\src\com\clusterfactions\clustercore\core\inventory\impl\guide\MainGuideMenu.java
 C:\Users\Mitchell\eclipse-workspace\ClusterFactions\src\com\clusterfactions\clustercore\core\listeners\player\PlayerJoinEventListener.java
+C:\Users\Mitchell\eclipse-workspace\ClusterFactions\src\com\clusterfactions\clustercore\core\listeners\player\PlayerResourcePackStatusEventListener.java
 C:\Users\Mitchell\eclipse-workspace\ClusterFactions\src\com\clusterfactions\clustercore\util\annotation\Manager.java
 C:\Users\Mitchell\eclipse-workspace\ClusterFactions\src\com\clusterfactions\clustercore\util\location\Vector2Integer.java
 C:\Users\Mitchell\eclipse-workspace\ClusterFactions\src\com\clusterfactions\clustercore\core\inventory\util\model\InventoryBase.java
@@ -48,6 +49,7 @@ C:\Users\Mitchell\eclipse-workspace\ClusterFactions\src\com\clusterfactions\clus
 C:\Users\Mitchell\eclipse-workspace\ClusterFactions\src\com\clusterfactions\clustercore\core\fx\spectator\cinematic\CinematicSequence.java
 C:\Users\Mitchell\eclipse-workspace\ClusterFactions\src\com\clusterfactions\clustercore\util\annotation\DoNotSerialize.java
 C:\Users\Mitchell\eclipse-workspace\ClusterFactions\src\com\clusterfactions\clustercore\util\ItemBuilder.java
+C:\Users\Mitchell\eclipse-workspace\ClusterFactions\src\com\clusterfactions\clustercore\util\ProbabilityCollection.java
 C:\Users\Mitchell\eclipse-workspace\ClusterFactions\src\com\clusterfactions\clustercore\core\command\impl\admin\AdminCommand.java
 C:\Users\Mitchell\eclipse-workspace\ClusterFactions\src\com\clusterfactions\clustercore\core\fx\spectator\util\EntityHider.java
 C:\Users\Mitchell\eclipse-workspace\ClusterFactions\src\com\clusterfactions\clustercore\core\items\types\CustomItem.java
@@ -107,6 +109,7 @@ C:\Users\Mitchell\eclipse-workspace\ClusterFactions\src\com\clusterfactions\clus
 C:\Users\Mitchell\eclipse-workspace\ClusterFactions\src\com\clusterfactions\clustercore\core\inventory\impl\player\settings\map\types\MapNeutralSettingsMenu.java
 C:\Users\Mitchell\eclipse-workspace\ClusterFactions\src\com\clusterfactions\clustercore\ClusterCore.java
 C:\Users\Mitchell\eclipse-workspace\ClusterFactions\src\com\clusterfactions\clustercore\core\fx\spectator\cinematic\util\CinematicFunction.java
+C:\Users\Mitchell\eclipse-workspace\ClusterFactions\src\com\clusterfactions\clustercore\core\listeners\player\PlayerAnimationEventListener.java
 C:\Users\Mitchell\eclipse-workspace\ClusterFactions\src\com\clusterfactions\clustercore\core\items\CustomItemType.java
 C:\Users\Mitchell\eclipse-workspace\ClusterFactions\src\com\clusterfactions\clustercore\persistence\serialization\VariableSerializer.java
 C:\Users\Mitchell\eclipse-workspace\ClusterFactions\src\com\clusterfactions\clustercore\core\permission\PermissionGroup.java

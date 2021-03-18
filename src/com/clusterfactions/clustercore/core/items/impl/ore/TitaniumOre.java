@@ -31,6 +31,11 @@ public class TitaniumOre extends CustomItem implements StackableItem, SmeltableI
 	public int smeltTime() {
 		return 5000;
 	}
+
+	@Override
+	public float expOutput() {
+		return 0;
+	}
 }
 
 

@@ -10,6 +10,7 @@ import java.util.UUID;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.craftbukkit.v1_16_R3.entity.CraftPlayer;
+import org.bukkit.craftbukkit.v1_16_R3.inventory.CraftItemStack;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event.Result;
 import org.bukkit.event.inventory.ClickType;
@@ -29,16 +30,16 @@ import com.clusterfactions.clustercore.core.inventory.util.model.interfaces.Inte
 import com.clusterfactions.clustercore.core.listeners.events.updates.UpdateTickEvent;
 import com.clusterfactions.clustercore.util.Colors;
 import com.clusterfactions.clustercore.util.model.Pair;
-import com.comphenix.protocol.PacketType;
-import com.comphenix.protocol.events.PacketContainer;
-import com.comphenix.protocol.reflect.StructureModifier;
 
 import de.tr7zw.changeme.nbtapi.NBTItem;
 import lombok.Getter;
 import net.minecraft.server.v1_16_R3.ChatMessage;
-import net.minecraft.server.v1_16_R3.Containers;
+import net.minecraft.server.v1_16_R3.Container;
 import net.minecraft.server.v1_16_R3.EntityPlayer;
+import net.minecraft.server.v1_16_R3.NonNullList;
 import net.minecraft.server.v1_16_R3.PacketPlayOutOpenWindow;
+import net.minecraft.server.v1_16_R3.PacketPlayOutSetSlot;
+import net.minecraft.server.v1_16_R3.PacketPlayOutWindowItems;
 
 @SuppressWarnings("deprecation")
 public abstract class InventoryBase {
@@ -64,7 +65,8 @@ public abstract class InventoryBase {
 		this.displayName = Colors.parseColors(displayName);
 		this.inventorySize = inventorySize;
 		this.inventoryUUID = UUID.randomUUID().toString();
-		this.handlers.add(player.getUniqueId());
+		if(player != null)
+			this.handlers.add(player.getUniqueId());
 
 		this.invInstance = Bukkit.createInventory(null, this.inventorySize, this.displayName);
 		
@@ -155,8 +157,8 @@ public abstract class InventoryBase {
 		handlers.remove(player.getUniqueId());
 	}
 	
-	public List<Player> getPlayerHandlers() {
-		List<Player> playerList = new ArrayList<>();
+	public ArrayList<Player> getPlayerHandlers() {
+		ArrayList<Player> playerList = new ArrayList<>();
 		for(UUID uuid : handlers) {
 			playerList.add(Bukkit.getPlayer(uuid));
 		}
@@ -214,38 +216,29 @@ public abstract class InventoryBase {
 		return true;
 	}
 	
-	public void renameWindow(Inventory inv, String title, Containers<?> cont) {
-		for(UUID uuid : handlers) {
-			Player p = Bukkit.getPlayer(uuid);
-			try {
+	public void renameWindow(Inventory inv, String title) {
+		if(handlers.isEmpty()) return;
+		
+		//Sample first handler for container- Means we dont have to iterate over each player
+		try {
+			//c.b() == Container contents
+			for(Player p : this.getPlayerHandlers()) {
 				EntityPlayer ep = (EntityPlayer) ((CraftPlayer) p).getHandle();
-			
-				PacketPlayOutOpenWindow windowPacket = new PacketPlayOutOpenWindow(ep.activeContainer.windowId, cont, new ChatMessage(title));
-				ep.playerConnection.sendPacket(windowPacket);
-			
-				PacketContainer windowItemPacket = new PacketContainer(PacketType.Play.Server.WINDOW_ITEMS);
-				windowItemPacket.getIntegers().write(0, ep.activeContainer.windowId);
-				List<ItemStack> items = new ArrayList<>();
-				for(ItemStack i : inv.getContents())
-					items.add(i == null ? new ItemStack(Material.AIR) : i);
-			
-				StructureModifier<List<ItemStack>> structMod = windowItemPacket.getItemListModifier();
-				structMod.write(0, items);
-				ClusterCore.getInstance().getProtocolManager().sendServerPacket(p, windowItemPacket);
-			
-				ItemStack cursor = p.getItemOnCursor();
-				PacketContainer setSlotPacket = new PacketContainer(PacketType.Play.Server.SET_SLOT);
-				setSlotPacket.getIntegers().write(0, -1);
-				setSlotPacket.getIntegers().write(1, -1);
-				StructureModifier<ItemStack> structMod2 = setSlotPacket.getItemModifier();
-				structMod2.write(0, cursor);
-				ClusterCore.getInstance().getProtocolManager().sendServerPacket(p, setSlotPacket);
-			
-			}catch(Exception e) {
-				e.printStackTrace();
+				Container c = ep.activeContainer;
+				
+				NonNullList<net.minecraft.server.v1_16_R3.ItemStack> items = NonNullList.a();
+				for(ItemStack item : inv.getContents()) {
+					items.add(CraftItemStack.asNMSCopy(item));
+				}
+				ep.playerConnection.sendPacket(new PacketPlayOutOpenWindow(c.windowId, c.getType(), new ChatMessage(title)));	
+				ep.playerConnection.sendPacket(new PacketPlayOutWindowItems(c.windowId, items));
+				ep.playerConnection.sendPacket(new PacketPlayOutSetSlot(-1, -1, ep.inventory.getCarried()));
 			}
+		}catch(Exception e) {
+			e.printStackTrace();
 		}
 	}
+	
 	
 	protected ItemStack setKey(ItemStack item, String key, String value) {
 		NBTItem nbtItem = new NBTItem(item);

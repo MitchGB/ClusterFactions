@@ -16,6 +16,12 @@ public class PlayerJoinEventListener implements Listener{
 		Player player = e.getPlayer();
 		player.sendTitle(" ", " ", 0, 1, 0);
 		
+		if(player.getName().contains("Buby") || player.getName().contains("KevinEatsPie101"))			
+			player.setResourcePack("http://192.168.250.100/dl/ClusterFactionsResourcePack.zip");
+		else
+			player.setResourcePack("http://180.150.50.189/dl/ClusterFactionsResourcePack.zip");
+			
+		
 		ClusterCore.getInstance().getPlayerManager().getPlayerData(player);
 		
 		//PERMISSION MANAGEMENT

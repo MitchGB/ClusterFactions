@@ -31,6 +31,11 @@ public class NickelOre extends CustomItem implements StackableItem, SmeltableIte
 	public int smeltTime() {
 		return 5000;
 	}
+
+	@Override
+	public float expOutput() {
+		return 0;
+	}
 }
 
 

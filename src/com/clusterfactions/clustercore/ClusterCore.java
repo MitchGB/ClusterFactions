@@ -27,11 +27,13 @@ import com.clusterfactions.clustercore.core.listeners.entity.EntityInteractEvent
 import com.clusterfactions.clustercore.core.listeners.events.updates.UpdateSecondEvent;
 import com.clusterfactions.clustercore.core.listeners.events.updates.UpdateTickEvent;
 import com.clusterfactions.clustercore.core.listeners.player.AsyncPlayerChatEventListener;
+import com.clusterfactions.clustercore.core.listeners.player.PlayerAnimationEventListener;
 import com.clusterfactions.clustercore.core.listeners.player.PlayerDeathEventListener;
 import com.clusterfactions.clustercore.core.listeners.player.PlayerInteractEventListener;
 import com.clusterfactions.clustercore.core.listeners.player.PlayerJoinEventListener;
 import com.clusterfactions.clustercore.core.listeners.player.PlayerMoveEventListener;
 import com.clusterfactions.clustercore.core.listeners.player.PlayerQuitEventListener;
+import com.clusterfactions.clustercore.core.listeners.player.PlayerResourcePackStatusEventListener;
 import com.clusterfactions.clustercore.core.listeners.server.ServerListPingEventListener;
 import com.clusterfactions.clustercore.core.permission.PlayerPermissionManager;
 import com.clusterfactions.clustercore.core.player.PlayerManager;
@@ -102,6 +104,8 @@ public class ClusterCore extends JavaPlugin{
 				new PlayerInteractEventListener(),
 				new PlayerDeathEventListener(),
 				new PlayerMoveEventListener(),
+				new PlayerResourcePackStatusEventListener(),
+				new PlayerAnimationEventListener(),
 				new AsyncPlayerChatEventListener(),
 				
 				new BlockBreakEventListener(),
@@ -125,8 +129,7 @@ public class ClusterCore extends JavaPlugin{
 	}
 	
 	public void unregisterListener(Listener... listeners) {
-		for(Listener l : listeners)
-		{
+		for(Listener l : listeners){
 			HandlerList.unregisterAll(l);	
 		}
 	}

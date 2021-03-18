@@ -8,6 +8,7 @@ import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.block.Block;
 import org.bukkit.block.TileState;
+import org.bukkit.entity.ExperienceOrb;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -84,6 +85,28 @@ public class InventoryManager implements Listener{
 		
 	}
 	
+	@EventHandler(priority=EventPriority.LOWEST)
+	public void blockBreakEventPass(BlockBreakEvent e) {
+		if(e.isCancelled()) return;
+		if(e.getBlock().getState() instanceof TileState){
+			TileState tile = (TileState) e.getBlock().getState();
+			String contents = tile.getPersistentDataContainer().get(new NamespacedKey(ClusterCore.getInstance(), "contents"), PersistentDataType.STRING);
+			tile.getPersistentDataContainer().set(new NamespacedKey(ClusterCore.getInstance(), "contents"), PersistentDataType.STRING, "");
+			
+			float exp = tile.getPersistentDataContainer().get(new NamespacedKey(ClusterCore.getInstance(), "exp"), PersistentDataType.FLOAT);
+			tile.getPersistentDataContainer().set(new NamespacedKey(ClusterCore.getInstance(), "exp"), PersistentDataType.FLOAT, 0f);
+			
+			tile.update();
+			for(ItemStack item : new ItemStackSerializer().deserialize(contents)){
+				if(item == null || item.getType() == Material.AIR) continue;
+				e.getBlock().getWorld().dropItemNaturally(e.getBlock().getLocation(), item);
+			}
+            ((ExperienceOrb)e.getBlock().getWorld().spawn(e.getBlock().getLocation(), ExperienceOrb.class)).setExperience(Math.round(exp));
+		}
+		if(!blockCache.containsKey(e.getBlock())) return;
+		blockCache.get(e.getBlock()).blockBreakEvent(e);
+	}
+	
 	/*
 	 * Passthrough event
 	 */
@@ -103,22 +126,6 @@ public class InventoryManager implements Listener{
 		if(e.getClickedInventory().getType() != InventoryType.PLAYER) return;	
 		if(!applicableInventory(inventory)) return;
 		getHandler(inventory).clickFromBottomInventory(e);
-	}
-	
-	@EventHandler(priority=EventPriority.LOWEST)
-	public void blockBreakEventPass(BlockBreakEvent e) {
-		if(e.getBlock().getState() instanceof TileState){
-			TileState tile = (TileState) e.getBlock().getState();
-			String contents = tile.getPersistentDataContainer().get(new NamespacedKey(ClusterCore.getInstance(), "contents"), PersistentDataType.STRING);
-			tile.getPersistentDataContainer().set(new NamespacedKey(ClusterCore.getInstance(), "contents"), PersistentDataType.STRING, "");
-			tile.update();
-			for(ItemStack item : new ItemStackSerializer().deserialize(contents)){
-				if(item == null || item.getType() == Material.AIR) continue;
-				e.getBlock().getWorld().dropItemNaturally(e.getBlock().getLocation(), item);
-			}
-		}
-		if(!blockCache.containsKey(e.getBlock())) return;
-		blockCache.get(e.getBlock()).blockBreakEvent(e);
 	}
 	
 	@EventHandler(priority=EventPriority.LOW)
@@ -142,7 +149,7 @@ public class InventoryManager implements Listener{
 		getHandler(inventory).closeInventoryEvent(e);
 	}
 	
-	@EventHandler
+	@EventHandler(priority=EventPriority.LOW) //need it to run first
 	public void updateTickEventPass(UpdateTickEvent e) {
 		for(InventoryBase base : inventoryCache.values()) {
 			base.updateTickEvent(e);

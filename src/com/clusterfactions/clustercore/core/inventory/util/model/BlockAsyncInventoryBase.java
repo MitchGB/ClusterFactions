@@ -32,19 +32,21 @@ public abstract class BlockAsyncInventoryBase extends BlockInventoryBase{
 	@Override
 	public void closeInventoryEvent(InventoryCloseEvent e) {
 		handlers.remove(e.getPlayer().getUniqueId());
-		TileState tile = (TileState) block.getState();
-		tile.getPersistentDataContainer().set(new NamespacedKey(ClusterCore.getInstance(), "contents"), PersistentDataType.STRING, new ItemStackSerializer().serialize(invInstance.getContents()));
-		tile.update();
+		setPersistentData("contents", PersistentDataType.STRING, new ItemStackSerializer().serialize(invInstance.getContents()));
 	}
 	
 	public void blockBreakEvent(BlockBreakEvent e) {
-		TileState tile = (TileState) block.getState();
-		tile.getPersistentDataContainer().set(new NamespacedKey(ClusterCore.getInstance(), "contents"), PersistentDataType.STRING, new ItemStackSerializer().serialize(invInstance.getContents()));
-		tile.update();
+		setPersistentData("contents", PersistentDataType.STRING, new ItemStackSerializer().serialize(invInstance.getContents()));
 		ClusterCore.getInstance().getInventoryManager().blockCache.remove(block);
 		for(UUID p : handlers){
 			Bukkit.getPlayer(p).closeInventory();
 		}
+	}
+	
+	protected <T,Z> void setPersistentData(String key, PersistentDataType<T, Z> type, Z value) {
+		TileState tile = (TileState) block.getState();
+		tile.getPersistentDataContainer().set(new NamespacedKey(ClusterCore.getInstance(), key), type, value);
+		tile.update();
 	}
 }
 

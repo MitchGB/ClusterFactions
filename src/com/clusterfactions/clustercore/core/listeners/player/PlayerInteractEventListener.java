@@ -119,9 +119,8 @@ public class PlayerInteractEventListener implements Listener{
 		ChunkOwner chunkOwner = claimManager.getChunkOwner(chunk);
 		
 		if(chunkOwner == null) return;
-		if(playerData.isAdminOverrideMode()){
-			return;
-		}
+		if(playerData.isAdminOverrideMode()) return;
+		
 		Block block = e.getClickedBlock();
 		
 		FactionPerm permNeeded = null;
@@ -139,6 +138,9 @@ public class PlayerInteractEventListener implements Listener{
 		
 		if(permNeeded == null)
 			return;
+		if(chunkOwner.isNull())
+			return;
+		
 		
 		if(faction == null || !chunkOwner.toString().equals(faction.getFactionID().toString()))
 		{
