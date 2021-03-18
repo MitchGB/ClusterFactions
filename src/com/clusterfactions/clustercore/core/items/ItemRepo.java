@@ -3,7 +3,6 @@ package com.clusterfactions.clustercore.core.items;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 
-import com.clusterfactions.clustercore.ClusterCore;
 import com.clusterfactions.clustercore.util.ItemBuilder;
 
 public enum ItemRepo {

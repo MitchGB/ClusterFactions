@@ -32,7 +32,6 @@ public class MongoHook {
 	private static final int port = 27017;
 	
 	
-	
 	public MongoHook() {		
 		Bukkit.getScheduler().runTaskLaterAsynchronously(ClusterCore.getInstance(), new Runnable() {
         @Override
@@ -45,7 +44,7 @@ public class MongoHook {
 	private void init() {
 		try {
 			Bukkit.getConsoleSender().sendMessage("Connecting to MongoDB");
-			mongoClient = new MongoClient(new ServerAddress(ip, port));			
+			mongoClient = new MongoClient(new ServerAddress(ip, port));	
 			mongoDatabase = mongoClient.getDatabase("clustercore");
 			collection = mongoDatabase.getCollection("players");		
 			}catch(Exception e) {

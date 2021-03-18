@@ -14,6 +14,7 @@ import com.clusterfactions.clustercore.core.command.impl.ClusterFactionsCommand;
 import com.clusterfactions.clustercore.core.command.impl.GuideCommand;
 import com.clusterfactions.clustercore.core.command.impl.admin.AdminCommand;
 import com.clusterfactions.clustercore.core.command.impl.admin.claim.AdminClaimCommand;
+import com.clusterfactions.clustercore.core.command.impl.admin.crate.AdminCrateCommand;
 import com.clusterfactions.clustercore.core.command.impl.factions.FactionsGeneralCommand;
 import com.clusterfactions.clustercore.core.command.impl.factions.FactionsInternalCommand;
 import com.clusterfactions.clustercore.core.command.impl.factions.SettingsCommand;
@@ -44,6 +45,8 @@ public class CommandManager {
 		
 		instance.getCommandContexts().registerContext(Faction.class, c -> {return ClusterCore.getInstance().getFactionsManager().getFaction(c.popFirstArg());});
 
+		instance.getCommandCompletions().registerAsyncCompletion("crate-types", c -> {return ClusterCore.getInstance().getCrateManager().crateTypes(); });
+		
 		instance.getCommandCompletions().registerAsyncCompletion("admin-claim-types", c -> {return EnumUtil.getAllList(AdminClaimType.class);});
 		instance.getCommandCompletions().registerAsyncCompletion("langs", c -> {return EnumUtil.getAllList(Lang.class);});
 		instance.getCommandCompletions().registerAsyncCompletion("custom-items", c -> {return EnumUtil.getAllList(CustomItemType.class);});
@@ -69,6 +72,7 @@ public class CommandManager {
 				
 				new AdminCommand(),
 				new AdminClaimCommand(),
+				new AdminCrateCommand(),
 				
 				new PermissionCommand(),
 				new SettingsCommand(),

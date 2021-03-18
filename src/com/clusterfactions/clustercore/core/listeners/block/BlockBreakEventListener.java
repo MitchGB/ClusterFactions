@@ -19,6 +19,18 @@ public class BlockBreakEventListener implements Listener{
 	public void PlayerBlockBreakEvent(BlockBreakEvent e) {
 		Player player = e.getPlayer();
 		PlayerData playerData = ClusterCore.getInstance().getPlayerManager().getPlayerData(player);
+		//Crate
+		
+		if(ClusterCore.getInstance().getCrateManager().isCrate(e.getBlock().getLocation())) {
+			if(!playerData.isAdminOverrideMode()) {
+				e.setCancelled(true);
+				return;
+			}
+			ClusterCore.getInstance().getCrateManager().removeCrate(e.getBlock().getLocation());
+			playerData.sendMessage(Lang.DESTROY_CRATE);
+		}
+
+		//
 		FactionClaimManager claimManager = ClusterCore.getInstance().getFactionClaimManager();
 		
 		Vector2Integer chunk = claimManager.getChunkVector(e.getPlayer().getLocation());

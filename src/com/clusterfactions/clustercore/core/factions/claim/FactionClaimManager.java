@@ -100,6 +100,27 @@ public class FactionClaimManager implements Listener{
 		return false;
 	}
 	
+	public boolean canInteractBlock(Location loc, Player player) {
+		ChunkOwner owner = getChunkOwner(getChunkVector(loc));
+		PlayerData playerData = ClusterCore.getInstance().getPlayerManager().getPlayerData(player);
+		if(playerData.isAdminOverrideMode()) return true;
+		if(owner.isNull()) return true;
+		if(owner.isAdmin()) return false;
+		if(owner.getFaction().containsPlayer(player)) {
+			if(owner.getFaction().hasPerm(player, FactionPerm.INTERACT))
+				return true;
+		}
+		if(owner.getFaction().containsPlayer(player)) {
+			if(owner.getFaction().hasPerm(player, FactionPerm.CONTAINER))
+				return true;
+		}
+		if(owner.getFaction().containsPlayer(player)) {
+			if(owner.getFaction().hasPerm(player, FactionPerm.CHEST))
+				return true;
+		}
+		return false;
+	}
+	
 	public FactionClaimManager() {
 		ClusterCore.getInstance().registerListener(this);
 	}

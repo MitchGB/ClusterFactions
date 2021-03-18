@@ -1,7 +1,5 @@
 package com.clusterfactions.clustercore.core.listeners.events.claim;
 
-import java.util.UUID;
-
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;

@@ -47,14 +47,14 @@ public class PlayerData{
 	@Getter @Setter @AlternateSerializable(PermissionGroupSerializer.class) private PermissionGroup group = PermissionGroup.MEMBER;
 	@Getter @Setter @AlternateSerializable(UUIDSerializer.class) private UUID faction;
 	
-	@Getter @Setter @DoNotSerialize ChatMessageMode chatMode = ChatMessageMode.GLOBAL;
-	
 	@Getter @Setter @AlternateSerializable(MapColourSerializer.class) private MapColour mapEnemyColour = MapColour.RED;
 	@Getter @Setter @AlternateSerializable(MapColourSerializer.class) private MapColour mapAllyColour = MapColour.GRAY_1;
 	@Getter @Setter @AlternateSerializable(MapColourSerializer.class) private MapColour mapNeutralColour = MapColour.WHITE;
 	@Getter @Setter @AlternateSerializable(MapColourSerializer.class) private MapColour mapEmptyColour = MapColour.TRANSPARENT;
 	@Getter @Setter @AlternateSerializable(MapColourSerializer.class) private MapColour mapFactionColour = MapColour.LIGHT_GREEN;
 	
+	@Getter @Setter @DoNotSerialize ChatMessageMode chatMode = ChatMessageMode.GLOBAL;
+	@Getter @Setter @DoNotSerialize String cratePlaceMode;
 	
 	public void saveData() {
 		ClusterCore.getInstance().getMongoHook().saveData(playerUUID.toString(), this, "players");

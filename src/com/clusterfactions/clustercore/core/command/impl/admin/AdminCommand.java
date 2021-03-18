@@ -8,6 +8,7 @@ import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.AreaEffectCloud;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
@@ -72,11 +73,11 @@ public class AdminCommand extends BaseCommand{
 		
 	}
 	
-	@Subcommand("debug-armorstands")
-	public void debugArmorStand(final CommandSender sender){
+	@Subcommand("debug-entity")
+	public void debugEntities(final CommandSender sender){
 		if(!(sender instanceof Player)) return;
 		for(Entity e : ((Player)sender).getWorld().getEntities()) {
-			if(e instanceof ArmorStand)
+			if(e instanceof ArmorStand || e instanceof AreaEffectCloud)
 				e.remove();
 		}
 	}

@@ -9,8 +9,12 @@ public class LanguageManager {
 	public final static Locale[] locales = {Locale.ENGLISH};
 
 	public String getString(Locale locale, Lang lang) {
-		ResourceBundle bundle = ResourceBundle.getBundle("com.clusterfactions.clustercore.core.lang.langs", locale);
-		return Colors.parseColors(bundle.getString(lang.name()));
+		try {
+			ResourceBundle bundle = ResourceBundle.getBundle("com.clusterfactions.clustercore.core.lang.langs", locale);
+			return Colors.parseColors(bundle.getString(lang.name()));
+		}catch(Exception e) {
+			return "UNDEFINED";
+		}
 	}
 	
 }

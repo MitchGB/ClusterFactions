@@ -13,8 +13,6 @@ import com.clusterfactions.clustercore.util.ItemBuilder;
 import com.clusterfactions.clustercore.util.NumberUtil;
 import com.clusterfactions.clustercore.util.unicode.CharRepo;
 
-import net.minecraft.server.v1_16_R3.Containers;
-
 public class GuideFurnaceInventory extends InventoryBase{
 
 	final static int tickRate = 10;

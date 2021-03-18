@@ -2,15 +2,16 @@ package com.clusterfactions.clustercore.core.inventory.util.model;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.UUID;
 import java.util.Map.Entry;
+import java.util.UUID;
 
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
-import com.clusterfactions.clustercore.core.inventory.util.InventoryClickHandler;
+import com.clusterfactions.clustercore.core.inventory.util.InventoryClickContext;
+import com.clusterfactions.clustercore.util.ActionHandler;
 import com.clusterfactions.clustercore.util.NumberUtil;
 import com.clusterfactions.clustercore.util.model.Pair;
 
@@ -51,7 +52,7 @@ public abstract class PaginatedInventoryBase extends InventoryBase{
 		setStaticItem(item, null, null, index);
 	}
 	
-	public void setStaticItem(ItemStack item, InventoryClickHandler handlerL, int... index)
+	public void setStaticItem(ItemStack item, ActionHandler<InventoryClickContext> handlerL, int... index)
 	{
 		setStaticItem(item, handlerL, null, index);
 	}
@@ -59,7 +60,7 @@ public abstract class PaginatedInventoryBase extends InventoryBase{
 	/*
 	 * Item that persists throughout all pages
 	 */
-	public void setStaticItem(ItemStack item, InventoryClickHandler handlerL, InventoryClickHandler handlerR, int... index)
+	public void setStaticItem(ItemStack item, ActionHandler<InventoryClickContext> handlerL, ActionHandler<InventoryClickContext> handlerR, int... index)
 	{
 		String rid = UUID.randomUUID().toString();
 		registerItemHandler(rid, handlerL, handlerR);

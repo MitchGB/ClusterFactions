@@ -10,8 +10,6 @@ import com.clusterfactions.clustercore.ClusterCore;
 import com.clusterfactions.clustercore.core.chat.ChatMessageMode;
 import com.clusterfactions.clustercore.core.factions.Faction;
 import com.clusterfactions.clustercore.core.factions.FactionsManager;
-import com.clusterfactions.clustercore.core.factions.claim.ChunkOwner;
-import com.clusterfactions.clustercore.core.factions.claim.FactionClaimManager;
 import com.clusterfactions.clustercore.core.factions.util.FactionPerm;
 import com.clusterfactions.clustercore.core.factions.util.FactionPlayerRemoveReason;
 import com.clusterfactions.clustercore.core.factions.util.FactionRole;
@@ -19,7 +17,6 @@ import com.clusterfactions.clustercore.core.inventory.impl.faction.perm.MainPerm
 import com.clusterfactions.clustercore.core.lang.Lang;
 import com.clusterfactions.clustercore.core.player.PlayerData;
 import com.clusterfactions.clustercore.util.location.LocationUtil;
-import com.clusterfactions.clustercore.util.location.Vector2Integer;
 
 import co.aikar.commands.BaseCommand;
 import co.aikar.commands.annotation.CommandAlias;

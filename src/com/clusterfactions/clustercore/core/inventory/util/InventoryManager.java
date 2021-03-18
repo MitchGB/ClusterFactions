@@ -89,19 +89,24 @@ public class InventoryManager implements Listener{
 	public void blockBreakEventPass(BlockBreakEvent e) {
 		if(e.isCancelled()) return;
 		if(e.getBlock().getState() instanceof TileState){
-			TileState tile = (TileState) e.getBlock().getState();
-			String contents = tile.getPersistentDataContainer().get(new NamespacedKey(ClusterCore.getInstance(), "contents"), PersistentDataType.STRING);
-			tile.getPersistentDataContainer().set(new NamespacedKey(ClusterCore.getInstance(), "contents"), PersistentDataType.STRING, "");
+			try {
+				TileState tile = (TileState) e.getBlock().getState();
+				String contents = tile.getPersistentDataContainer().get(new NamespacedKey(ClusterCore.getInstance(), "contents"), PersistentDataType.STRING);
+				tile.getPersistentDataContainer().set(new NamespacedKey(ClusterCore.getInstance(), "contents"), PersistentDataType.STRING, "");
 			
-			float exp = tile.getPersistentDataContainer().get(new NamespacedKey(ClusterCore.getInstance(), "exp"), PersistentDataType.FLOAT);
-			tile.getPersistentDataContainer().set(new NamespacedKey(ClusterCore.getInstance(), "exp"), PersistentDataType.FLOAT, 0f);
+				float exp = tile.getPersistentDataContainer().get(new NamespacedKey(ClusterCore.getInstance(), "exp"), PersistentDataType.FLOAT);
+				tile.getPersistentDataContainer().set(new NamespacedKey(ClusterCore.getInstance(), "exp"), PersistentDataType.FLOAT, 0f);
 			
-			tile.update();
-			for(ItemStack item : new ItemStackSerializer().deserialize(contents)){
-				if(item == null || item.getType() == Material.AIR) continue;
-				e.getBlock().getWorld().dropItemNaturally(e.getBlock().getLocation(), item);
+				tile.update();
+				for(ItemStack item : new ItemStackSerializer().deserialize(contents)){
+					if(item == null || item.getType() == Material.AIR) continue;
+					e.getBlock().getWorld().dropItemNaturally(e.getBlock().getLocation(), item);
+				}
+            	((ExperienceOrb)e.getBlock().getWorld().spawn(e.getBlock().getLocation(), ExperienceOrb.class)).setExperience(Math.round(exp));
+			}catch(Exception ex) {
+				return;
 			}
-            ((ExperienceOrb)e.getBlock().getWorld().spawn(e.getBlock().getLocation(), ExperienceOrb.class)).setExperience(Math.round(exp));
+			
 		}
 		if(!blockCache.containsKey(e.getBlock())) return;
 		blockCache.get(e.getBlock()).blockBreakEvent(e);

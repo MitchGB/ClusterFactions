@@ -1,26 +1,23 @@
 package com.clusterfactions.clustercore.core.listeners.player;
 
-import org.bukkit.Location;
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
-import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.inventory.EquipmentSlot;
 
 import com.clusterfactions.clustercore.ClusterCore;
 import com.clusterfactions.clustercore.core.factions.Faction;
 import com.clusterfactions.clustercore.core.factions.claim.ChunkOwner;
 import com.clusterfactions.clustercore.core.factions.claim.FactionClaimManager;
 import com.clusterfactions.clustercore.core.factions.util.FactionPerm;
-import com.clusterfactions.clustercore.core.fx.spectator.cinematic.CinematicSequence;
-import com.clusterfactions.clustercore.core.inventory.impl.block.CraftingTableInventory;
-import com.clusterfactions.clustercore.core.inventory.impl.block.FurnaceInventory;
+import com.clusterfactions.clustercore.core.listeners.events.player.PlayerBlockInteractEvent;
 import com.clusterfactions.clustercore.core.player.PlayerData;
-import com.clusterfactions.clustercore.util.location.LocationUtil;
 import com.clusterfactions.clustercore.util.location.Vector2Integer;
 import com.google.common.collect.ImmutableSet;
 
@@ -155,58 +152,11 @@ public class PlayerInteractEventListener implements Listener{
 	}
 	
 	@EventHandler(priority = EventPriority.HIGHEST)
-	public void PlayerInteractEventFurnace(PlayerInteractEvent e) {
-		Block block = e.getClickedBlock();
-		if(e.getAction() != Action.RIGHT_CLICK_BLOCK) return;
-		if(e.isCancelled()) return;
-		if(block == null) return;
-		if(block.getType() == Material.FURNACE){
-			e.setCancelled(true);
-			if(ClusterCore.getInstance().getInventoryManager().blockCache.containsKey(block)){
-				ClusterCore.getInstance().getInventoryManager().blockCache.get(block).openInventory(e.getPlayer());
-			}else
-				new FurnaceInventory(e.getPlayer(), block).openInventory(e.getPlayer());
-		}
-	}	
-	
-	@EventHandler(priority = EventPriority.HIGHEST)
-	public void PlayerInteractEventCraftingTable(PlayerInteractEvent e) {
-		Block block = e.getClickedBlock();
-		if(e.getAction() != Action.RIGHT_CLICK_BLOCK) return;
-		if(e.isCancelled()) return;
-		if(block == null) return;
-		if(block.getType() == Material.CRAFTING_TABLE){
-			e.setCancelled(true);
-			new CraftingTableInventory(e.getPlayer(), block).openInventory(e.getPlayer());
-		}
-	}	
-	
-	@EventHandler(priority = EventPriority.NORMAL)
-	public void PlayerInteractEventNoteblock(PlayerInteractEvent e) {
-		Block block = e.getClickedBlock();
-		if(e.getAction() != Action.RIGHT_CLICK_BLOCK) return;
-		if(e.getPlayer().isSneaking()) return;
-		if(block == null) return;
-		if(block.getType() == Material.NOTE_BLOCK){
-			e.setCancelled(true);
-		}
-	}	
-	
-	@EventHandler(priority = EventPriority.NORMAL)
-	public void PlayerInteractEventCoalBlock(PlayerInteractEvent e) {
-		Block block = e.getClickedBlock();
-		if(e.getAction() != Action.RIGHT_CLICK_BLOCK) return;
-		if(block == null) return;
-		if(block.getType() != Material.COAL_BLOCK) return;
-		Player player = e.getPlayer();
-		Entity stand = ClusterCore.getInstance().getSpectatorManager().viewLoc(e.getPlayer(), block.getLocation().clone().add(.5, -1, -10));
-		Location loc = block.getLocation();
+	public void PlayerInteractBlock(PlayerInteractEvent e) {
+		if(e.getHand() == EquipmentSlot.OFF_HAND) return;
 		
-
-		new CinematicSequence(true, LocationUtil.lerp(stand.getLocation(), loc.clone().add(.5, -1, -2), 100, stand) ).execute(player);
-
-
-
+		if(e.getAction() != Action.RIGHT_CLICK_BLOCK && e.getAction() != Action.LEFT_CLICK_BLOCK) return;
+		Bukkit.getPluginManager().callEvent(new PlayerBlockInteractEvent(e.getPlayer(), e.getClickedBlock(), e.getAction(), e));
 	}
 }
 
@@ -216,7 +166,7 @@ public class PlayerInteractEventListener implements Listener{
 
 
 
-
+	
 
 
 

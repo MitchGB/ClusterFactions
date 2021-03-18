@@ -24,10 +24,10 @@ import org.bukkit.inventory.ItemStack;
 
 import com.clusterfactions.clustercore.ClusterCore;
 import com.clusterfactions.clustercore.core.inventory.util.InventoryClickContext;
-import com.clusterfactions.clustercore.core.inventory.util.InventoryClickHandler;
 import com.clusterfactions.clustercore.core.inventory.util.model.interfaces.FilteredSlots;
 import com.clusterfactions.clustercore.core.inventory.util.model.interfaces.InteractableSlots;
 import com.clusterfactions.clustercore.core.listeners.events.updates.UpdateTickEvent;
+import com.clusterfactions.clustercore.util.ActionHandler;
 import com.clusterfactions.clustercore.util.Colors;
 import com.clusterfactions.clustercore.util.model.Pair;
 
@@ -47,7 +47,7 @@ public abstract class InventoryBase {
 	public final static String INVENTORY_UUID = "INVENTORY_UUID";
 	public final static String ITEM_ID_TAG = "ITEM_UUID";
 	
-	@Getter protected HashMap<String, Pair<InventoryClickHandler, InventoryClickHandler>> clickHandlers = new HashMap<>();
+	@Getter protected HashMap<String, Pair<ActionHandler<InventoryClickContext>, ActionHandler<InventoryClickContext>>> clickHandlers = new HashMap<>();
 	
 	@Getter protected String inventoryUUID;
 	@Getter protected String inventoryTag;
@@ -58,7 +58,7 @@ public abstract class InventoryBase {
 	@Getter protected List<ItemStack> itemAddList = new ArrayList<>();
 	@Getter protected List<UUID> handlers = new ArrayList<>();
 	@Getter protected Inventory invInstance;
-	@Getter protected InventoryClickHandler defaultClickHandler;
+	@Getter protected ActionHandler<InventoryClickContext> defaultClickHandler;
 	
 	public InventoryBase(Player player, String tag, String displayName, int inventorySize) {
 		this.inventoryTag = tag;
@@ -165,19 +165,19 @@ public abstract class InventoryBase {
 		return playerList;
 	}
 	
-	protected void registerItemHandler(String uuid, InventoryClickHandler handlerL, InventoryClickHandler handlerR){
-		clickHandlers.put(uuid, new Pair<InventoryClickHandler, InventoryClickHandler>(handlerL, handlerR));
+	protected void registerItemHandler(String uuid, ActionHandler<InventoryClickContext> handlerL, ActionHandler<InventoryClickContext> handlerR){
+		clickHandlers.put(uuid, new Pair<ActionHandler<InventoryClickContext>, ActionHandler<InventoryClickContext>>(handlerL, handlerR));
 	}
 	
 	public void addItem(ItemStack item) {
 		addItem(item, null, null);
 	}
 	
-	public void addItem(ItemStack item, InventoryClickHandler handlerL){
+	public void addItem(ItemStack item, ActionHandler<InventoryClickContext> handlerL){
 		addItem(item, handlerL, null);
 	}
 	
-	public void addItem(ItemStack item, InventoryClickHandler handlerL, InventoryClickHandler handlerR)	{
+	public void addItem(ItemStack item, ActionHandler<InventoryClickContext> handlerL, ActionHandler<InventoryClickContext> handlerR)	{
 		String randomUUID = UUID.randomUUID().toString();
 		NBTItem nbtItem = new NBTItem(item);
 		nbtItem.setString(ITEM_ID_TAG, randomUUID);
@@ -191,11 +191,11 @@ public abstract class InventoryBase {
 		setItem(item, null, null, index);
 	}
 	
-	public void setItem(ItemStack item, InventoryClickHandler handlerL, int... index){
+	public void setItem(ItemStack item, ActionHandler<InventoryClickContext> handlerL, int... index){
 		setItem(item, handlerL, null, index);
 	}
 	
-	public void setItem(ItemStack item, InventoryClickHandler handlerL, InventoryClickHandler handlerR, int... index) {
+	public void setItem(ItemStack item, ActionHandler<InventoryClickContext> handlerL, ActionHandler<InventoryClickContext> handlerR, int... index) {
 		String randomUUID = UUID.randomUUID().toString();
 		NBTItem nbtItem = new NBTItem(item);
 		nbtItem.setString(ITEM_ID_TAG, randomUUID);

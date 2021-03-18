@@ -138,7 +138,6 @@ com\clusterfactions\clustercore\core\command\impl\admin\claim\AdminClaimCommand.
 com\clusterfactions\clustercore\core\items\impl\ore\NickelOre.class
 com\clusterfactions\clustercore\core\items\types\interfaces\InteractableItem.class
 com\clusterfactions\clustercore\core\listeners\player\PlayerResourcePackStatusEventListener.class
-com\clusterfactions\clustercore\core\inventory\util\InventoryClickHandler.class
 com\clusterfactions\clustercore\core\inventory\impl\faction\perm\MainPermissionMenu.class
 com\clusterfactions\clustercore\core\inventory\util\InventoryClickContext.class
 com\clusterfactions\clustercore\core\listeners\player\PlayerJoinEventListener.class

@@ -6,7 +6,6 @@ import java.util.List;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
-import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.Furnace;
@@ -189,6 +188,7 @@ public class FurnaceInventory extends BlockAsyncInventoryBase implements Interac
 	public void inventoryClickEvent(InventoryClickEvent e) {
 		if(e.getAction() == InventoryAction.PICKUP_ALL || e.getAction() == InventoryAction.PICKUP_HALF 
 				|| e.getAction() == InventoryAction.PICKUP_ONE || e.getAction() == InventoryAction.PICKUP_SOME) {
+			if(this.storedExp == 0) return;
             ((ExperienceOrb)block.getWorld().spawn(block.getLocation(), ExperienceOrb.class)).setExperience(Math.round(this.storedExp));
 			setPersistentData("exp", PersistentDataType.FLOAT, storedExp);
 			this.storedExp = 0;

@@ -4,6 +4,10 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 
 import org.bukkit.Bukkit;
+import org.bukkit.World;
+import org.bukkit.entity.AreaEffectCloud;
+import org.bukkit.entity.ArmorStand;
+import org.bukkit.entity.Entity;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.PluginManager;
@@ -12,6 +16,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 
 import com.clusterfactions.clustercore.core.combat.CombatManager;
 import com.clusterfactions.clustercore.core.command.CommandManager;
+import com.clusterfactions.clustercore.core.crate.CrateManager;
 import com.clusterfactions.clustercore.core.factions.FactionsManager;
 import com.clusterfactions.clustercore.core.factions.TeleportQueue;
 import com.clusterfactions.clustercore.core.factions.claim.FactionClaimManager;
@@ -23,11 +28,13 @@ import com.clusterfactions.clustercore.core.items.block.CustomBlockManager;
 import com.clusterfactions.clustercore.core.lang.LanguageManager;
 import com.clusterfactions.clustercore.core.listeners.block.BlockBreakEventListener;
 import com.clusterfactions.clustercore.core.listeners.block.BlockPlaceEventListener;
+import com.clusterfactions.clustercore.core.listeners.entity.EntityDeathEventListener;
 import com.clusterfactions.clustercore.core.listeners.entity.EntityInteractEventListener;
 import com.clusterfactions.clustercore.core.listeners.events.updates.UpdateSecondEvent;
 import com.clusterfactions.clustercore.core.listeners.events.updates.UpdateTickEvent;
 import com.clusterfactions.clustercore.core.listeners.player.AsyncPlayerChatEventListener;
 import com.clusterfactions.clustercore.core.listeners.player.PlayerAnimationEventListener;
+import com.clusterfactions.clustercore.core.listeners.player.PlayerBlockInteractEventListener;
 import com.clusterfactions.clustercore.core.listeners.player.PlayerDeathEventListener;
 import com.clusterfactions.clustercore.core.listeners.player.PlayerInteractEventListener;
 import com.clusterfactions.clustercore.core.listeners.player.PlayerJoinEventListener;
@@ -46,7 +53,7 @@ import lombok.Getter;
 
 public class ClusterCore extends JavaPlugin{
 
-	@Manager @Getter  private MongoHook mongoHook;
+	@Manager @Getter private MongoHook mongoHook;
 	@Manager @Getter private InventoryManager inventoryManager;
 	@Manager @Getter private CommandManager commandManager;
 	@Manager @Getter private FactionsManager factionsManager;
@@ -57,6 +64,7 @@ public class ClusterCore extends JavaPlugin{
 	@Manager @Getter private FactionClaimManager factionClaimManager;
 	@Manager @Getter private CombatManager combatManager;
 	@Manager @Getter private SpectatorManager spectatorManager;
+	@Manager @Getter private CrateManager crateManager;
 	
 	@Manager @Getter private ItemManager itemManager;
 	@Manager @Getter private CustomBlockManager customBlockManager;
@@ -102,6 +110,7 @@ public class ClusterCore extends JavaPlugin{
 				new PlayerJoinEventListener(),
 				new PlayerQuitEventListener(),
 				new PlayerInteractEventListener(),
+				new PlayerBlockInteractEventListener(),
 				new PlayerDeathEventListener(),
 				new PlayerMoveEventListener(),
 				new PlayerResourcePackStatusEventListener(),
@@ -112,13 +121,22 @@ public class ClusterCore extends JavaPlugin{
 				new BlockPlaceEventListener(),
 				
 				new EntityInteractEventListener(),
+				new EntityDeathEventListener(),
 				
 				new ServerListPingEventListener()
 				);
 	}
 	
+	@Override
 	public void onDisable() {
 		getMongoHook().disable();
+		System.out.println("[ClusterFactions] disabling...");
+		for(World world :  Bukkit.getWorlds()) {
+			for(Entity e : world.getEntities()) {
+				if(e instanceof ArmorStand || e instanceof AreaEffectCloud)
+					e.remove();
+				}
+		}
 	}
 	
 	public void registerListener(Listener... listeners) {
@@ -142,6 +160,7 @@ public class ClusterCore extends JavaPlugin{
     			if(field.getAnnotation(Manager.class) == null) continue;
     			Constructor<?> constructor = field.getType().getDeclaredConstructor();
     			field.set(this, constructor.newInstance());
+
         	}
     	}catch(Exception e) {
     		e.printStackTrace();
